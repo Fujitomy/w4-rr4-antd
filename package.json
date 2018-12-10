@@ -1,0 +1,52 @@
+{
+  "name": "w4-rr4-antd",
+  "version": "1.0.1",
+  "description": "wepack4-react-router4-antd",
+  "main": "index.js",
+  "scripts": {
+    "dll": "webpack --config webpack.dll.js",
+    "dev": "webpack-dev-server --watch --color --config webpack.dev.js"
+  },
+  "keywords": [
+    "wepack4-react-router4-antd"
+  ],
+  "author": "tomy",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-runtime": "^6.26.0",
+    "clean-webpack-plugin": "^0.1.19",
+    "html-webpack-plugin": "^3.2.0",
+    "open-browser-webpack-plugin": "^0.0.5",
+    "webpack-cli": "^3.1.2",
+    "webpack-merge": "^4.1.4"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "babel-polyfill": "^6.26.0",
+    "lodash": "^4.17.11",
+    "prop-types": "^15.6.2",
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0",
+    "react-loadable": "^5.5.0",
+    "react-router-dom": "^4.3.1",
+    "webpack": "^4.16.2"
+  },
+  "dependenciesCommits": {
+    "name": "依赖注释",
+    "clean-webpack-plugin": "文件清除插件",
+    "html-webpack-plugin": "用于html模板文件构建，如/source/html/index.ejs",
+    "open-browser-webpack-plugin": "自动打开页面插件",
+    "webpack-cli": "webpack命令行插件，安装之后可以不用全局安装webpack，也可以使用使用webpack命令行",
+    "webpack-merge": "合并webpack配置文件插件,比如合并webpack.common.js和webpack.dev.js",
+    "babel-polyfill": "将es5+的js转换为es5,",
+    "babel-loader": "babel-loader是告诉webpack我要对js文件进行代码兼容性编译，那么，webpack接下来就是要找babel",
+    "@babel/core": "而bable的入口就是babel-core 只有通过它，webpack才能使用各种babel的api（前提是你安装了相关的api）",
+    "@babel/preset-react": "用于编译react的插件,并在编译配置文件中开启options: {presets: ['@babel/preset-react']}"
+  }
+}
