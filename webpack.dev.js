@@ -7,6 +7,11 @@
 *
 */
 
+
+// https://blog.csdn.net/weixiaoderensheng/article/details/82993332 编译异常
+// https://blog.csdn.net/ZYC88888/article/details/80592654
+// https://blog.csdn.net/u013738122/article/details/81809002 编译配置
+
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -14,38 +19,41 @@ const OpenBrowserWebpackPlugin = require('open-browser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const manifest = require('./source/vendors/vendor.manifest.json');
 const dllchunkname = manifest.name.split('_')[1];
+console.log(dllchunkname,'dllchunkname');
 
 // 是否打印调用栈
-process.traceDeprecation = true;
+// process.traceDeprecation = true;
 // 是否关闭弃用警告
-// process.noDeprecation = false;
+process.noDeprecation = false;
 
 module.exports = {
-    // mode: 'development',
+    mode: 'development',
     // 调试工具，错误打印等级，eval-source-map
-    // devtool: "source-map",
-    // w4之后独立出来，在配置文件中，配置才能生效，以前直接在packjson中配置也行
-    // stats: {
-    //     colors: true,
-    //     version: true,
-    // },
+    devtool: "source-map",
+    // webpack 4.0 之后独立出来，在配置文件中，配置才能生效，以前直接在packjson.script命令行中配置--colors也行
+    stats: {
+        colors: true,
+        version: true,
+    },
     entry:{
         // index: path.resolve(__dirname,'./source/entry/index.js'),
         index: [
             'babel-polyfill',path.resolve(__dirname, './source/entry/index.js')
         ]
     },
+    // devServer模式下不配置output也是可以的
     output: {
         filename: '[name].[hash].js',
         chunkFilename: "[name]-chunk.js",
-        path: path.resolve(__dirname,'./source/dist/'),
+        path: path.resolve(__dirname,'./source/vendors/'),
         publicPath: "/"
     },
     devServer:{
+        // open: true, // 启动后打开浏览器
         // 告诉服务器从哪个目录中提供内容。只有在你想要提供静态文件时才需要,
         // 若配置错误，是找不到资源文件的
         // 默认情况下，将使用当前工作目录作为提供内容的目录，但是你可以修改为其他目录
-        contentBase: path.resolve(__dirname,'./source/dist'),
+        contentBase: path.resolve(__dirname,'./source/vendors/'),
         // 一切服务都启用gzip压缩(所有来自 './source/vendors' 目录的文件都做 gzip 压缩)
         compress: true,
         // 启动本地服务端口号
@@ -55,40 +63,43 @@ module.exports = {
         inline: true, // 实时刷新 设置为true，当源文件改变时会自动刷新页面
         // clientLogLevel: 'none', // 当使用内联模式(inline mode)时，会在开发工具(DevTools)的控制台(console)显示消息，例如：在重新加载之前，在一个错误之前，或者模块热替换(Hot Module Replacement)启用时。这可能显得很繁琐,使用none
         historyApiFallback: true, // 不跳转
+        // 接口代理
+        proxy: {
+            // 业务线接口升级到v4
+            "/v4/*": {
+                target: 'https://dp.clife.net/',
+                changeOrigin: true,
+                secure: false
+            },
+            // 公共接口未升级
+            "/v1/web/*": {
+                target: 'https://dp.clife.net/',
+                changeOrigin: true,
+                secure: false
+            },
+        },
     },
-    // 文件解析配置
-    // resolve: {
-    //     // 默认后缀名，配置后可省略
-    //     extensions: ['.js', '.jsx'],
-    //     // 文件夹别名配置
-    //     alias: {
-    //         components: path.resolve(__dirname, './source/components'),
-    //         pages: path.resolve(__dirname, './source/pages'),
-    //         // commonjsx: path.resolve(__dirname, '../src/commonjsx'),
-    //         // common: path.resolve(__dirname, '../src/assets/common'),
-    //         // actions: path.resolve(__dirname, '../src/redux/actions')
-    //     },
-    // },
     plugins: [
-        // 热更新
+        // 热更新，不刷新页面异步更新
         new webpack.HotModuleReplacementPlugin(),
         // 引入dll
-        // new webpack.DllReferencePlugin({
-        //     context: __dirname,
-        //     manifest: require('./source/vendors/vendor.manifest.json')
-        // }),
+        new webpack.DllReferencePlugin({
+            context: __dirname,
+            manifest: require('./source/vendors/vendor.manifest.json')
+        }),
+        // 模板插件
         new HtmlWebpackPlugin({
-            title: 'React-router 4 && webpack4.0+',
+            title: 'react-router 4 && webpack4.0+ && antd.design',
             template: './source/html/index.ejs', // html模板文档地址，webpack默认模板为ejs
             filename: 'index.html', // 由模板生成的文件名和存放位置，可带路径的？需要去官网文档看下
             author: 'tomy',
             inject: 'true',// 资源文件注入位置true,body,header,false
             // 动态引入dll
-            // vendor: /*manifest.name*/'vendor.dll.'+dllchunkname + '.js' //manifest就是dll生成的json
+            vendor: /*manifest.name*/'vendor.dll.'+dllchunkname + '.js' //manifest就是dll生成的json
         }),
         new OpenBrowserWebpackPlugin({
             browser: 'Chrome',
-            url: 'http://localhost:7777',
+            url: 'http://localhost:9090',
         }),
         // new CleanWebpackPlugin([
         //         './source/vendors/index.*.js',
@@ -121,9 +132,55 @@ module.exports = {
                         presets: ['@babel/preset-react'],
                         // plugins: ['syntax-dynamic-import'],
                         // plugins: ['@babel/plugin-transform-runtime']
+                        // 这个也可以在.babelrc中配置
+                        // plugins:[
+                        //     // 数组写法在babel7中已经弃用
+                        //     ['import',{libraryName:'antd', style:true}]
+                        // ],
+                        // This is a feature of `babel-loader` for webpack (not Babel itself).It enables caching results in ./node_modules/.cache/babel-loader/directory for faster rebuilds.
+                        // 这是webpack的“babel-loader”特征（不是Babel本身）。
+                        // 它可以在./node_modules/.cache/babel-loader/目录中启用缓存结果，以便更快地进行重建。
+                        cacheDirectory: true,
                     }
                 },
             },
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+                // use: [
+                //     { loader: 'style-loader' },
+                //     { loader: 'css-loader?modules' },
+                // ]
+            },
+            {
+                test: /\.scss/,
+                use: ['style-loader', 'css-loader', 'sass-loader']
+            },
+            {
+                test: /\.less$/,
+                use: ['style-loader', 'css-loader', 'less-loader']
+            },
+            {
+                test: /\.(png|svg|jpg|gif)$/,
+                use:[
+                    'file-loader'
+                ]
+            },
+            {
+                test: /\.(woff|woff2|eot|ttf|otf)$/,
+                use: 'file-loader'
+            },
         ],
+    },
+    // 文件解析配置
+    resolve: {
+        // 默认后缀名，配置后可省略
+        extensions: ['.js', '.jsx','.es6'],
+        // 文件夹别名配置
+        alias: {
+            components: path.resolve(__dirname, './source/components'),
+            pages: path.resolve(__dirname, './source/pages'),
+            // actions: path.resolve(__dirname, '../src/redux/actions')
+        },
     },
 };

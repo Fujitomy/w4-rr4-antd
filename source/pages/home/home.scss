@@ -1,0 +1,37 @@
+//home sass
+.home{
+	font-size:20px;
+	font-weight:bold;
+	text-align:center;
+	margin-top:50px;
+	.but{
+		padding:8px 10px;
+		border:solid 1px #ccc;
+		border-radius:3px;
+		cursor:pointer;
+		box-shadow:0 0 5px #ccc;
+	}
+}
+.mt20{
+	margin-top:20px;
+}
+.redux{
+	font-size:25px;
+	color:red;
+}
+.button_add{
+	font-size:18px;
+	border:solid 1px #000;
+	color:#000;
+	margin-left:20px;
+	cursor:pointer;
+}
+.home-button{
+	padding:5px 10px;
+	border:solid 1px #6f8fb7;
+	margin-left:10px;
+	cursor:pointer;
+	color:#fff;
+	background:#6f8fb7;
+	border-radius:3px;
+}
