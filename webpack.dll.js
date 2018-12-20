@@ -17,6 +17,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 module.exports = {
     // 模式，4.0之后必需
     // mode: "development",
+    // 一般不需要查看库文件错误提示，直接production模式打包
     mode: "production",
     devtool: 'none',
     // 编译统计

@@ -3,14 +3,14 @@
 * NamedModulesPlugin && OccurrenceOrderPlugin
 * https://blog.csdn.net/chenqiuge1984/article/details/80128021
 *
-*
+* https://blog.csdn.net/weixiaoderensheng/article/details/82993332 编译异常
+* https://blog.csdn.net/ZYC88888/article/details/80592654
+* https://blog.csdn.net/u013738122/article/details/81809002 编译配置
 *
 */
 
 
-// https://blog.csdn.net/weixiaoderensheng/article/details/82993332 编译异常
-// https://blog.csdn.net/ZYC88888/article/details/80592654
-// https://blog.csdn.net/u013738122/article/details/81809002 编译配置
+
 
 const path = require('path');
 const webpack = require('webpack');
@@ -19,6 +19,7 @@ const OpenBrowserWebpackPlugin = require('open-browser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const manifest = require('./source/vendors/vendor.manifest.json');
 const dllchunkname = manifest.name.split('_')[1];
+
 console.log(dllchunkname,'dllchunkname');
 
 // 是否打印调用栈
@@ -27,9 +28,10 @@ console.log(dllchunkname,'dllchunkname');
 process.noDeprecation = false;
 
 module.exports = {
-    mode: 'development',
+    mode: 'production',
+    // mode: 'development',
     // 调试工具，错误打印等级，eval-source-map
-    devtool: "source-map",
+    // devtool: "source-map",
     // webpack 4.0 之后独立出来，在配置文件中，配置才能生效，以前直接在packjson.script命令行中配置--colors也行
     stats: {
         colors: true,
@@ -44,7 +46,7 @@ module.exports = {
     // devServer模式下不配置output也是可以的
     output: {
         filename: '[name].[hash].js',
-        chunkFilename: "[name]-chunk.js",
+        chunkFilename: "[name].chunk.js",
         path: path.resolve(__dirname,'./source/vendors/'),
         publicPath: "/"
     },
@@ -53,6 +55,7 @@ module.exports = {
         // 告诉服务器从哪个目录中提供内容。只有在你想要提供静态文件时才需要,
         // 若配置错误，是找不到资源文件的
         // 默认情况下，将使用当前工作目录作为提供内容的目录，但是你可以修改为其他目录
+        // 这个很重要，比如你的静态公共包资源放在./source/vendors/目录下，如果你不配置到此，那么devServer启动可能会找不到依赖文件
         contentBase: path.resolve(__dirname,'./source/vendors/'),
         // 一切服务都启用gzip压缩(所有来自 './source/vendors' 目录的文件都做 gzip 压缩)
         compress: true,
@@ -94,8 +97,8 @@ module.exports = {
             filename: 'index.html', // 由模板生成的文件名和存放位置，可带路径的？需要去官网文档看下
             author: 'tomy',
             inject: 'true',// 资源文件注入位置true,body,header,false
-            // 动态引入dll
-            vendor: /*manifest.name*/'vendor.dll.'+dllchunkname + '.js' //manifest就是dll生成的json
+            // 动态引入dll， manifest就是dll生成的json
+            vendor: /*manifest.name*/'vendor.dll.' + dllchunkname + '.js'
         }),
         new OpenBrowserWebpackPlugin({
             browser: 'Chrome',
@@ -113,8 +116,8 @@ module.exports = {
         //         exclude: ['manifest.json'],
         //     }
         // ),
-        // // 经常使用的模块提取到打包编译文件靠前位置，提升查找效率和运行速度
-        // new webpack.optimize.OccurrenceOrderPlugin(),
+        // 经常使用的模块提取到打包编译文件靠前位置，提升查找效率和运行速度
+        new webpack.optimize.OccurrenceOrderPlugin(),
         // // NamedModulesPlugin使用模块的相对路径作为模块的 id，
         // // 所以只要我们不重命名一个模块文件，那么它的id就不会变，更不会影响到其它模块了
         // new webpack.NamedModulesPlugin(),
@@ -179,8 +182,9 @@ module.exports = {
         // 文件夹别名配置
         alias: {
             components: path.resolve(__dirname, './source/components'),
+            com: path.resolve(__dirname, './source/components'),
             pages: path.resolve(__dirname, './source/pages'),
-            // actions: path.resolve(__dirname, '../src/redux/actions')
+            utils: path.resolve(__dirname, './source/utils')
         },
     },
 };

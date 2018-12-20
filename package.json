@@ -17,8 +17,9 @@
     "axios": "^0.18.0",
     "lodash": "^4.17.11",
     "prop-types": "^15.6.2",
-    "react": "^16.6.0",
-    "react-dom": "^16.6.0",
+    "qs": "^6.6.0",
+    "react": "^16.7.0-alpha.2",
+    "react-dom": "^16.7.0-alpha.2",
     "react-loadable": "^5.5.0",
     "react-router-dom": "^4.3.1"
   },
@@ -61,7 +62,7 @@
     "@babel/core": "而bable的入口就是babel-core 只有通过它，webpack才能使用各种babel的api（前提是你安装了相关的api）",
     "@babel/preset-react": "用于编译react的插件,并在编译配置文件中开启options: {presets: ['@babel/preset-react']}",
     "plugin-syntax-dynamic-import": "动态引入语法编译插件",
-    "@babel/plugin-syntax-dynamic-import": "动态引入语法编译插件",
+    "@babel/plugin-syntax-dynamic-import": "动态引入语法编译插件 Allow parsing of import()",
     "less-loader sass-loader sass-loader style-loader": "样式处理的loader",
     "file-loader": "文件处理字体图片等"
   }
