@@ -6,6 +6,8 @@ import Loadable from 'react-loadable';
 import Loading from 'components/Loading/';
 
 import qs from 'qs';
+import Iterator from '../Demo/Iterator';
+
 import axios from 'axios';
 
 const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
@@ -120,6 +122,12 @@ class App extends React.Component {
         return (
             <BrowserRouter>
                 <main>
+                    <aside>
+                        <div>
+                            迭代器函数
+                            <Iterator/>
+                        </div>
+                    </aside>
                     <h1>React Web App 16.0+</h1>
                     <ul className="nav">
                         <li><Link to="/">Home</Link></li>
@@ -129,6 +137,7 @@ class App extends React.Component {
                     </ul>
                     <DatePicker onChange={this.onChange} />
                     {/*{renderRoutes(routes)}*/}
+
                     <aside ref={'ajaxData'}></aside>
                     <div>
                         <Route path="/" exact component={Home} />
