@@ -1,6 +1,6 @@
 /*
-*  Iterator (遍历器/迭代器) 是一种机制，而不是一个API,类似于一种规范
-*  遍历器（Iterator）就是这样一种机制。它是一种接口，为各种不同的数据结构提供统一的访问机制。
+*  Iterator (遍历器/迭代器) 是一种为各种不同的数据结构提供统一的访问机制的接口，而不是一个API,类似于一种规范，比如CommonJs,AMD规范
+*
 *  任何数据结构只要部署 Iterator 接口，就可以完成遍历操作（即依次处理该数据结构的所有成员）。
 *
 *  实现原因：
@@ -8,7 +8,9 @@
 *  2、Iterator 接口的目的，就是为所有数据结构，提供了一种统一的访问机制，即for...of循环
 *
 *
-*
+*  简单来说遍历器是一个部属了返回遍历器对象方法的对象或者数据结构
+*  原生具备 Iterator 接口的数据结构如下:
+*  Array Map Set String TypedArray  函数的 arguments 对象  NodeList 对象
 *
 *  传统的可以遍历的对象包括：数组，对象，字符串对象，类数组对象（比如domList,nodeList）
 *  主要表示数据集合的还是Array和Object，ES6又新增了对象 Set 和 Map
@@ -22,16 +24,10 @@
 *  3、是 ES6 创造了一种新的遍历命令for...of循环，Iterator 接口主要供for...of消费
 *
 *
-*
 *  Iterator 接口的目的，就是为所有数据结构，提供了一种统一的访问机制，即for...of循环
 *  当使用for...of循环遍历某种数据结构时，该循环会自动去寻找 Iterator 接口。
 *
 *  一种数据结构只要部署了 Iterator 接口，我们就称这种数据结构是“可遍历的”（iterable）。
-*
-*
-*  原生具备 Iterator 接口的数据结构如下。
-*
-*  Array Map Set String TypedArray  函数的 arguments 对象  NodeList 对象
 *
 *
 *   对象（Object）之所以没有默认部署 Iterator 接口，是因为对象的哪个属性先遍历，哪个属性后遍历是不确定的，需要开发者手动指定。
@@ -53,6 +49,7 @@
 import React from "react";
 
 const Iterator = () =>{
+
     // ES5实现的遍历器函数
     var it = makeIterator(['a', 'b']);
     window.it = it;
@@ -131,7 +128,9 @@ const Iterator = () =>{
     var str = new String("hi");
         // var str = "hi"; 为什么改写成直接的字符串就不能覆盖了
         [...str] // ["h", "i"]
-
+    // 从协程到状态机--regenerator源码解析 https://zhuanlan.zhihu.com/p/37562698
+    // 从协程到状态机--regenerator源码解析(2) https://zhuanlan.zhihu.com/p/37563837
+    // 从协程到状态机--regenerator源码解析(3) https://zhuanlan.zhihu.com/p/37563947
     str[Symbol.iterator] = function() {
         return {
             next: function() {
@@ -148,6 +147,20 @@ const Iterator = () =>{
 
     [...str] // ["bye"]
     str // "hi"
+
+
+    function* creatIterator(){
+        let first = yield 1;
+        let nextVal;
+        try {
+            nextVal = yield first +2;
+        }
+        catch(err){
+            console.log('内部捕获外部错误',err);
+        }
+    }
+    let it3 = creatIterator();
+
 
     return <section>
         遍历器demo，查看控制台
