@@ -48,7 +48,14 @@
 
 import React from "react";
 
+const fs = require("fs");
+
+console.log(fs,'fs');
+
+
 const Iterator = () =>{
+
+
 
     // ES5实现的遍历器函数
     var it = makeIterator(['a', 'b']);

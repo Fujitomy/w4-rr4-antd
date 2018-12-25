@@ -32,20 +32,24 @@
 *  以后，每次调用遍历器对象的next方法，就会返回一个有着value和done两个属性的对象。
 *  value属性表示当前的内部状态的值，是yield表达式后面那个表达式的值；done属性是一个布尔值，表示是否遍历结束。
 *
+*
+*  讲的挺好的
+*  深入解析Javascript异步编程
+*  https://www.cnblogs.com/nullcc/p/5841182.html
+*
+*  JS 生成器 vs. Lua 协程
+*  https://www.jianshu.com/p/911f93208335
+*
+*  ES6 生成器 - 1. ES6 生成器基础
+*  https://www.jianshu.com/p/fe03910deaba
+*
 */
 
 import React from "react";
-// const fs = require('fs');
+const fs = require('fs');
+
 
 const Generator = () =>{
-
-    // fs.readFile("./config.json", function(err, contents) {
-    //     if (err) {
-    //         throw err;
-    //     }
-    //     console.log(contents,'打印结果');
-    //     console.log("Done");
-    // });
 
     const myIterable = {};
     myIterable[Symbol.iterator] = function* () {

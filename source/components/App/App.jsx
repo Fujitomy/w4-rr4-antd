@@ -9,6 +9,7 @@ import qs from 'qs';
 import Iterator from '../Demo/Iterator';
 
 import axios from 'axios';
+const fs = require('fs');
 
 const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
 const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
@@ -36,6 +37,15 @@ const handleRequest = (res,callback)=>{
 
 class App extends React.Component {
     componentDidMount(){
+
+        fs.readFile("./config.json", function(err, contents) {
+            if (err) {
+                throw err;
+            }
+            console.log(contents,'打印结果1');
+            console.log("Done");
+        });
+
         const ajax = new XMLHttpRequest();
         ajax.onreadystatechange= ()=> {
             if (ajax.readyState==4 && ajax.status==200)
