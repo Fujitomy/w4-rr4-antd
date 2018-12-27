@@ -46,8 +46,6 @@
 */
 
 import React from "react";
-const fs = require('fs');
-
 
 const Generator = () =>{
 

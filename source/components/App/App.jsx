@@ -5,11 +5,13 @@ import { DatePicker } from 'antd';
 import Loadable from 'react-loadable';
 import Loading from 'components/Loading/';
 
+const style = require('./App.less');
+
 import qs from 'qs';
 import Iterator from '../Demo/Iterator';
 
 import axios from 'axios';
-const fs = require('fs');
+// const fs = require('fs');
 
 const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
 const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
@@ -38,13 +40,13 @@ const handleRequest = (res,callback)=>{
 class App extends React.Component {
     componentDidMount(){
 
-        fs.readFile("./config.json", function(err, contents) {
-            if (err) {
-                throw err;
-            }
-            console.log(contents,'打印结果1');
-            console.log("Done");
-        });
+        // fs.readFile("./config.json", function(err, contents) {
+        //     if (err) {
+        //         throw err;
+        //     }
+        //     console.log(contents,'打印结果1');
+        //     console.log("Done");
+        // });
 
         const ajax = new XMLHttpRequest();
         ajax.onreadystatechange= ()=> {
@@ -131,7 +133,27 @@ class App extends React.Component {
     render() {
         return (
             <BrowserRouter>
-                <main>
+                <main className='main'>
+                    <aside>
+                        {`设备独立像素 device dependent pixel = width-`}{ screen.width }
+                    </aside>
+                    <aside>
+                        <div>
+                            {`视觉视口 Visual viewport width  = innerWidth`}{ window.innerWidth }
+                            <br/>
+                            {`视觉视口 Visual viewport height = innerHeight`}{ window.innerHeight }
+                            <br/>
+                            {`设备像素比 设备像素比 = 物理像素 / 设备独立像素 // 在某一方向上，x方向或者y方向`}{ window.devicePixelRatio}
+                        </div>
+                        <div>
+                            <p>Ideal Viewport：理想视口，其实就是设备的可见区域，和可见视口一致。</p>
+                            <p>我们希望设备的最佳阅读体验是，默认不需要横向滚动条，就可以拥有堪比PC端的浏览体验</p>
+                            <p>因为移动设备，安卓 & ios的视觉视口很小，所以我们希望我们的理想布局视口和视觉视口宽度保持一致</p>
+                            <p>但是移动端浏览器厂商，各自的布局视口宽度各不相同，所以需要我们手动重置布局视口为我们想要的布局视口</p>
+                            <p>为了保证我们再不同浏览器，不同设备像素比的设备下都能拥有相似的体验</p>
+                            <p>就有了理想视口的需求</p>
+                        </div>
+                    </aside>
                     <aside>
                         <div>
                             迭代器函数

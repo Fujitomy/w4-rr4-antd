@@ -48,11 +48,6 @@
 
 import React from "react";
 
-const fs = require("fs");
-
-console.log(fs,'fs');
-
-
 const Iterator = () =>{
 
 
