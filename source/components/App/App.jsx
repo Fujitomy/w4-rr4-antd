@@ -13,10 +13,10 @@ import Iterator from '../Demo/Iterator';
 import axios from 'axios';
 // const fs = require('fs');
 
-const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
-const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
-const Two  = Loadable({loader: () => import('pages/home/two'),loading:Loading});
-const User = Loadable({loader: () => import('pages/user/user'),loading:Loading});
+// const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
+// const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
+// const Two  = Loadable({loader: () => import('pages/home/two'),loading:Loading});
+// const User = Loadable({loader: () => import('pages/user/user'),loading:Loading});
 
 const handleRequest = (res,callback)=>{
     console.log(res,'--res');
@@ -38,6 +38,9 @@ const handleRequest = (res,callback)=>{
 }
 
 class App extends React.Component {
+    state = {
+        screenWidth: null
+    }
     componentDidMount(){
 
         // fs.readFile("./config.json", function(err, contents) {
@@ -48,15 +51,15 @@ class App extends React.Component {
         //     console.log("Done");
         // });
 
-        const ajax = new XMLHttpRequest();
-        ajax.onreadystatechange= ()=> {
-            if (ajax.readyState==4 && ajax.status==200)
-            {
-                this.refs.ajaxData.innerHTML= ajax.responseText;
-            }
-        }
-        ajax.open("GET","https://www.easy-mock.com/mock/5bf4fa20fa81633e1ba92d78/miniApp/getInfo",true);
-        ajax.send();
+        // const ajax = new XMLHttpRequest();
+        // ajax.onreadystatechange= ()=> {
+        //     if (ajax.readyState==4 && ajax.status==200)
+        //     {
+        //         this.refs.ajaxData.innerHTML= ajax.responseText;
+        //     }
+        // }
+        // ajax.open("GET","https://www.easy-mock.com/mock/5bf4fa20fa81633e1ba92d78/miniApp/getInfo",true);
+        // ajax.send();
 
         // es5 实现迭代器
         const iterator = makeIterator([3,2,1])
@@ -103,6 +106,11 @@ class App extends React.Component {
         }).catch((err)=>{
             console.log(err,'--------err');
         });
+
+        window.addEventListener('orientationchange',(data)=>{
+            console.log(screen.width,'--------横屏');
+            this.setState({screenWidth:screen.width})
+        },false);
     }
     onChange=(date, dateString)=>{
         console.log(date, dateString,'打印时间选择');
@@ -121,6 +129,7 @@ class App extends React.Component {
                         resolve(res);
                     }).catch(error => {
                         reject('请求失败');
+                        console.log('');
                         console.log(error,'----------请求错误----------');
                     });
                     break;
@@ -135,48 +144,65 @@ class App extends React.Component {
             <BrowserRouter>
                 <main className='main'>
                     <aside>
-                        {`设备独立像素 device dependent pixel = width-`}{ screen.width }
+                        <h1 style={{width:'35%',background:'orange'}}>{ `width:'375px的蓝色div` }</h1>
+                        <h1 style={{width:'750px',background:'orange'}}>
+                            {`设备独立像素 device dependent pixel 获取 screen.width:`}
+                            { screen.width }
+                            { this.state.screenWidth || '--' }
+                        </h1>
+                        <br/>
+                        <h1 style={{width:'980px',background:'orange'}}>
+                            {`设备像素比 devicePixelRatio 获取 window.devicePixelRatio:`}
+                            { window.devicePixelRatio }
+                        </h1>
+                        <br/>
+                        <h1 style={{width:'50vw',background:'orange'}}>
+                            {`设备像素 Visual viewport width  = innerWidth`}{ window.innerWidth }
+                        </h1>
                     </aside>
-                    <aside>
-                        <div>
-                            {`视觉视口 Visual viewport width  = innerWidth`}{ window.innerWidth }
-                            <br/>
-                            {`视觉视口 Visual viewport height = innerHeight`}{ window.innerHeight }
-                            <br/>
-                            {`设备像素比 设备像素比 = 物理像素 / 设备独立像素 // 在某一方向上，x方向或者y方向`}{ window.devicePixelRatio}
-                        </div>
-                        <div>
-                            <p>Ideal Viewport：理想视口，其实就是设备的可见区域，和可见视口一致。</p>
-                            <p>我们希望设备的最佳阅读体验是，默认不需要横向滚动条，就可以拥有堪比PC端的浏览体验</p>
-                            <p>因为移动设备，安卓 & ios的视觉视口很小，所以我们希望我们的理想布局视口和视觉视口宽度保持一致</p>
-                            <p>但是移动端浏览器厂商，各自的布局视口宽度各不相同，所以需要我们手动重置布局视口为我们想要的布局视口</p>
-                            <p>为了保证我们再不同浏览器，不同设备像素比的设备下都能拥有相似的体验</p>
-                            <p>就有了理想视口的需求</p>
-                        </div>
-                    </aside>
-                    <aside>
-                        <div>
-                            迭代器函数
-                            <Iterator/>
-                        </div>
-                    </aside>
-                    <h1>React Web App 16.0+</h1>
-                    <ul className="nav">
-                        <li><Link to="/">Home</Link></li>
-                        <li><Link to="/one">One</Link></li>
-                        <li><Link to="/two">Two</Link></li>
-                        <li><Link to="/user">User</Link></li>
-                    </ul>
-                    <DatePicker onChange={this.onChange} />
-                    {/*{renderRoutes(routes)}*/}
+                    {/*<aside>*/}
+                        {/*<div>*/}
+                            {/*<h1>{`视觉视口 Visual viewport width  = innerWidth`}{ window.innerWidth }</h1>*/}
+                            {/*<br/>*/}
+                            {/*<h1>{`视觉视口 Visual viewport height = innerHeight`}{ window.innerHeight }</h1>*/}
+                            {/*<br/>*/}
+                            {/*<h1>*/}
+                                {/*{`设备像素比 设备像素比 = 物理像素 / 设备独立像素 // 在某一方向上，x方向或者y方向`}*/}
+                                {/*{ window.devicePixelRatio}*/}
+                            {/*</h1>*/}
+                        {/*</div>*/}
+                        {/*<div>*/}
+                            {/*<p>Ideal Viewport：理想视口，其实就是设备的可见区域，和可见视口一致。</p>*/}
+                            {/*<p>我们希望设备的最佳阅读体验是，默认不需要横向滚动条，就可以拥有堪比PC端的浏览体验</p>*/}
+                            {/*<p>因为移动设备，安卓 & ios的视觉视口很小，所以我们希望我们的理想布局视口和视觉视口宽度保持一致</p>*/}
+                            {/*<p>但是移动端浏览器厂商，各自的布局视口宽度各不相同，所以需要我们手动重置布局视口为我们想要的布局视口</p>*/}
+                            {/*<p>为了保证我们再不同浏览器，不同设备像素比的设备下都能拥有相似的体验</p>*/}
+                            {/*<p>就有了理想视口的需求</p>*/}
+                        {/*</div>*/}
+                    {/*</aside>*/}
+                    {/*<aside>*/}
+                        {/*<div>*/}
+                            {/*迭代器函数*/}
+                            {/*<Iterator/>*/}
+                        {/*</div>*/}
+                    {/*</aside>*/}
+                    {/*<h1>React Web App 16.0+</h1>*/}
+                    {/*<ul className="nav">*/}
+                        {/*<li><Link to="/">Home</Link></li>*/}
+                        {/*<li><Link to="/one">One</Link></li>*/}
+                        {/*<li><Link to="/two">Two</Link></li>*/}
+                        {/*<li><Link to="/user">User</Link></li>*/}
+                    {/*</ul>*/}
+                    {/*<DatePicker onChange={this.onChange} />*/}
+                    {/*/!*{renderRoutes(routes)}*!/*/}
 
-                    <aside ref={'ajaxData'}></aside>
-                    <div>
-                        <Route path="/" exact component={Home} />
-                        <Route path="/one" component={One} />
-                        <Route path="/two" component={Two} />
-                        <Route path="/user" component={User} />
-                    </div>
+                    {/*<aside ref={'ajaxData'}></aside>*/}
+                    {/*<div>*/}
+                        {/*<Route path="/" exact component={Home} />*/}
+                        {/*<Route path="/one" component={One} />*/}
+                        {/*<Route path="/two" component={Two} />*/}
+                        {/*<Route path="/user" component={User} />*/}
+                    {/*</div>*/}
                 </main>
             </BrowserRouter>
         )
