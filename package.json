@@ -17,6 +17,7 @@
     "axios": "^0.18.0",
     "fs": "^0.0.1-security",
     "lodash": "^4.17.11",
+    "mockjs": "^1.0.1-beta3",
     "prop-types": "^15.6.2",
     "qs": "^6.6.0",
     "react": "^16.7.0-alpha.2",

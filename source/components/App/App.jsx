@@ -7,6 +7,8 @@ import Loading from 'components/Loading/';
 
 const style = require('./App.less');
 
+const Mock = require('mockjs');
+
 import qs from 'qs';
 import Iterator from '../Demo/Iterator';
 
@@ -42,6 +44,17 @@ class App extends React.Component {
         screenWidth: null
     }
     componentDidMount(){
+
+        const dataMock = Mock.mock({
+            // 属性 list 的值是一个数组，其中含有 1 到 10 个元素
+            'list|1-3': [{
+                // 属性 id 是一个自增数，起始值为 1，每次增 1
+                'id|+1': 1
+            }]
+        });
+        // 输出结果
+        console.log(JSON.stringify(dataMock, null, 4));
+
 
         // fs.readFile("./config.json", function(err, contents) {
         //     if (err) {
@@ -143,6 +156,15 @@ class App extends React.Component {
         return (
             <BrowserRouter>
                 <main className='main'>
+                    <section className='marquee-wrapper'>
+                        <aside className='marquee-area'>
+                            <a className={'marquee-item'}>111111</a>
+                            <a className={'marquee-item'}>22222</a>
+                            <a className={'marquee-item'}>3333</a>
+                            <a className={'marquee-item'}>4444</a>
+                            <a className={'marquee-item'}>5555</a>
+                        </aside>
+                    </section>
                     <aside>
                         <h1 style={{width:'35%',background:'orange'}}>{ `width:'375px的蓝色div` }</h1>
                         <h1 style={{width:'750px',background:'orange'}}>
