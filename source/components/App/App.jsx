@@ -13,12 +13,13 @@ import qs from 'qs';
 import Iterator from '../Demo/Iterator';
 
 import axios from 'axios';
+
 // const fs = require('fs');
 
-// const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
-// const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
-// const Two  = Loadable({loader: () => import('pages/home/two'),loading:Loading});
-// const User = Loadable({loader: () => import('pages/user/user'),loading:Loading});
+const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
+const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
+const Two  = Loadable({loader: () => import('pages/home/two'),loading:Loading});
+const User = Loadable({loader: () => import('pages/user/user'),loading:Loading});
 
 const handleRequest = (res,callback)=>{
     console.log(res,'--res');
@@ -40,11 +41,20 @@ const handleRequest = (res,callback)=>{
 }
 
 class App extends React.Component {
-    state = {
+    static state = {
         screenWidth: null
     }
-    componentDidMount(){
 
+    static defaultProps = {
+        onLoading: true
+    }
+
+    constructor(props) {
+        super(props);
+        this.main = React.createRef();
+    }
+
+    componentDidMount(){
         const dataMock = Mock.mock({
             // 属性 list 的值是一个数组，其中含有 1 到 10 个元素
             'list|1-3': [{
@@ -55,7 +65,7 @@ class App extends React.Component {
         // 输出结果
         console.log(JSON.stringify(dataMock, null, 4));
 
-
+        console.log(this.main.current,'mainRef ref object');
         // fs.readFile("./config.json", function(err, contents) {
         //     if (err) {
         //         throw err;
@@ -120,14 +130,16 @@ class App extends React.Component {
             console.log(err,'--------err');
         });
 
-        window.addEventListener('orientationchange',(data)=>{
-            console.log(screen.width,'--------横屏');
-            this.setState({screenWidth:screen.width})
-        },false);
+        // window.addEventListener('orientationchange',(data)=>{
+        //     console.log(screen.width,'--------横屏');
+        //     this.setState({screenWidth:screen.width})
+        // },false);
     }
+
     onChange=(date, dateString)=>{
         console.log(date, dateString,'打印时间选择');
     }
+
     fetchApi=(method,url,params,callback,allConfig)=>{
         return new Promise((resolve,reject)=>{
             switch (method) {
@@ -152,10 +164,11 @@ class App extends React.Component {
             }
         });
     }
+
     render() {
         return (
             <BrowserRouter>
-                <main className='main'>
+                <main className='main' ref={this.main}>
                     <section className='marquee-wrapper'>
                         <aside className='marquee-area'>
                             <a className={'marquee-item'}>111111</a>
@@ -165,23 +178,23 @@ class App extends React.Component {
                             <a className={'marquee-item'}>5555</a>
                         </aside>
                     </section>
-                    <aside>
-                        <h1 style={{width:'35%',background:'orange'}}>{ `width:'375px的蓝色div` }</h1>
-                        <h1 style={{width:'750px',background:'orange'}}>
-                            {`设备独立像素 device dependent pixel 获取 screen.width:`}
-                            { screen.width }
-                            { this.state.screenWidth || '--' }
-                        </h1>
-                        <br/>
-                        <h1 style={{width:'980px',background:'orange'}}>
-                            {`设备像素比 devicePixelRatio 获取 window.devicePixelRatio:`}
-                            { window.devicePixelRatio }
-                        </h1>
-                        <br/>
-                        <h1 style={{width:'50vw',background:'orange'}}>
-                            {`设备像素 Visual viewport width  = innerWidth`}{ window.innerWidth }
-                        </h1>
-                    </aside>
+                    {/*<aside>*/}
+                        {/*<h1 style={{width:'35%',background:'orange'}}>{ `width:'375px的蓝色div` }</h1>*/}
+                        {/*<h1 style={{width:'750px',background:'orange'}}>*/}
+                            {/*{`设备独立像素 device dependent pixel 获取 screen.width:`}*/}
+                            {/*{ screen.width }*/}
+                            {/*{ this.state.screenWidth || '--' }*/}
+                        {/*</h1>*/}
+                        {/*<br/>*/}
+                        {/*<h1 style={{width:'980px',background:'orange'}}>*/}
+                            {/*{`设备像素比 devicePixelRatio 获取 window.devicePixelRatio:`}*/}
+                            {/*{ window.devicePixelRatio }*/}
+                        {/*</h1>*/}
+                        {/*<br/>*/}
+                        {/*<h1 style={{width:'50vw',background:'orange'}}>*/}
+                            {/*{`设备像素 Visual viewport width  = innerWidth`}{ window.innerWidth }*/}
+                        {/*</h1>*/}
+                    {/*</aside>*/}
                     {/*<aside>*/}
                         {/*<div>*/}
                             {/*<h1>{`视觉视口 Visual viewport width  = innerWidth`}{ window.innerWidth }</h1>*/}
@@ -209,22 +222,22 @@ class App extends React.Component {
                         {/*</div>*/}
                     {/*</aside>*/}
                     {/*<h1>React Web App 16.0+</h1>*/}
-                    {/*<ul className="nav">*/}
-                        {/*<li><Link to="/">Home</Link></li>*/}
-                        {/*<li><Link to="/one">One</Link></li>*/}
-                        {/*<li><Link to="/two">Two</Link></li>*/}
-                        {/*<li><Link to="/user">User</Link></li>*/}
-                    {/*</ul>*/}
-                    {/*<DatePicker onChange={this.onChange} />*/}
-                    {/*/!*{renderRoutes(routes)}*!/*/}
+                    <ul className="nav">
+                        <li><Link to="/">Home</Link></li>
+                        <li><Link to="/one">One</Link></li>
+                        <li><Link to="/two">Two</Link></li>
+                        <li><Link to="/user">User</Link></li>
+                    </ul>
+                    <DatePicker onChange={this.onChange} />
+                    {/*{renderRoutes(routes)}*/}
 
-                    {/*<aside ref={'ajaxData'}></aside>*/}
-                    {/*<div>*/}
-                        {/*<Route path="/" exact component={Home} />*/}
-                        {/*<Route path="/one" component={One} />*/}
-                        {/*<Route path="/two" component={Two} />*/}
-                        {/*<Route path="/user" component={User} />*/}
-                    {/*</div>*/}
+                    <aside ref={'ajaxData'}></aside>
+                    <div>
+                        <Route path="/" exact component={Home} />
+                        <Route path="/one" component={One} />
+                        <Route path="/two" component={Two} />
+                        <Route path="/user" component={User} />
+                    </div>
                 </main>
             </BrowserRouter>
         )
