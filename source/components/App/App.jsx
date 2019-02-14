@@ -5,9 +5,15 @@ import { DatePicker } from 'antd';
 import Loadable from 'react-loadable';
 import Loading from 'components/Loading/';
 
+import ErrorBoundary from './ErrorBoundary.jsx';
+
+
 const style = require('./App.less');
 
 const Mock = require('mockjs');
+
+
+
 
 import qs from 'qs';
 import Iterator from '../Demo/Iterator';
@@ -16,10 +22,15 @@ import axios from 'axios';
 
 // const fs = require('fs');
 
+
 const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
 const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
 const Two  = Loadable({loader: () => import('pages/home/two'),loading:Loading});
 const User = Loadable({loader: () => import('pages/user/user'),loading:Loading});
+
+// 文章
+const Article = React.lazy(() => import('../Article/Article.jsx'));
+
 
 const handleRequest = (res,callback)=>{
     console.log(res,'--res');
@@ -40,9 +51,23 @@ const handleRequest = (res,callback)=>{
     }
 }
 
+const AndYetAnotherLazyComponent = React.lazy(() =>
+    import('../Article/AndYetAnotherLazyComponent')
+);
+
+function AnotherLazyComponent() {
+    return (
+        <div>
+            <span>So...so..lazy..</span>
+            <AndYetAnotherLazyComponent />
+        </div>
+    );
+}
+
 class App extends React.Component {
     static state = {
-        screenWidth: null
+        screenWidth: null,
+        showArticle: false
     }
 
     static defaultProps = {
@@ -52,9 +77,17 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.main = React.createRef();
+        this.state = {
+            showArticle: false
+        }
     }
 
     componentDidMount(){
+        // 异步加载文章
+        setTimeout(()=>{
+            this.setState({ showArticle:true });
+        },3000);
+
         const dataMock = Mock.mock({
             // 属性 list 的值是一个数组，其中含有 1 到 10 个元素
             'list|1-3': [{
@@ -227,6 +260,7 @@ class App extends React.Component {
                         <li><Link to="/one">One</Link></li>
                         <li><Link to="/two">Two</Link></li>
                         <li><Link to="/user">User</Link></li>
+                        <li><Link to="/article">Article</Link></li>
                     </ul>
                     <DatePicker onChange={this.onChange} />
                     {/*{renderRoutes(routes)}*/}
@@ -238,6 +272,25 @@ class App extends React.Component {
                         <Route path="/two" component={Two} />
                         <Route path="/user" component={User} />
                     </div>
+                    <ErrorBoundary>
+                        <Suspense fallback={false}>
+                            <Route path="/article" component={ Article } />
+                        </Suspense>
+
+                    </ErrorBoundary>
+
+                    {/*异步加载方案2*/}
+                    <Suspense fallback={false}>
+                        {/*{*/}
+                            {/*this.state.showArticle && <Article/>*/}
+                        {/*}*/}
+                        <div>
+                            <Suspense fallback="Sorry for our lazinessSorry">
+                                <span>Cast</span>
+                                <AnotherLazyComponent />
+                            </Suspense>
+                        </div>
+                    </Suspense>
                 </main>
             </BrowserRouter>
         )
