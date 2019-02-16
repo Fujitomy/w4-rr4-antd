@@ -11,13 +11,13 @@ const initLogo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGYAAAAoCAYAAAAM
 function Header(props) {
     const { projectName,projectLogo } = props.headerInfo;
     const onError = (e)=>{
-        const img = e.target;
-        img.src = initLogo;
-        console.log(e,img,'-----------e  picture');
+        // const img = e.target;
+        // img.src = initLogo;
+        // console.log(e,img,'-----------e  picture');
     };
     return (
        <header className='global-header' id='global-header'>
-           <a><img src={projectLogo} onError={onError} ref={'logo'} />{projectName}</a>
+           <a><img src={projectLogo} onError={ e => e.target.src = initLogo }  />{projectName}</a>
        </header>
     )
 }
