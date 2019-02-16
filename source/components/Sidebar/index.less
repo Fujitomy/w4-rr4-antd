@@ -1,0 +1,127 @@
+#global-sidebar {
+	float: left;
+	width: 200px;
+	height: 100vh;
+	background: #203A71;
+	
+	button {
+		display: inline-block;
+		width: 100%;
+		text-align: center;
+		margin: 0 auto;
+		border: 0;
+		outline: 0;
+		background: transparent;
+		color: #fff;
+	}
+	
+	li {
+		list-style: none;
+		height: 38px;
+		line-height: 38px;
+		text-align: left;
+		color: #fff;
+		font-size: 16px;
+		padding: 0 10px;
+	}
+	
+	
+	.hide {
+		display: none;
+	}
+	.sidebar-logo-wrapper {
+		position: absolute;
+		left: 0;
+		bottom: 20px;
+		width: 100%;
+		height: 50px;
+		background: #203a71;
+		.sidebar-logo {
+			display: block;
+			position: absolute;
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			height: 32px;
+			text-align: center;
+			line-height: 32px;
+			color:#B4D9FF;
+			font-size: 32px;
+			text-indent: 15px;
+		}
+	}
+	
+	.ant-menu-item-selected {
+		background:rgba(39,67,123,1);
+		.global-sidebar-subtitle {
+			color:#fff;
+		}
+	}
+	.ant-menu-sub {
+		box-shadow: none;
+	}
+	.ant-menu-submenu-arrow {
+		&:after,&:before{
+			background: #B4D9FF;
+		}
+	}
+	// 侧边栏主体
+	.global-sidebar-ul,.ant-menu-sub {
+		background: #203A71;
+	}
+	// 侧边栏主标题
+	.ant-menu-submenu-title {
+		.global-sidebar-title {
+			height: 20px;
+			vertical-align: top;
+			padding: 10px 0;
+			color: #B4D9FF;
+			i {
+				display: inline-block;
+				font-size: 19px;
+				vertical-align: top;
+			}
+			span {
+				display: inline-block;
+				padding: 0 0 0 8px;
+				font-size: 15px;
+				line-height: 38px;
+				vertical-align: top;
+			}
+		}
+	}
+	// 侧边栏副标题
+	.global-sidebar-subtitle {
+		display: inline-block;
+		height: 100%;
+		overflow: hidden;
+		color: #B4D9FF;
+		i {
+			display: inline-block;
+			padding: 1px 8px 0 0;
+			font-size: 19px;
+			vertical-align: top;
+		}
+		span {
+			display: inline-block;
+			font-size: 14px;
+			vertical-align: top;
+		}
+	}
+}
+
+// 本地化引用失败
+/* 引入 icon class 文件 */
+/* 关于这个引用路径，有一个坑，ant.design 我用的dva，默认资源路径为 /public 所以这个引用的实际目录是  /public/fonts/iconfont/iconfont.css */
+
+/* 设置使用字体的优先级 anticon-user 高 */
+//:global(.anticon) {  /* :global() 是为了覆盖全局class .anticon 的样式 */
+//	@import url("./iconfont.css");
+//	&:before {
+//		font-family: "anticon", "anticon-user" !important;
+//		/* 默认样式是这样
+//			font-family: "anticon" !important;
+//		*/
+//	}
+//}

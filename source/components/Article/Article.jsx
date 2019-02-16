@@ -21,11 +21,13 @@ class Article extends React.Component {
             this.setState({ showArticle:true });
         },3000);
         setTimeout(()=>{
-            throw new Error('I crashed!');
+            history.back();
+
+            // throw new Error('I crashed!');
         },8000);
     }
     render() {
-        throw new Error('I crashed!');
+        // throw new Error('I crashed!');
         return (
             // this.state.showArticle &&
             <Fragment>

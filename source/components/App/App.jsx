@@ -1,36 +1,37 @@
 
-import React, { lazy, Suspense } from "react";
-import { BrowserRouter, Link,Route } from 'react-router-dom';
+import React, { Suspense } from "react";
+import { BrowserRouter, HashRouter, Link,Route } from 'react-router-dom';
 import { DatePicker } from 'antd';
 import Loadable from 'react-loadable';
 import Loading from 'components/Loading/';
+import ReactDOM from 'react-dom';
 
-import ErrorBoundary from './ErrorBoundary.jsx';
+const supportHistory = 'pushState' in window.history;
+import ErrBoundary from './ErrBoundary.jsx';
 
-
-const style = require('./App.less');
-
-const Mock = require('mockjs');
-
-
-
-
-import qs from 'qs';
-import Iterator from '../Demo/Iterator';
 
 import axios from 'axios';
+const style = require('./App.less');
+const Mock = require('mockjs');
+import qs from 'qs';
+
+import Iterator from '../Demo/Iterator';
 
 // const fs = require('fs');
-
-
+// asynchronous load
 const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
 const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
 const Two  = Loadable({loader: () => import('pages/home/two'),loading:Loading});
 const User = Loadable({loader: () => import('pages/user/user'),loading:Loading});
 
+import Header from '../Header/index.jsx';
+import Sidebar from '../Sidebar/index.jsx';
+
 // 文章
 const Article = React.lazy(() => import('../Article/Article.jsx'));
 
+// 进入退出提示
+import { Prompt } from 'react-router';
 
 const handleRequest = (res,callback)=>{
     console.log(res,'--res');
@@ -49,8 +50,7 @@ const handleRequest = (res,callback)=>{
             const msg = Object.prototype.toString.call(baseMsg)!== "[object String]"?localMsg:baseMsg;
             console.log(msg);
     }
-}
-
+};
 const AndYetAnotherLazyComponent = React.lazy(() =>
     import('../Article/AndYetAnotherLazyComponent')
 );
@@ -62,7 +62,7 @@ function AnotherLazyComponent() {
             <AndYetAnotherLazyComponent />
         </div>
     );
-}
+};
 
 class App extends React.Component {
     static state = {
@@ -78,7 +78,15 @@ class App extends React.Component {
         super(props);
         this.main = React.createRef();
         this.state = {
-            showArticle: false
+            showArticle: false,
+            projectName: '书与月光',
+            projectLogo: '',
+            routes: [
+                { name:'one', url: 'one' },
+                { name:'two', url: 'two' },
+                { name:'user', url: 'user' },
+                { name:'article', url: 'article' },
+            ]
         }
     }
 
@@ -199,9 +207,63 @@ class App extends React.Component {
     }
 
     render() {
+        const getConfirmation = (message, callback) => {
+            const allowTransition = window.confirm(message);
+            callback(allowTransition);
+        }
+
+        const children = null;
+
+        const {
+            projectName,
+            projectLogo,
+        } = this.state;
+
+        const headerInfo = { projectName, projectLogo }
+
         return (
-            <BrowserRouter>
+            <HashRouter basename='manage' >
                 <main className='main' ref={this.main}>
+                    {/*<Prompt message="Are you sure you want to leave?" />*/}
+                    <Header headerInfo={ headerInfo } />
+                    <Sidebar routes = { this.state.routes } />
+
+                    {/*<ul className="nav">*/}
+                        {/*<li><Link to="/">Home</Link></li>*/}
+                        {/*<li><Link to="/one">One</Link></li>*/}
+                        {/*<li><Link to="/two">Two</Link></li>*/}
+                        {/*<li><Link to="/user">User</Link></li>*/}
+                        {/*<li><Link to="/article">Article</Link></li>*/}
+                    {/*</ul>*/}
+                    <DatePicker onChange={this.onChange} />
+                    {/*{renderRoutes(routes)}*/}
+                    <aside ref={'ajaxData'}></aside>
+                    <div>
+                        <Route path="/" exact component={Home} />
+
+                    </div>
+
+                    <ErrBoundary>
+                        <Suspense fallback={false}>
+                            <Route path="/article" component={ Article } />
+                            <Route path="/user" component={User} />
+                            <Route path="/one" component={One} />
+                            <Route path="/two" component={Two} />
+                        </Suspense>
+                    </ErrBoundary>
+
+                    {/*异步加载方案2*/}
+                    <Suspense fallback={false}>
+                        {/*{*/}
+                        {/*this.state.showArticle && <Article/>*/}
+                        {/*}*/}
+                        <div>
+                            <Suspense fallback="Sorry for our lazinessSorry">
+                                <span>Cast</span>
+                                <AnotherLazyComponent />
+                            </Suspense>
+                        </div>
+                    </Suspense>
                     <section className='marquee-wrapper'>
                         <aside className='marquee-area'>
                             <a className={'marquee-item'}>111111</a>
@@ -211,6 +273,7 @@ class App extends React.Component {
                             <a className={'marquee-item'}>5555</a>
                         </aside>
                     </section>
+
                     {/*<aside>*/}
                         {/*<h1 style={{width:'35%',background:'orange'}}>{ `width:'375px的蓝色div` }</h1>*/}
                         {/*<h1 style={{width:'750px',background:'orange'}}>*/}
@@ -255,44 +318,9 @@ class App extends React.Component {
                         {/*</div>*/}
                     {/*</aside>*/}
                     {/*<h1>React Web App 16.0+</h1>*/}
-                    <ul className="nav">
-                        <li><Link to="/">Home</Link></li>
-                        <li><Link to="/one">One</Link></li>
-                        <li><Link to="/two">Two</Link></li>
-                        <li><Link to="/user">User</Link></li>
-                        <li><Link to="/article">Article</Link></li>
-                    </ul>
-                    <DatePicker onChange={this.onChange} />
-                    {/*{renderRoutes(routes)}*/}
 
-                    <aside ref={'ajaxData'}></aside>
-                    <div>
-                        <Route path="/" exact component={Home} />
-                        <Route path="/one" component={One} />
-                        <Route path="/two" component={Two} />
-                        <Route path="/user" component={User} />
-                    </div>
-                    <ErrorBoundary>
-                        <Suspense fallback={false}>
-                            <Route path="/article" component={ Article } />
-                        </Suspense>
-
-                    </ErrorBoundary>
-
-                    {/*异步加载方案2*/}
-                    <Suspense fallback={false}>
-                        {/*{*/}
-                            {/*this.state.showArticle && <Article/>*/}
-                        {/*}*/}
-                        <div>
-                            <Suspense fallback="Sorry for our lazinessSorry">
-                                <span>Cast</span>
-                                <AnotherLazyComponent />
-                            </Suspense>
-                        </div>
-                    </Suspense>
                 </main>
-            </BrowserRouter>
+            </HashRouter>
         )
     }
 }

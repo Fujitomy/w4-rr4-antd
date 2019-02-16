@@ -1,0 +1,423 @@
+{
+    "code": 0,
+    "data": [
+        {
+            "rightId": 751,
+            "rightName": "健康校园项目",
+            "url": "",
+            "type": "1",
+            "rightCode": "appliance-campus",
+            "upper": 0,
+            "order": 1,
+            "level": 1,
+            "icon": null,
+            "subRights": [
+                {
+                    "rightId": 753,
+                    "rightName": "设备管理",
+                    "url": "",
+                    "type": "1",
+                    "rightCode": "device-manage",
+                    "upper": 751,
+                    "order": 2,
+                    "level": 2,
+                    "icon": "icon-shebei",
+                    "subRights": [
+                        {
+                            "rightId": 762,
+                            "rightName": "设备添加",
+                            "url": "/main/devManage/",
+                            "type": "1",
+                            "rightCode": "dev-add",
+                            "upper": 753,
+                            "order": 1,
+                            "level": 3,
+                            "icon": "icon-shebei",
+                            "subRights": [
+                                {
+                                    "rightId": 1614,
+                                    "rightName": "查询",
+                                    "url": "null",
+                                    "type": "2",
+                                    "rightCode": "dev-add-query",
+                                    "upper": 762,
+                                    "order": 0,
+                                    "level": 2,
+                                    "icon": "null",
+                                    "subRights": null
+                                },
+                                {
+                                    "rightId": 807,
+                                    "rightName": "添加设备",
+                                    "url": "/deviceManage/insertOrUpdateDeviceData",
+                                    "type": "2",
+                                    "rightCode": "dev-add-add",
+                                    "upper": 762,
+                                    "order": 1,
+                                    "level": 4,
+                                    "icon": null,
+                                    "subRights": null
+                                },
+                                {
+                                    "rightId": 808,
+                                    "rightName": "编辑",
+                                    "url": "/deviceManage/insertOrUpdateDeviceData",
+                                    "type": "2",
+                                    "rightCode": "dev-add-edit",
+                                    "upper": 762,
+                                    "order": 2,
+                                    "level": 4,
+                                    "icon": null,
+                                    "subRights": null
+                                },
+                                {
+                                    "rightId": 809,
+                                    "rightName": "取消关联",
+                                    "url": "/deviceManage/insertOrUpdateDeviceData",
+                                    "type": "2",
+                                    "rightCode": "dev-add-delete",
+                                    "upper": 762,
+                                    "order": 3,
+                                    "level": 4,
+                                    "icon": null,
+                                    "subRights": null
+                                },
+                                {
+                                    "rightId": 810,
+                                    "rightName": "回收站",
+                                    "url": "/studentManage/getDeviceDataList",
+                                    "type": "2",
+                                    "rightCode": "dev-add-hs",
+                                    "upper": 762,
+                                    "order": 4,
+                                    "level": 4,
+                                    "icon": null,
+                                    "subRights": null
+                                }
+                            ]
+                        },
+                        {
+                            "rightId": 763,
+                            "rightName": "设备数据查看",
+                            "url": "/main/devDataView/",
+                            "type": "1",
+                            "rightCode": "dev-data-view",
+                            "upper": 753,
+                            "order": 2,
+                            "level": 3,
+                            "icon": "icon-chakandeshebei",
+                            "subRights": [
+                                {
+                                    "rightId": 1615,
+                                    "rightName": "除臭机查询",
+                                    "url": "null",
+                                    "type": "2",
+                                    "rightCode": "dev-data-view-chou-query",
+                                    "upper": 763,
+                                    "order": 1,
+                                    "level": 2,
+                                    "icon": "null",
+                                    "subRights": null
+                                },
+                                {
+                                    "rightId": 1616,
+                                    "rightName": "除臭机详情",
+                                    "url": "null",
+                                    "type": "2",
+                                    "rightCode": "dev-data-view-chou-detail",
+                                    "upper": 763,
+                                    "order": 2,
+                                    "level": 2,
+                                    "icon": "null",
+                                    "subRights": null
+                                },
+                                {
+                                    "rightId": 1617,
+                                    "rightName": "新风机查询",
+                                    "url": "null",
+                                    "type": "2",
+                                    "rightCode": "dev-data-view-feng-query",
+                                    "upper": 763,
+                                    "order": 3,
+                                    "level": 2,
+                                    "icon": "null",
+                                    "subRights": null
+                                },
+                                {
+                                    "rightId": 1618,
+                                    "rightName": "新风机详情",
+                                    "url": "null",
+                                    "type": "2",
+                                    "rightCode": "dev-data-view-feng-detail",
+                                    "upper": 763,
+                                    "order": 4,
+                                    "level": 2,
+                                    "icon": "null",
+                                    "subRights": null
+                                },
+                                {
+                                    "rightId": 1619,
+                                    "rightName": "净饮机查询",
+                                    "url": "null",
+                                    "type": "2",
+                                    "rightCode": "dev-data-view-shui-query",
+                                    "upper": 763,
+                                    "order": 5,
+                                    "level": 2,
+                                    "icon": "null",
+                                    "subRights": null
+                                },
+                                {
+                                    "rightId": 1620,
+                                    "rightName": "净饮机详情",
+                                    "url": "null",
+                                    "type": "2",
+                                    "rightCode": "dev-data-view-shui-detail",
+                                    "upper": 763,
+                                    "order": 6,
+                                    "level": 2,
+                                    "icon": "null",
+                                    "subRights": null
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "rightId": 812,
+            "rightName": "系统管理",
+            "url": "",
+            "type": "1",
+            "rightCode": "system-manage",
+            "upper": 0,
+            "order": 99,
+            "level": 1,
+            "icon": "icon-xitongguanli5",
+            "subRights": [
+                {
+                    "rightId": 813,
+                    "rightName": "角色管理",
+                    "url": "/main/roleMng/",
+                    "type": "1",
+                    "rightCode": "role-manage",
+                    "upper": 812,
+                    "order": 1,
+                    "level": 2,
+                    "icon": "icon-user",
+                    "subRights": [
+                        {
+                            "rightId": 827,
+                            "rightName": "添加",
+                            "url": "/role/addRole",
+                            "type": "2",
+                            "rightCode": "role-manage-add",
+                            "upper": 813,
+                            "order": 3,
+                            "level": 3,
+                            "icon": null,
+                            "subRights": null
+                        },
+                        {
+                            "rightId": 1301,
+                            "rightName": "数据权限",
+                            "url": "/accountMng/dataAuthority/",
+                            "type": "2",
+                            "rightCode": "account-dataAuthority",
+                            "upper": 813,
+                            "order": 4,
+                            "level": 3,
+                            "icon": null,
+                            "subRights": null
+                        },
+                        {
+                            "rightId": 828,
+                            "rightName": "编辑",
+                            "url": "/role/editRoleByRoleId",
+                            "type": "2",
+                            "rightCode": "role-manage-edit",
+                            "upper": 813,
+                            "order": 4,
+                            "level": 3,
+                            "icon": null,
+                            "subRights": null
+                        },
+                        {
+                            "rightId": 829,
+                            "rightName": "页面配置",
+                            "url": "/role/editRoleByRoleId",
+                            "type": "2",
+                            "rightCode": "role-manage-deploy",
+                            "upper": 813,
+                            "order": 5,
+                            "level": 3,
+                            "icon": null,
+                            "subRights": null
+                        },
+                        {
+                            "rightId": 830,
+                            "rightName": "启用/禁用",
+                            "url": "/role/operateRoleByRoleId",
+                            "type": "2",
+                            "rightCode": "role-manage-enable",
+                            "upper": 813,
+                            "order": 6,
+                            "level": 3,
+                            "icon": null,
+                            "subRights": null
+                        }
+                    ]
+                },
+                {
+                    "rightId": 814,
+                    "rightName": "账号管理",
+                    "url": "/main/accountMng/",
+                    "type": "1",
+                    "rightCode": "account-manage",
+                    "upper": 812,
+                    "order": 2,
+                    "level": 2,
+                    "icon": "icon-zhanghaoguanli1",
+                    "subRights": [
+                        {
+                            "rightId": 832,
+                            "rightName": "自建密码",
+                            "url": null,
+                            "type": "2",
+                            "rightCode": "account-manage-selfPwd",
+                            "upper": 814,
+                            "order": 1,
+                            "level": 3,
+                            "icon": null,
+                            "subRights": null
+                        },
+                        {
+                            "rightId": 833,
+                            "rightName": "短信密码",
+                            "url": null,
+                            "type": "2",
+                            "rightCode": "account-manage-msgPwd",
+                            "upper": 814,
+                            "order": 2,
+                            "level": 3,
+                            "icon": null,
+                            "subRights": null
+                        },
+                        {
+                            "rightId": 836,
+                            "rightName": "启用/禁用",
+                            "url": "/account/opeAccountByUserId",
+                            "type": "2",
+                            "rightCode": "account-manage-enable",
+                            "upper": 814,
+                            "order": 3,
+                            "level": 3,
+                            "icon": null,
+                            "subRights": null
+                        }
+                    ]
+                },
+                {
+                    "rightId": 1219,
+                    "rightName": "推送设置",
+                    "url": "/main/pushSetting/",
+                    "type": "1",
+                    "rightCode": "campus-push-set",
+                    "upper": 812,
+                    "order": 50,
+                    "level": 2,
+                    "icon": "icon-tuisongxiaoxi",
+                    "subRights": null
+                },
+                {
+                    "rightId": 1220,
+                    "rightName": "数据审核",
+                    "url": "/main/dataAudit/",
+                    "type": "1",
+                    "rightCode": "campus-data-audit",
+                    "upper": 812,
+                    "order": 55,
+                    "level": 2,
+                    "icon": "icon-tubiaolunkuo-",
+                    "subRights": [
+                        {
+                            "rightId": 1224,
+                            "rightName": "异常体温审核",
+                            "url": "null",
+                            "type": "3",
+                            "rightCode": "campus-temperature-audit",
+                            "upper": 1220,
+                            "order": 1,
+                            "level": 2,
+                            "icon": null,
+                            "subRights": [
+                                {
+                                    "rightId": 1225,
+                                    "rightName": "审核",
+                                    "url": "null",
+                                    "type": "2",
+                                    "rightCode": "campus-temperature-audit-audit",
+                                    "upper": 1224,
+                                    "order": 1,
+                                    "level": 2,
+                                    "icon": null,
+                                    "subRights": null
+                                },
+                                {
+                                    "rightId": 1226,
+                                    "rightName": "删除",
+                                    "url": "null",
+                                    "type": "2",
+                                    "rightCode": "campus-temperature-audit-delete",
+                                    "upper": 1224,
+                                    "order": 5,
+                                    "level": 2,
+                                    "icon": null,
+                                    "subRights": null
+                                }
+                            ]
+                        },
+                        {
+                            "rightId": 1221,
+                            "rightName": "身高体重BMI审核",
+                            "url": "null",
+                            "type": "3",
+                            "rightCode": "campus-hw-audit",
+                            "upper": 1220,
+                            "order": 5,
+                            "level": 2,
+                            "icon": null,
+                            "subRights": [
+                                {
+                                    "rightId": 1222,
+                                    "rightName": "审核",
+                                    "url": "null",
+                                    "type": "2",
+                                    "rightCode": "campus-hw-audit-audit",
+                                    "upper": 1221,
+                                    "order": 1,
+                                    "level": 2,
+                                    "icon": null,
+                                    "subRights": null
+                                },
+                                {
+                                    "rightId": 1223,
+                                    "rightName": "删除",
+                                    "url": "null",
+                                    "type": "2",
+                                    "rightCode": "campus-hw-audit-delete",
+                                    "upper": 1221,
+                                    "order": 5,
+                                    "level": 2,
+                                    "icon": null,
+                                    "subRights": null
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
