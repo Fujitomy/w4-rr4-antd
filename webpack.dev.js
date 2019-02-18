@@ -76,7 +76,7 @@ module.exports = {
         host: '0.0.0.0',
         // 需要开启 plugins > new webpack.HotModuleReplacementPlugin()
         quiet: false, // true关闭编译控制台打印，世界一下子安静了
-        inline: true, // 实时刷新 设置为true，当源文件改变时会自动刷新页面
+        // inline: true, // 实时刷新 设置为true，当源文件改变时会自动刷新页面
         // clientLogLevel: 'none', // 当使用内联模式(inline mode)时，会在开发工具(DevTools)的控制台(console)显示消息，例如：在重新加载之前，在一个错误之前，或者模块热替换(Hot Module Replacement)启用时。这可能显得很繁琐,使用none
         historyApiFallback: true, // 不跳转
         // 接口代理

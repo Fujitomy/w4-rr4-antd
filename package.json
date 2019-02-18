@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dll": "webpack --config webpack.dll.js",
-    "dev": "webpack-dev-server --color --watch --config webpack.dev.js"
+    "dev": "webpack-dev-server --hotOnly --color --watch --config webpack.dev.js"
   },
   "keywords": [
     "wepack4-react-router4-antd"
