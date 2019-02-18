@@ -27,9 +27,12 @@ console.log(dllchunkname,'dllchunkname');
 // 是否关闭弃用警告
 process.noDeprecation = false;
 
+const dev = Boolean(process.env.WEBPACK_SERVE);
+const production = process.argv.indexOf('--mode=production') > -1;
+
 module.exports = {
-    mode: 'production',
-    // mode: 'development',
+    // mode: 'production',
+    mode: 'development',
     // 调试工具，错误打印等级，eval-source-map
     // devtool: "source-map",
     // webpack 4.0 之后独立出来，在配置文件中，配置才能生效，以前直接在packjson.script命令行中配置--colors也行
@@ -37,6 +40,7 @@ module.exports = {
         colors: true,
         version: true,
     },
+    devtool: production ? 'cheap-module-eval-source-map' : 'hidden-source-map',
     entry:{
         // index: path.resolve(__dirname,'./source/entry/index.js'),
         index: [
@@ -47,8 +51,15 @@ module.exports = {
     output: {
         filename: '[name].[hash].js',
         chunkFilename: "[name].chunk.js",
+        // 这里业务代码为何输出到公共包目录了··
         path: path.resolve(__dirname,'./source/vendors/'),
         publicPath: "/"
+    },
+    optimization:{
+        runtimeChunk: true,
+        splitChunks: {
+            chunks: 'all'
+        },
     },
     devServer:{
         // open: true, // 启动后打开浏览器
@@ -83,6 +94,7 @@ module.exports = {
                 secure: false
             },
         },
+        hot: true,
     },
     plugins: [
         // 热更新，不刷新页面异步更新

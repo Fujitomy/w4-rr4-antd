@@ -227,7 +227,7 @@ class App extends React.Component {
                     {/*<Prompt message="Are you sure you want to leave?" />*/}
                     <Header headerInfo={ headerInfo } />
                     <Sidebar routes = { this.state.routes } />
-
+                    编译测试99992
                     {/*<ul className="nav">*/}
                         {/*<li><Link to="/">Home</Link></li>*/}
                         {/*<li><Link to="/one">One</Link></li>*/}
@@ -240,7 +240,6 @@ class App extends React.Component {
                     <aside ref={'ajaxData'}></aside>
                     <div>
                         <Route path="/" exact component={Home} />
-
                     </div>
 
                     <ErrBoundary>
