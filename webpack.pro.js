@@ -30,9 +30,11 @@ process.noDeprecation = false;
 const dev = Boolean(process.env.WEBPACK_SERVE);
 const production = process.argv.indexOf('--mode=production') > -1;
 
+
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
 module.exports = {
-    // mode: 'production',
-    mode: 'development',
+    mode: 'production',
     // 调试工具，错误打印等级，eval-source-map
     // devtool: "source-map",
     // webpack 4.0 之后独立出来，在配置文件中，配置才能生效，以前直接在packjson.script命令行中配置--colors也行
@@ -56,6 +58,8 @@ module.exports = {
         publicPath: "/"
     },
     optimization:{
+        minimize: true, // Tell webpack to minimize the bundle using the UglifyjsWebpackPlugin
+        // minimizer: [new UglifyJsPlugin({/* your config */})],  // 允许用户使用其他最小化插件，覆盖webpack默认最小化编译器
         runtimeChunk: true,
         splitChunks: {
             chunks: 'all'

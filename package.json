@@ -70,5 +70,6 @@
     "@babel/plugin-syntax-dynamic-import": "动态引入语法编译插件 Allow parsing of import()",
     "less-loader sass-loader sass-loader style-loader": "样式处理的loader",
     "file-loader": "文件处理字体图片等"
-  }
+  },
+  "sideEffects": false
 }

@@ -278,3 +278,9 @@ https://segmentfault.com/a/1190000008315937
 路由刷新之后404需要配置服务器代理环境，devServer or nginx
 
 
+
+Webpack 打包优化之速度篇
+https://www.jeffjade.com/2017/08/12/125-webpack-package-optimization-for-speed/
+
+w4打包优化
+https://www.cnblogs.com/wmhuang/p/8967639.html
