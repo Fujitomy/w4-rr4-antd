@@ -1,7 +1,10 @@
 
-import React, { Suspense } from "react";
+import React, { Suspense,lazy as Lazy } from "react";
 import { BrowserRouter, HashRouter, Link,Route } from 'react-router-dom';
-import { DatePicker } from 'antd';
+// import { DatePicker } from 'antd';
+
+import DatePicker from 'antd/lib/date-picker';  // 加载 JS
+import 'antd/lib/date-picker/style/css';        // 加载 CSS
 import Loadable from 'react-loadable';
 import Loading from 'components/Loading/';
 import ReactDOM from 'react-dom';
@@ -19,16 +22,20 @@ import Iterator from '../Demo/Iterator';
 
 // const fs = require('fs');
 // asynchronous load
-const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
-const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
-const Two  = Loadable({loader: () => import('pages/home/two'),loading:Loading});
-const User = Loadable({loader: () => import('pages/user/user'),loading:Loading});
+// const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
+// const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
+// const Two  = Loadable({loader: () => import('pages/home/two'),loading:Loading});
+// const User = Loadable({loader: () => import('pages/user/user'),loading:Loading});
 
 import Header from '../Header/index.jsx';
 import Sidebar from '../Sidebar/index.jsx';
 
 // 文章
-const Article = React.lazy(() => import('../Article/Article.jsx'));
+const Article = Lazy(() => import('../Article/Article.jsx'));
+const Home = Lazy(() => import('pages/home/home'));
+const One = Lazy(() => import('pages/home/one'));
+const Two = Lazy(() => import('pages/home/two'));
+const User = Lazy(() => import('pages/user/user'));
 
 // 进入退出提示
 import { Prompt } from 'react-router';
@@ -165,11 +172,11 @@ class App extends React.Component {
             console.log(fetchRes,'接口请求成功返回结果');
         };
 
-        this.fetchApi('get',url,params,callback).then((success)=>{
-            console.log(success,'--------success');
-        }).catch((err)=>{
-            console.log(err,'--------err');
-        });
+        // this.fetchApi('get',url,params,callback).then((success)=>{
+        //     console.log(success,'--------success');
+        // }).catch((err)=>{
+        //     console.log(err,'--------err');
+        // });
 
         // window.addEventListener('orientationchange',(data)=>{
         //     console.log(screen.width,'--------横屏');
@@ -236,15 +243,16 @@ class App extends React.Component {
                         {/*<li><Link to="/user">User</Link></li>*/}
                         {/*<li><Link to="/article">Article</Link></li>*/}
                     {/*</ul>*/}
-                    <DatePicker onChange={this.onChange} />
+                    {/*<DatePicker onChange={this.onChange} />*/}
                     {/*{renderRoutes(routes)}*/}
                     <aside ref={'ajaxData'}></aside>
-                    <div>
-                        <Route path="/" exact component={Home} />
-                    </div>
+                    {/*<div>*/}
+                        {/*<Route path="/" exact component={Home} />*/}
+                    {/*</div>*/}
 
                     <ErrBoundary>
                         <Suspense fallback={false}>
+                            <Route path="/" exact component={Home} />
                             <Route path="/article" component={ Article } />
                             <Route path="/user" component={User} />
                             <Route path="/one" component={One} />

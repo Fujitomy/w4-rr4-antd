@@ -18,7 +18,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OpenBrowserWebpackPlugin = require('open-browser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const manifest = require('./source/vendors/vendor.manifest.json');
-const dllchunkname = manifest.name.split('_')[1];
+const dllchunkname = manifest.name.split('_')[2];
 
 console.log(dllchunkname,'dllchunkname');
 
@@ -58,8 +58,27 @@ module.exports = {
     optimization:{
         runtimeChunk: true,
         splitChunks: {
-            chunks: 'all'
-        },
+            // chunks: 'all',
+            chunks: 'async',
+            // minSize: 30000,
+            // maxSize: 0,
+            // minChunks: 1,
+            // maxAsyncRequests: 5,
+            // maxInitialRequests: 3,
+            // automaticNameDelimiter: '+',
+            // name: true,
+            // cacheGroups: {
+            //     vendors: {
+            //         test: /[\\/]node_modules[\\/]/,
+            //         priority: -10
+            //     },
+            //     default: {
+            //         minChunks: 2,
+            //         priority: -20,
+            //         reuseExistingChunk: true
+            //     }
+            // }
+        }
     },
     devServer:{
         // open: true, // 启动后打开浏览器
@@ -71,7 +90,7 @@ module.exports = {
         // 一切服务都启用gzip压缩(所有来自 './source/vendors' 目录的文件都做 gzip 压缩)
         compress: true,
         // 启动本地服务端口号
-        port: 9090,
+        port: 8088,
         // 配置host之后才可以使用本地ip打开localhost页面
         host: '0.0.0.0',
         // 需要开启 plugins > new webpack.HotModuleReplacementPlugin()
@@ -97,12 +116,12 @@ module.exports = {
         hot: true,
     },
     plugins: [
-        // 热更新，不刷新页面异步更新
+        // 热更新，不刷新页面异步更新,熱更新需要引入額外代碼在入口文件
         new webpack.HotModuleReplacementPlugin(),
         // 引入dll
         new webpack.DllReferencePlugin({
             context: __dirname,
-            manifest: require('./source/vendors/vendor.manifest.json')
+            manifest: require('./source/vendors/vendor.manifest.json'),
         }),
         // 模板插件
         new HtmlWebpackPlugin({
@@ -111,12 +130,13 @@ module.exports = {
             filename: 'index.html', // 由模板生成的文件名和存放位置，可带路径的？需要去官网文档看下
             author: 'tomy',
             inject: 'true',// 资源文件注入位置true,body,header,false
+            chunksSortMode: 'none', //如果使用webpack4将该配置项设置为'none'
             // 动态引入dll， manifest就是dll生成的json
-            vendor: /*manifest.name*/'vendor.dll.' + dllchunkname + '.js'
+            vendor: /*manifest.name*/'vendor.dll.' + dllchunkname + '.js',
         }),
         new OpenBrowserWebpackPlugin({
             browser: 'Chrome',
-            url: 'http://localhost:9090',
+            url: 'http://localhost:8088',
         }),
         // new CleanWebpackPlugin([
         //         './source/vendors/index.*.js',
@@ -135,6 +155,8 @@ module.exports = {
         // // NamedModulesPlugin使用模块的相对路径作为模块的 id，
         // // 所以只要我们不重命名一个模块文件，那么它的id就不会变，更不会影响到其它模块了
         // new webpack.NamedModulesPlugin(),
+
+
     ],
     module:{
         rules:[
@@ -145,8 +167,22 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        // 编译规则，如果不开启，编译jsx会报错，旧配置presets: ['es2015', 'react']
-                        presets: ['@babel/preset-react'],
+                        // // 编译规则，如果不开启，编译jsx会报错，旧配置presets: ['es2015', 'react']
+                        // presets: ['@babel/preset-react'],
+                        // // plugins: ['syntax-dynamic-import'],
+                        // // plugins: ['@babel/plugin-transform-runtime']
+                        // // 这个也可以在.babelrc中配置
+                        // // plugins:[
+                        // //     // 数组写法在babel7中已经弃用
+                        // //     ['import',{libraryName:'antd', style:true}]
+                        // // ],
+                        // // This is a feature of `babel-loader` for webpack (not Babel itself).It enables caching results in ./node_modules/.cache/babel-loader/directory for faster rebuilds.
+                        // // 这是webpack的“babel-loader”特征（不是Babel本身）。
+                        // // 它可以在./node_modules/.cache/babel-loader/目录中启用缓存结果，以便更快地进行重建。
+                        // cacheDirectory: true,
+
+
+                        presets: ['@babel/preset-env','@babel/preset-react'],
                         // plugins: ['syntax-dynamic-import'],
                         // plugins: ['@babel/plugin-transform-runtime']
                         // 这个也可以在.babelrc中配置
@@ -157,7 +193,31 @@ module.exports = {
                         // This is a feature of `babel-loader` for webpack (not Babel itself).It enables caching results in ./node_modules/.cache/babel-loader/directory for faster rebuilds.
                         // 这是webpack的“babel-loader”特征（不是Babel本身）。
                         // 它可以在./node_modules/.cache/babel-loader/目录中启用缓存结果，以便更快地进行重建。
+
                         cacheDirectory: true,
+                        plugins: [
+                            // '@babel/plugin-proposal-object-rest-spread',
+                            // 编译动态引入语法，e.g: import('./xxx.js')
+                            "syntax-dynamic-import",
+                            // 编译一些es7语法
+                            "@babel/plugin-proposal-class-properties",
+                            [
+                                // "import",
+                                // {
+                                //     "libraryName": "antd",
+                                //     // "libraryDirectory": "lib",
+                                //     "style": "css" // `style: true` 会加载 less 文件
+                                // }
+                                "import",
+                                {
+                                    "libraryName": "antd",
+                                    "libraryDirectory": "es",
+                                    "style": "css"
+                                }
+                            ]
+                        ]
+
+
                     }
                 },
             },

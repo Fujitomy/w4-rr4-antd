@@ -35,7 +35,7 @@ module.exports = {
             'react-dom',
             'react-router',
             'react-router-dom',
-            'react-loadable',
+            // 'react-loadable',
             'axios',
         ]
     },
@@ -45,7 +45,7 @@ module.exports = {
         // 输出文件名 [name].dll.[chunkhash].js中name对应上文中的，entry.vendor的vendor
         filename: '[name].dll.[chunkhash].js',
         // dll公共包文件内的name名称命名规则，映射关系，与下文DllPlugin.name对应
-        library: '[name]_[chunkhash]',
+        library: '[name]_tomy_[chunkhash]',
     },
     plugins:[
         // 打包前，先清除旧的打包文件
@@ -53,20 +53,20 @@ module.exports = {
             './source/vendors/manifest.*.json',
             './source/vendors/vendor.dll.*.js',
             './source/vendors/vendor.*.js'
-        ],
-        {
+        ], {
             // webpack文件夹的绝对路径,Default: root of your package
             root: __dirname, 
             verbose: true,
             // 删除排除选项，无法排除指定正则文件格式,so,要排除从第一个参数吧
             exclude: ['manifest.json'],
         }),
+
         // 抽离公共包配置
         new webpack.DllPlugin({
             // context是解析包路径的上下文
             context: __dirname,
-            // name是dll暴露的对象名(manifest清单索引文件内的name),与上文output.library保持一致
-            name: '[name]_[chunkhash]',
+            // name是dll內部暴露的对象名(manifest清单索引文件内的name),与上文output.library保持一致
+            name: '[name]_tomy_[chunkhash]',
             // 生成manifest索引清单的文件名，竟然是path属性，这里更改manifest的文件名，why not filename？
             // path 是 manifest.json 文件的输出路径，这个文件会用于后续的业务代码打包；
             path: path.join(__dirname, './source/vendors/','[name].manifest.json'),

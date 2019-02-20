@@ -1,5 +1,5 @@
 /*
-* 开发环境编译文件
+* 生产环境编译配置
 * NamedModulesPlugin && OccurrenceOrderPlugin
 * https://blog.csdn.net/chenqiuge1984/article/details/80128021
 *
@@ -7,33 +7,189 @@
 * https://blog.csdn.net/ZYC88888/article/details/80592654
 * https://blog.csdn.net/u013738122/article/details/81809002 编译配置
 *
+*
+*  最初，chunks(以及其在內部通過import导入的模块)，它们通过webpack graph中的父子关系进行连接
+*  CommonsChunkPlugin被用于防止跨越它们引入重复依赖，但是也没法深入优化了
+*  从webpack v4起，删除了CommonsChunkPlugin，转而使用optimization.splitChunks
+*
+*
+*  Default
+*  开箱即用的SplitChunksPlugin(默认配置)能够满足大多数用户的需求
+*  By default it only affects on-demand chunks, because changing initial chunks would
+*  affect the script tags the HTML file should include to run the project.
+*  默认情况下，它仅影响按需加载的chunks，因为改变initial chunks（初始块）会影响HTML文件用应包含的script标签以运行项目
+*  webpack will automatically split chunks based on these conditions:
+*  webpack将根据以下条件自动拆分chunks
+*  1、新的chunk可以共享，或者来自node_modules文件夹内
+*  2、新的chunk至少要大于30kb (before min+gz)
+*  3、按需加载块时的最大并行请求数小于或等于5
+*  4、初始页面加载时的最大并行请求数将小于或等于3
+*  webpack为希望更多控制此功能的开发人员提供了一组选项。
+*  默认配置是Web性能最佳的实践，但你的项目得最佳策略可能会有所不同。 如果您要更改配置，则应衡量更改的影响，以确保实现真正的好处。
+*  此配置对象表示SplitChunksPlugin的默认行为。
+*
+*  optimization: {
+    splitChunks: {
+      chunks: 'async',
+      minSize: 30000, // 要生成的块的最小大小（以字节为单位）。
+      maxSize: 0,
+      minChunks: 1, // 分割前必须共享模块的最小块数。
+      maxAsyncRequests: 5, // 按需加载的最大并行请求数
+      maxInitialRequests: 3, // 入口文件的最大并行请求数
+      automaticNameDelimiter: '~',
+      name: true,
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
+  }
+
+* splitChunks.automaticNameDelimiter
+* 默认情况下，webpack将使用origin来源和chunks名称来生成名称（例如vendors~main.js）。 此选项允许您指定用于生成的名称的分隔符。
+*
+* 这表示将选择哪些块进行优化。 提供字符串时，有效值为all，async和initial。
+* 提供all可以特别强大，因为这意味着即使在异步和非异步块之间也可以共享chunks。
+*
+* optimization: {
+    splitChunks: {
+      // include all types of chunks
+      chunks: 'all'
+    }
+  }
+*
+* Alternatively或者，您可以通过一个function来提供更多控制功能。 返回值将指示是否包括每个块。
+* optimization: {
+    splitChunks: {
+      chunks (chunk) {
+        // exclude `my-excluded-chunk`
+        return chunk.name !== 'my-excluded-chunk';
+      }
+    }
+  }
+* 您可以将此配置与HtmlWebpackPlugin结合使用。 它将为您注入所有生成的vendor chunks块。
+*
+* maxSize
+* 当共享块大小超过maxSize时，将共享块拆分成更小的共享块，该共享块不小于minSize(next to maxSize靠近最大值),
+* maxSize选项旨在与HTTP / 2和长期缓存一起使用。它增加了请求数以获得更好的缓存。它还可用于减小文件大小以加快重建速度。
+* maxInitialRequest/maxAsyncRequests < maxSize < minSize.
+*
+*
+* splitChunks.name
+* 拆分块的名称。 提供true将自动生成基于块和缓存组密钥的名称。
+* 提供字符串或函数允许您使用自定义名称。
+* 指定字符串或始终返回相同字符串的函数会将所有常见模块和供应商合并为一个块。
+* 这可能会导致更大的初始下载量和减慢页面加载速度。
+* If the splitChunks.name matches an entry point name, the entry point will be removed.
+* 如果splitChunks.name与入口点名称匹配，则将删除入口点。
+* 对于生产版本，建议将splitChunks.name设置为false，以便它不会不必要地更改名称。
+* 为不同的拆分块分配相同的名称时，所有供应商模块都放在一个共享块中，但不建议这样做，因为它可以导致更多的代码下载。
+*
+* splitChunks.cacheGroups
+* 缓存组可以继承和/或覆盖splitChunks中的任何选项;
+* 但是test，priority和reuseExistingChunk只能在缓存组级别配置。 要禁用任何默认缓存组，请将它们设置为false。
+* optimization: {
+    splitChunks: {
+      cacheGroups: {
+        default: false
+      }
+    }
+  }
+
+  splitChunks.cacheGroups.priority
+  模块可以属于多个缓存组。 优化将优先选择具有更高优先级的缓存组。
+   默认组的优先级为负，以允许自定义组获得更高的优先级（自定义组的默认值为0）。
+
+   splitChunks.cacheGroups.{cacheGroup}.reuseExistingChunk
+   如果当前块包含已从主束拆分的模块，则将重用它而不是生成新的块。 这可能会影响块的结果文件名。
+
+   optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          reuseExistingChunk: true
+        }
+      }
+    }
+  }
+
+  splitChunks.cacheGroups.{cacheGroup}.test
+  可能的值function (module, chunk) | RegExp | string
+  控制此缓存组选择的模块。 省略它选择所有模块。 它可以匹配绝对模块资源路径或块名称。 匹配块名称时，将选择块中的所有模块。
+
+   optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          test(module, chunks) {
+            //...
+            return module.type === 'javascript/auto';
+          }
+        }
+      }
+    }
+  }
+
+  splitChunks.cacheGroups.{cacheGroup}.filename
+  允许在当且仅当它是初始块时覆盖文件名。 output.filename中提供的所有占位符也可在此处获得。
+  此选项也可以在splitChunks.filename中全局设置，
+  但不建议这样做，如果splitChunks.chunks未设置为“initial”，则可能会导致错误。 避免全局设置。
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          filename: '[name].bundle.js'
+        }
+      }
+    }
+  }
+
+  splitChunks.cacheGroups.{cacheGroup}.enforce
+
+  告诉webpack
+  忽略splitChunks.minSize，
+  splitChunks.minChunks，
+  splitChunks.maxAsyncRequests和splitChunks.maxInitialRequests选项,并始终为此缓存组创建块。
+
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          enforce: true
+        }
+      }
+    }
+  }
+
+  
 */
-
-
-
 
 const path = require('path');
 const webpack = require('webpack');
+const merge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OpenBrowserWebpackPlugin = require('open-browser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const manifest = require('./source/vendors/vendor.manifest.json');
-const dllchunkname = manifest.name.split('_')[1];
-
-console.log(dllchunkname,'dllchunkname');
-
-// 是否打印调用栈
-// process.traceDeprecation = true;
-// 是否关闭弃用警告
-process.noDeprecation = false;
-
-const dev = Boolean(process.env.WEBPACK_SERVE);
+const dllchunkname = manifest.name.split('_')[2];
 const production = process.argv.indexOf('--mode=production') > -1;
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+process.traceDeprecation = false; // 是否打印调用栈
+process.noDeprecation = false; // 是否关闭弃用警告
 
-
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+// console.log(dllchunkname,'dllchunkname');
 
 module.exports = {
+    // mode: 'development',
     mode: 'production',
     // 调试工具，错误打印等级，eval-source-map
     // devtool: "source-map",
@@ -42,115 +198,137 @@ module.exports = {
         colors: true,
         version: true,
     },
-    devtool: production ? 'cheap-module-eval-source-map' : 'hidden-source-map',
+    devtool: 'none',
     entry:{
         // index: path.resolve(__dirname,'./source/entry/index.js'),
         index: [
-            'babel-polyfill',path.resolve(__dirname, './source/entry/index.js')
+            'babel-polyfill', // 编译新版本js的新api(如Promise)，主要是让IE11能够执行编译后的代码
+            path.resolve(__dirname, './source/entry/index.js')
         ]
     },
     // devServer模式下不配置output也是可以的
     output: {
         filename: '[name].[hash].js',
-        chunkFilename: "[name].chunk.js",
+        chunkFilename: "[name].chunk.[chunkhash:8].js",
         // 这里业务代码为何输出到公共包目录了··
-        path: path.resolve(__dirname,'./source/vendors/'),
-        publicPath: "/"
+        // path: path.resolve(__dirname,'./source/vendors/'),
+        path: path.resolve(__dirname,'./dist/build/'),
+        // publicPath: "/",
+        publicPath: './build/',
     },
     optimization:{
         minimize: true, // Tell webpack to minimize the bundle using the UglifyjsWebpackPlugin
         // minimizer: [new UglifyJsPlugin({/* your config */})],  // 允许用户使用其他最小化插件，覆盖webpack默认最小化编译器
-        runtimeChunk: true,
+        usedExports: true,
+        // 识别package.json中的sideEffects以剔除无用的模块，用来做tree-shake
+        // 依赖于optimization.providedExports和optimization.usedExports
+        sideEffects: true,
+        //取代 new webpack.optimize.ModuleConcatenationPlugin()
+        concatenateModules: true,
+        //取代 new webpack.NoEmitOnErrorsPlugin()，编译错误时不打印输出资源。
+        noEmitOnErrors: true,
         splitChunks: {
-            chunks: 'all'
+            // chunks: 'all',
+            chunks: 'async',
+            minSize: 30000, // 模块大于30k会被抽离到公共模块
+            // maxSize: 1024*1024,
+            minChunks: 1, // 模块出现1次就会被抽离到公共模块
+            maxAsyncRequests: 5, // 异步模块，一次最多只能被加载5个
+            maxInitialRequests: 3, // 入口模块最多只能加载3个
+            automaticNameDelimiter: '+',
+            name: true,
+            cacheGroups: {
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    priority: -10
+                },
+                default: {
+                    minChunks: 2,
+                    priority: -20,
+                    reuseExistingChunk: true
+                }
+            }
         },
-    },
-    devServer:{
-        // open: true, // 启动后打开浏览器
-        // 告诉服务器从哪个目录中提供内容。只有在你想要提供静态文件时才需要,
-        // 若配置错误，是找不到资源文件的
-        // 默认情况下，将使用当前工作目录作为提供内容的目录，但是你可以修改为其他目录
-        // 这个很重要，比如你的静态公共包资源放在./source/vendors/目录下，如果你不配置到此，那么devServer启动可能会找不到依赖文件
-        contentBase: path.resolve(__dirname,'./source/vendors/'),
-        // 一切服务都启用gzip压缩(所有来自 './source/vendors' 目录的文件都做 gzip 压缩)
-        compress: true,
-        // 启动本地服务端口号
-        port: 9090,
-        // 配置host之后才可以使用本地ip打开localhost页面
-        host: '0.0.0.0',
-        // 需要开启 plugins > new webpack.HotModuleReplacementPlugin()
-        quiet: false, // true关闭编译控制台打印，世界一下子安静了
-        // inline: true, // 实时刷新 设置为true，当源文件改变时会自动刷新页面
-        // clientLogLevel: 'none', // 当使用内联模式(inline mode)时，会在开发工具(DevTools)的控制台(console)显示消息，例如：在重新加载之前，在一个错误之前，或者模块热替换(Hot Module Replacement)启用时。这可能显得很繁琐,使用none
-        historyApiFallback: true, // 不跳转
-        // 接口代理
-        proxy: {
-            // 业务线接口升级到v4
-            "/v4/*": {
-                target: 'https://dp.clife.net/',
-                changeOrigin: true,
-                secure: false
-            },
-            // 公共接口未升级
-            "/v1/web/*": {
-                target: 'https://dp.clife.net/',
-                changeOrigin: true,
-                secure: false
-            },
-        },
-        hot: true,
     },
     plugins: [
-        // 热更新，不刷新页面异步更新
-        new webpack.HotModuleReplacementPlugin(),
         // 引入dll
         new webpack.DllReferencePlugin({
             context: __dirname,
             manifest: require('./source/vendors/vendor.manifest.json')
         }),
-        // 模板插件
+        // // 模板插件
         new HtmlWebpackPlugin({
             title: 'react-router 4 && webpack4.0+ && antd.design',
             template: './source/html/index.ejs', // html模板文档地址，webpack默认模板为ejs
-            filename: 'index.html', // 由模板生成的文件名和存放位置，可带路径的？需要去官网文档看下
+            filename: '../index.html', // 由模板生成的文件名和存放位置，可带路径的？需要去官网文档看下
             author: 'tomy',
             inject: 'true',// 资源文件注入位置true,body,header,false
+            inline: true,
             // 动态引入dll， manifest就是dll生成的json
-            vendor: /*manifest.name*/'vendor.dll.' + dllchunkname + '.js'
+            vendor: /*manifest.name*/'./vendors/vendor.dll.' + dllchunkname + '.js',
+            // manifest: './vendors/vendor.manifest.json',
+
+            minify: {
+                // collapseBooleanAttributes: true,
+                // collapseWhitespace: true,
+                // minifyCSS: true,
+                // minifyJS: true,
+                // removeComments: true,
+                // removeAttributeQuotes: true,
+                // removeEmptyAttributes: true,
+                // removeScriptTypeAttributes: true,
+                // removeStyleLinkTypeAttributes: true,
+            }
         }),
-        new OpenBrowserWebpackPlugin({
-            browser: 'Chrome',
-            url: 'http://localhost:9090',
-        }),
-        // new CleanWebpackPlugin([
-        //         './source/vendors/index.*.js',
-        //         './source/vendors/index.*.map',
-        //     ],
-        //     {
-        //         // webpack文件夹的绝对路径,Default: root of your package
-        //         root: __dirname,
-        //         verbose: true,
-        //         // 删除排除选项，无法排除指定正则文件格式,so,要排除从第一个参数吧
-        //         exclude: ['manifest.json'],
-        //     }
-        // ),
+        // new OpenBrowserWebpackPlugin({
+        //     browser: 'Chrome',
+        //     url: 'http://localhost:9090',
+        // }),
+        new CleanWebpackPlugin(['dist/build'],
+            {
+                // webpack文件夹的绝对路径,Default: root of your package
+                root: __dirname,
+                verbose: true,
+                // 删除排除选项，无法排除指定正则文件格式,so,要排除从第一个参数吧
+                // exclude: ['manifest.json'],
+            }
+        ),
         // 经常使用的模块提取到打包编译文件靠前位置，提升查找效率和运行速度
         new webpack.optimize.OccurrenceOrderPlugin(),
         // // NamedModulesPlugin使用模块的相对路径作为模块的 id，
         // // 所以只要我们不重命名一个模块文件，那么它的id就不会变，更不会影响到其它模块了
         // new webpack.NamedModulesPlugin(),
+
+        // 拷贝文件
+        new CopyWebpackPlugin(
+            [{
+                from: path.join(__dirname, './source', 'vendors'),
+                to: path.join(__dirname, './dist', 'vendors'),
+                force: true
+            },
+            {
+                from: path.join(__dirname, './source', 'html', 'favicon.ico'),
+                to: path.join(__dirname, './dist'),
+                force: true
+            }]
+        ),
+        // antd icon 本地化
+        // new StringReplacePlugin(),
+
     ],
     module:{
         rules:[
             {
                 // 需要检查打包的各种js资源文件
                 test: /(\.jsx|\.js|\.es6)$/,
-                // 排除查找模块的目录
+                // 排除查找模块的目录,提升编译速度
+                // exclude:,
                 use: {
-                    loader: 'babel-loader',
+                    loader: 'babel-loader?compact=false',
+                    // query: {},
                     options: {
                         // 编译规则，如果不开启，编译jsx会报错，旧配置presets: ['es2015', 'react']
-                        presets: ['@babel/preset-react'],
+                        presets: ['@babel/preset-env','@babel/preset-react'],
                         // plugins: ['syntax-dynamic-import'],
                         // plugins: ['@babel/plugin-transform-runtime']
                         // 这个也可以在.babelrc中配置
@@ -162,6 +340,28 @@ module.exports = {
                         // 这是webpack的“babel-loader”特征（不是Babel本身）。
                         // 它可以在./node_modules/.cache/babel-loader/目录中启用缓存结果，以便更快地进行重建。
                         cacheDirectory: true,
+
+                        plugins: [
+                            // '@babel/plugin-proposal-object-rest-spread',
+                            // 编译动态引入语法，e.g: import('./xxx.js')
+                            "syntax-dynamic-import",
+                            // 编译一些es7语法
+                            "@babel/plugin-proposal-class-properties",
+                            [
+                                // "import",
+                                // {
+                                //     "libraryName": "antd",
+                                //     // "libraryDirectory": "lib",
+                                //     "style": "css" // `style: true` 会加载 less 文件
+                                // }
+                                "import",
+                                {
+                                    "libraryName": "antd",
+                                    "libraryDirectory": "es",
+                                    "style": "css"
+                                }
+                            ]
+                        ]
                     }
                 },
             },
@@ -173,6 +373,19 @@ module.exports = {
                 //     { loader: 'css-loader?modules' },
                 // ]
             },
+            // {
+            //     test:/\.css$/,
+            //
+            //     use: [
+            //         new MiniCssExtractPlugin().loader,
+            //         {
+            //             loader: 'css-loader',
+            //             options: {
+            //                 minimize:true || process.env.NODE_ENV === 'production'
+            //             }
+            //         }
+            //     ],
+            // },
             {
                 test: /\.scss/,
                 use: ['style-loader', 'css-loader', 'sass-loader']

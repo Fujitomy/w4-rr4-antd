@@ -8,6 +8,7 @@ npm-debug.log
 # IDE
 .idea/
 .idea
+.vscode
 
 # Windows
 Thumbs.db
