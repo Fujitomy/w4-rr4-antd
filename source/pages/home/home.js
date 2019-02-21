@@ -5,7 +5,7 @@ import React from 'react'
 require('./home.scss')
 
 // import { updateCartNumber } from 'actions'
-import _ from 'lodash';
+// import _ from 'lodash';
 class Home extends React.Component {
     constructor(props, context) {
         super(props, context)
@@ -13,7 +13,7 @@ class Home extends React.Component {
             username: 'wangweianger00',
             begintime:'',
         }
-        console.log(props,_);
+        // console.log(props,_);
     }
     componentDidMount(){
         // zaneDate({

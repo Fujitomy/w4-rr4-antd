@@ -1,22 +1,22 @@
 
 import React, { Suspense,lazy as Lazy } from "react";
 import { BrowserRouter, HashRouter, Link,Route } from 'react-router-dom';
-// import { DatePicker } from 'antd';
+import { DatePicker } from 'antd';
 
-import DatePicker from 'antd/lib/date-picker';  // 加载 JS
-import 'antd/lib/date-picker/style/css';        // 加载 CSS
-import Loadable from 'react-loadable';
+// import DatePicker from 'antd/lib/date-picker';  // 加载 JS
+// import 'antd/lib/date-picker/style/css';        // 加载 CSS
+// import Loadable from 'react-loadable';
 import Loading from 'components/Loading/';
-import ReactDOM from 'react-dom';
+// import ReactDOM from 'react-dom';
 
 const supportHistory = 'pushState' in window.history;
 import ErrBoundary from './ErrBoundary.jsx';
-
+import { Button } from 'antd';
 
 import axios from 'axios';
 const style = require('./App.less');
-const Mock = require('mockjs');
-import qs from 'qs';
+// const Mock = require('mockjs');
+// import qs from 'qs';
 
 import Iterator from '../Demo/Iterator';
 
@@ -32,13 +32,13 @@ import Sidebar from '../Sidebar/index.jsx';
 
 // 文章
 const Article = Lazy(() => import('../Article/Article.jsx'));
-const Home = Lazy(() => import('pages/home/home'));
+// // const Home = Lazy(() => import('pages/home/home'));
 const One = Lazy(() => import('pages/home/one'));
 const Two = Lazy(() => import('pages/home/two'));
 const User = Lazy(() => import('pages/user/user'));
 
 // 进入退出提示
-import { Prompt } from 'react-router';
+// import { Prompt } from 'react-router';
 
 const handleRequest = (res,callback)=>{
     console.log(res,'--res');
@@ -58,6 +58,7 @@ const handleRequest = (res,callback)=>{
             console.log(msg);
     }
 };
+
 const AndYetAnotherLazyComponent = React.lazy(() =>
     import('../Article/AndYetAnotherLazyComponent')
 );
@@ -103,15 +104,15 @@ class App extends React.Component {
             this.setState({ showArticle:true });
         },3000);
 
-        const dataMock = Mock.mock({
-            // 属性 list 的值是一个数组，其中含有 1 到 10 个元素
-            'list|1-3': [{
-                // 属性 id 是一个自增数，起始值为 1，每次增 1
-                'id|+1': 1
-            }]
-        });
+        // const dataMock = Mock.mock({
+        //     // 属性 list 的值是一个数组，其中含有 1 到 10 个元素
+        //     'list|1-3': [{
+        //         // 属性 id 是一个自增数，起始值为 1，每次增 1
+        //         'id|+1': 1
+        //     }]
+        // });
         // 输出结果
-        console.log(JSON.stringify(dataMock, null, 4));
+        // console.log(JSON.stringify(dataMock, null, 4));
 
         console.log(this.main.current,'mainRef ref object');
         // fs.readFile("./config.json", function(err, contents) {
@@ -166,11 +167,11 @@ class App extends React.Component {
         console.log(iterators.next().value); // 3
 
 
-        const url = `https://www.easy-mock.com/mock/5bf4fa20fa81633e1ba92d78/miniApp/getInfo`;
-        const params = { user: 'tomy' }
-        const callback = (fetchRes)=>{
-            console.log(fetchRes,'接口请求成功返回结果');
-        };
+        // const url = `https://www.easy-mock.com/mock/5bf4fa20fa81633e1ba92d78/miniApp/getInfo`;
+        // const params = { user: 'tomy' }
+        // const callback = (fetchRes)=>{
+        //     console.log(fetchRes,'接口请求成功返回结果');
+        // };
 
         // this.fetchApi('get',url,params,callback).then((success)=>{
         //     console.log(success,'--------success');
@@ -188,30 +189,30 @@ class App extends React.Component {
         console.log(date, dateString,'打印时间选择');
     }
 
-    fetchApi=(method,url,params,callback,allConfig)=>{
-        return new Promise((resolve,reject)=>{
-            switch (method) {
-                case 'get':
-                    axios({
-                        method:'get',
-                        url:`${url}?${qs.stringify(params)}`,
-                        // timeout: 2000,
-                    }).then(res => {
-                        console.log(res,'request success');
-                        handleRequest(res,callback);
-                        resolve(res);
-                    }).catch(error => {
-                        reject('请求失败');
-                        console.log('');
-                        console.log(error,'----------请求错误----------');
-                    });
-                    break;
-                case 'post':
-                    axios.post(`${url}`,qs.stringify(params)).then((res) => {});
-                    break;
-            }
-        });
-    }
+    // fetchApi=(method,url,params,callback,allConfig)=>{
+    //     return new Promise((resolve,reject)=>{
+    //         switch (method) {
+    //             case 'get':
+    //                 axios({
+    //                     method:'get',
+    //                     url:`${url}?${qs.stringify(params)}`,
+    //                     // timeout: 2000,
+    //                 }).then(res => {
+    //                     console.log(res,'request success');
+    //                     handleRequest(res,callback);
+    //                     resolve(res);
+    //                 }).catch(error => {
+    //                     reject('请求失败');
+    //                     console.log('');
+    //                     console.log(error,'----------请求错误----------');
+    //                 });
+    //                 break;
+    //             case 'post':
+    //                 axios.post(`${url}`,qs.stringify(params)).then((res) => {});
+    //                 break;
+    //         }
+    //     });
+    // }
 
     render() {
         const getConfirmation = (message, callback) => {
@@ -244,6 +245,7 @@ class App extends React.Component {
                         {/*<li><Link to="/article">Article</Link></li>*/}
                     {/*</ul>*/}
                     {/*<DatePicker onChange={this.onChange} />*/}
+                    <Button>Antd Button</Button>
                     {/*{renderRoutes(routes)}*/}
                     <aside ref={'ajaxData'}></aside>
                     {/*<div>*/}
@@ -252,7 +254,7 @@ class App extends React.Component {
 
                     <ErrBoundary>
                         <Suspense fallback={false}>
-                            <Route path="/" exact component={Home} />
+                            {/*<Route path="/" exact component={Home} />*/}
                             <Route path="/article" component={ Article } />
                             <Route path="/user" component={User} />
                             <Route path="/one" component={One} />

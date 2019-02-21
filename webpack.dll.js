@@ -21,23 +21,25 @@ module.exports = {
     mode: "production",
     devtool: 'none',
     // 编译统计
-    stats: {
-        // 编译代码变色
-        colors: true,
-        // 打印webpack版本
-        version: true,
-    },
+    // stats: {
+    //     // 编译代码变色
+    //     colors: true,
+    //     // 打印webpack版本
+    //     version: true,
+    // },
     // 抽离公共包入口
     entry: {
         // 抽离公共包文件名和模块
         vendor: [
             'react',
             'react-dom',
-            'react-router',
+            // 'react-router',
             'react-router-dom',
             // 'react-loadable',
             'axios',
-        ]
+            // 'antd'
+        ],
+        // antd:['antd']
     },
     output: {
         // 输出文件路径
@@ -45,7 +47,7 @@ module.exports = {
         // 输出文件名 [name].dll.[chunkhash].js中name对应上文中的，entry.vendor的vendor
         filename: '[name].dll.[chunkhash].js',
         // dll公共包文件内的name名称命名规则，映射关系，与下文DllPlugin.name对应
-        library: '[name]_tomy_[chunkhash]',
+        library: '[name]_[chunkhash]',
     },
     plugins:[
         // 打包前，先清除旧的打包文件
@@ -66,7 +68,7 @@ module.exports = {
             // context是解析包路径的上下文
             context: __dirname,
             // name是dll內部暴露的对象名(manifest清单索引文件内的name),与上文output.library保持一致
-            name: '[name]_tomy_[chunkhash]',
+            name: '[name]_[chunkhash]',
             // 生成manifest索引清单的文件名，竟然是path属性，这里更改manifest的文件名，why not filename？
             // path 是 manifest.json 文件的输出路径，这个文件会用于后续的业务代码打包；
             path: path.join(__dirname, './source/vendors/','[name].manifest.json'),

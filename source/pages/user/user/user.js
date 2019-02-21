@@ -1,7 +1,8 @@
 import React from 'react'
 
-require('./user.scss')
-import _ from 'lodash';
+import('./user.scss');
+
+// import _ from 'lodash';
 export default class User extends React.Component {
     constructor(props, context){
         super(props, context)
@@ -16,7 +17,7 @@ export default class User extends React.Component {
 
     alertId(item){
         alert('我的编号是'+item.id)
-        console.log(_,'---------------_');
+        // console.log(_,'---------------_');
     }
 
     render() {

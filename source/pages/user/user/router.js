@@ -1,10 +1,16 @@
 // @flow
 import asyncComponent from 'components/AsyncComponent'
 
-module.exports = [
-    { 
+// module.exports = [
+//     {
+//         path: '/user',
+//         component: asyncComponent(() => import('./user'))
+//     },
+// ]
+
+export default [
+    {
         path: '/user',
         component: asyncComponent(() => import('./user'))
     },
 ]
-
