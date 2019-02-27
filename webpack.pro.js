@@ -246,7 +246,7 @@ module.exports = {
             //     return chunk.name !== 'react' && chunk.name !== 'react-router-dom'  && chunk.name !== 'react-dom';
             // },
             minSize: 30000, // 模块大于30k会被抽离到公共模块
-            // maxSize: 1024*1024,
+            maxSize: 1024*1000,
             minChunks: 1, // 模块出现1次就会被抽离到公共模块
             maxAsyncRequests: 5, // 异步模块并行加载模块数，默认值为5
             maxInitialRequests: 3, // 初始加载模块最大并行请求数，默认值为3
@@ -256,7 +256,7 @@ module.exports = {
                 vendors: {
                     test: /[\\/]node_modules[\\/]/,
                     priority: -10,
-                    reuseExistingChunk: true
+                    // reuseExistingChunk: true
                 },
                 // default:false,
                 // default: {
@@ -338,69 +338,69 @@ module.exports = {
                 // 需要检查打包的各种js资源文件
                 test: /(\.jsx|\.js|\.es6)$/,
                 // 排除查找模块的目录,提升编译速度
-                // exclude:,
+                exclude: /node_modules/,
                 use: {
                     // loader: 'babel-loader?compact=true',
-                    loader: require.resolve('babel-loader'),
+                    loader: 'babel-loader',
                     // query: {},
-                    options: {
-                        // 编译规则，如果不开启，编译jsx会报错，旧配置presets: ['es2015', 'react']
-                        presets: [
-                            ['@babel/preset-env',{
-                                "targets": {
-                                    "esmodules": true
-                                }
-                            }],'@babel/preset-react'
-                        ],
-                        // plugins: ['syntax-dynamic-import'],
-                        // plugins: ['@babel/plugin-transform-runtime']
-                        // 这个也可以在.babelrc中配置
-                        // plugins:[
-                        //     // 数组写法在babel7中已经弃用
-                        //     ['import',{libraryName:'antd', style:true}]
-                        // ],
-                        // This is a feature of `babel-loader` for webpack (not Babel itself).It enables caching results in ./node_modules/.cache/babel-loader/directory for faster rebuilds.
-                        // 这是webpack的“babel-loader”特征（不是Babel本身）。
-                        // 它可以在./node_modules/.cache/babel-loader/目录中启用缓存结果，以便更快地进行重建。
-                        cacheDirectory: true,
-                        compact: true,
-                        plugins: [
-                            [
-                                // "transform-runtime",
-                                // "import",
-                                // {
-                                //     "libraryName": "antd",
-                                //     // "libraryDirectory": "lib",
-                                //     "style": "css" // `style: true` 会加载 less 文件
-                                // }
-                                "import",
-                                {
-                                    "libraryName": "antd",
-                                    "libraryDirectory": "es",
-                                    "style":   "css"// true 会打less
-                                },
-                                "ant"
-                            ],
-                            // "@babel/plugin-transform-runtime",
-                            // '@babel/plugin-proposal-object-rest-spread',
-                            // 编译动态引入语法，e.g: import('./xxx.js')
-                            "syntax-dynamic-import",
-                            // 编译一些es7语法
-                            "@babel/plugin-proposal-class-properties",
-
-
-
-                            // [
-                            //     "@babel/plugin-transform-runtime",
-                            //     {
-                            //         "corejs": false,
-                            //         "helpers": true,
-                            //         "regenerator": true,
-                            //         "useESModules": true
-                            //     }
-                            // ],
-                        ]
-                    }
+                    // options: {
+                    //     // 编译规则，如果不开启，编译jsx会报错，旧配置presets: ['es2015', 'react']
+                    //     presets: [
+                    //         ['@babel/preset-env',{
+                    //             "targets": {
+                    //                 "esmodules": true
+                    //             }
+                    //         }],'@babel/preset-react'
+                    //     ],
+                    //     // plugins: ['syntax-dynamic-import'],
+                    //     // plugins: ['@babel/plugin-transform-runtime']
+                    //     // 这个也可以在.babelrc中配置
+                    //     // plugins:[
+                    //     //     // 数组写法在babel7中已经弃用
+                    //     //     ['import',{libraryName:'antd', style:true}]
+                    //     // ],
+                    //     // This is a feature of `babel-loader` for webpack (not Babel itself).It enables caching results in ./node_modules/.cache/babel-loader/directory for faster rebuilds.
+                    //     // 这是webpack的“babel-loader”特征（不是Babel本身）。
+                    //     // 它可以在./node_modules/.cache/babel-loader/目录中启用缓存结果，以便更快地进行重建。
+                    //     cacheDirectory: true,
+                    //     compact: true,
+                    //     plugins: [
+                    //         [
+                    //             // "transform-runtime",
+                    //             // "import",
+                    //             // {
+                    //             //     "libraryName": "antd",
+                    //             //     // "libraryDirectory": "lib",
+                    //             //     "style": "css" // `style: true` 会加载 less 文件
+                    //             // }
+                    //             "import",
+                    //             {
+                    //                 "libraryName": "antd",
+                    //                 "libraryDirectory": "es",
+                    //                 "style":   "css"// true 会打less
+                    //             },
+                    //             "ant"
+                    //         ],
+                    //         // "@babel/plugin-transform-runtime",
+                    //         // '@babel/plugin-proposal-object-rest-spread',
+                    //         // 编译动态引入语法，e.g: import('./xxx.js')
+                    //         "syntax-dynamic-import",
+                    //         // 编译一些es7语法
+                    //         "@babel/plugin-proposal-class-properties",
+                    //
+                    //
+                    //
+                    //         // [
+                    //         //     "@babel/plugin-transform-runtime",
+                    //         //     {
+                    //         //         "corejs": false,
+                    //         //         "helpers": true,
+                    //         //         "regenerator": true,
+                    //         //         "useESModules": true
+                    //         //     }
+                    //         // ],
+                    //     ]
+                    // }
                 },
             },
             {

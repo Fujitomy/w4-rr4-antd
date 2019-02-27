@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[1],{487:function(n,e,t){"use strict";t.r(e);var a=t(1),o=t.n(a);e.default=(()=>o.a.createElement("span",null,"AndYetAnotherLazyComponent"))}}]);

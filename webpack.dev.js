@@ -44,7 +44,11 @@ module.exports = {
     entry:{
         // index: path.resolve(__dirname,'./source/entry/index.js'),
         index: [
-            'babel-polyfill',path.resolve(__dirname, './source/entry/index.js')
+            // 入口头文件引入会导致编译包体积增大，应该使用babel-runtime和babel-helpers按需引入和防止重复打包，
+            // 比如有50个文件使用了Object.assign()方法，
+            // 应该是抽一个es5 版Object.assign()的js模块，给其他各个文件引入，而不是打得到50个文件中，这个引入babel抽离到babel-helpers中了
+            'babel-polyfill',
+            path.resolve(__dirname, './source/entry/index.js')
         ]
     },
     // devServer模式下不配置output也是可以的

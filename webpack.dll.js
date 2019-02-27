@@ -73,7 +73,8 @@ module.exports = {
             // path 是 manifest.json 文件的输出路径，这个文件会用于后续的业务代码打包；
             path: path.join(__dirname, './source/vendors/','[name].manifest.json'),
         }),
-    ]
+    ],
+
 }
 
 

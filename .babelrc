@@ -1,5 +1,5 @@
 {
-    "presets": ["@babel/preset-env","@babel/preset-react"],
+    // plugins 会在 Preset 之前运行，plugins 会从前到后顺序执行 顺序使用插件
     "plugins": [
         "syntax-dynamic-import",
         // 编译一些es7语法
@@ -11,5 +11,8 @@
                 "style": "css" // `style: true` 会加载 less 文件
             }
         ]
-    ]
+    ],
+    // preset 倒序使用预设 主要是为了保证向后兼容
+    // 因为大多数用户的编写顺序是 ['es2015', 'stage-0'],这样必须先执行 stage-0 才能确保 babel 不报错
+    "presets": ["@babel/preset-env","@babel/preset-react"]
 }
