@@ -1,10 +1,6 @@
 
 import React, { Suspense,lazy as Lazy } from "react";
 
-
-
-
-
 // import { BrowserRouter, HashRouter, Link,Route } from 'react-router-dom';
 // import { DatePicker } from 'antd';
 //
@@ -345,6 +341,7 @@ import React, { Suspense,lazy as Lazy } from "react";
 // }else{
 //     console.log('我不支持呀');
 // }
+
 class App extends React.Component {
 
     constructor(props) {
