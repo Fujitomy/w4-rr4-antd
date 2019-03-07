@@ -3,8 +3,24 @@
 *  使用 webpack 4 和 Babel 7 配置 Vue.js 工程模板
 *  https://segmentfault.com/a/1190000015247255
 *
+*  一口（很长的）气了解 babel
+*  https://zhuanlan.zhihu.com/p/43249121
+*
 *  我们使用 @babel/cli 从终端运行 Babel，@babel/polyfill 来实现所有新的 JavaScript 功能，
 *  env preset 只包含我们使用的功能的转换，实现我们的目标浏览器中缺少的功能
+*
+*
+*
+*  env = es2015 + es2016 + es2017
+*  stage-0 = stage-1 + stage-2 + stage-3
+*
+*  babel-register
+*
+*  babel-register模块改写require命令，为它加上一个钩子。此后，每当使用require加载.js、.jsx、.es和.es6后缀名的文件，就会先用Babel进行转码。
+*  使用时，必须首先加载babel-register。
+*  require("babel-register");
+*  require("./index.js");
+*
 */
 
 
@@ -44,33 +60,81 @@ const plugins = [
     // 打包后代码冗余量比较大，
     // 对于现代的浏览器,有些不需要polyfill，造成流量浪费
     // 污染了全局对象
+    // @babel/polyfill主要有两个缺点(在入口点全局引入@babel/polyfill)：
+    // 使用@babel/polyfill会导致打出来的包非常大，因为 @babel/polyfill 是一个整体，把所有方法都加到原型链上。比如我们只使用了 Array.from，但它把 Object.defineProperty 也给加上了，这就是一种浪费了。这个问题可以通过单独使用 core-js 的某个类库来解决，core-js 都是分开的。
+    // @babel/polyfill会污染全局变量，给很多类的原型链上都作了修改，如果我们开发的也是一个类库供其他开发者使用，这种情况就会变得非常不可控。
+
+    // 因此在实际使用中，如果我们无法忍受这两个缺点(尤其是第二个)，通常我们会倾向于使用 babel-plugin-transform-runtime。
+    // 但如果你的代码中包含高版本 js 中类型的实例方法
+    // (例如 ECMAScript2016/ES7 中的 Array 实例方法 [1,2,3].includes(1))，这还是要使用 polyfill。
 
     // babel-polyfill主要由两部分组成，core-js和regenerator runtime。
     // core-js：提供了如ES5、ES6、ES7等规范中 中新定义的各种对象、方法的模拟实现。
     // regenerator：提供generator支持，如果应用代码中用到generator、async函数的话用到。
     // 链接：https://www.jianshu.com/p/7bc7b0fadfc2
 
-
-    // 网上很多人说，集成了transform-runtime就不用babel-polyfill了，其实不然，看看官方怎么说的：
+    // 很多人说，集成了transform-runtime就不用babel-polyfill了，其实不然，看看官方怎么说的：
     // 注意：诸如“foobar”.includes（“foo”）之类的实例方法将无法工作，因为这需要修改现有的内置插件（使用babel-polyfill来实现）
     // 所以配置transform-runtime之后任然引入babel-polyfill的目的就是来实现一些实例化的新增全局对象调用了
+    // https://babeljs.io/docs/en/babel-plugin-transform-runtime
+    // https://babeljs.io/docs/en/babel-plugin-transform-runtime#technical-details
+    // https://www.cnblogs.com/chyingp/archive/2018/06/01/understanding-babel-polyfill.html
+    // https://www.cnblogs.com/JRliu/p/8280055.html
 
-//     https://babeljs.io/docs/en/babel-plugin-transform-runtime
-// https://babeljs.io/docs/en/babel-plugin-transform-runtime#technical-details
-//
-//     https://www.cnblogs.com/chyingp/archive/2018/06/01/understanding-babel-polyfill.html
-//         https://www.cnblogs.com/JRliu/p/8280055.html
+    [
+        "@babel/plugin-transform-runtime",
+        {
+            "helpers": true,
+            "regenerator": true, // 默认为true,切换生成器函数是否转换为使用不会污染全局范围的再生器运行时
+            "useESModules":false, // 默认flase,启用后，转换将使用不通过@ babel/plugin-transform-modules-commonjs运行的帮助程序。 这允许在webpack等模块系统中进行较小的构建，因为它不需要保留commonjs语义。
+            // "moduleName": "@babel/runtime",
+            // "corejs": 2
+        },
+        // "transform-runtime"
+    ],
+    [
+        "import",
+        {
+            "libraryName": "antd",
+            "libraryDirectory": "lib", // `lib` 默认
+            "style": "css" // `style: true` 会加载 less 文件
+        },
+        "antd"
+    ]
 
+    // 提案阶段插件，
+    // babel-env只编译stage-4即已发布的语法，提案阶段的语法需要手动引入插件编译
+    // babel-preset-env 变成了 @babel/preset-env。进一步，还可以省略 preset 而简写为 @babel/env。
+    // babel-plugin-transform-arrow-functions 变成了 @babel/plugin-transform-arrow-functions。和 preset 一样，plugin 也可以省略，于是简写为 @babel/transform-arrow-functions。
+    // stage-x 被删除了，它包含的插件虽然保留，但也被重命名了。babel 团队希望更明显地区分已经位于规范中的插件 (如 es2015 的 babel-plugin-transform-arrow-functions) 和仅仅位于草案中的插件 (如 stage-0 的 @babel/plugin-proposal-function-bind)。
+    // 方式就是在名字中增加 proposal，所有包含在 stage-x 的转译插件都使用了这个前缀，语法插件不在其列。
+    // 最后，如果插件名称中包含了规范名称 (-es2015-, -es3- 之类的)，一律删除。例如 babel-plugin-transform-es2015-classes 变成了 @babel/plugin-transform-classes。
 
-
-
-    [ "@babel/plugin-transform-runtime",{
-        "helpers": true,
-        "regenerator": true, // 默认为true,切换生成器函数是否转换为使用不会污染全局范围的再生器运行时
-        "useESModules":false, // 默认flase,启用后，转换将使用不通过@ babel / plugin-transform-modules-commonjs运行的帮助程序。 这允许在webpack等模块系统中进行较小的构建，因为它不需要保留commonjs语义。
-        "moduleName": "@babel/runtime"
-    }]
+    // // Stage 0
+    // "@babel/plugin-proposal-function-bind",
+    //
+    // // Stage 1
+    // "@babel/plugin-proposal-export-default-from",
+    // "@babel/plugin-proposal-logical-assignment-operators",
+    // ["@babel/plugin-proposal-optional-chaining", { "loose": false }],
+    // ["@babel/plugin-proposal-pipeline-operator", { "proposal": "minimal" }],
+    // ["@babel/plugin-proposal-nullish-coalescing-operator", { "loose": false }],
+    // "@babel/plugin-proposal-do-expressions",
+    //
+    // // Stage 2
+    // ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    // "@babel/plugin-proposal-function-sent",
+    // "@babel/plugin-proposal-export-namespace-from",
+    // "@babel/plugin-proposal-numeric-separator",
+    // "@babel/plugin-proposal-throw-expressions",
+    //
+    // // Stage 3
+    // "@babel/plugin-syntax-dynamic-import",
+    // "@babel/plugin-syntax-import-meta",
+    // ["@babel/plugin-proposal-class-properties", { "loose": false }],
+    // "@babel/plugin-proposal-json-strings"
 ];
+
 const presets = [
     // Babel 7 的 presets 设置由原来的 env 换成了 @babel/preset-env,
     // 可以配置 targets, useBuiltIns 等选项用于编译出兼容目标环境的代码。
@@ -81,13 +145,15 @@ const presets = [
     [
         "@babel/preset-env",
         {
-            "modules": false,
+            // "modules": false,
             "targets": {
-                "browsers": "> 0.25%, not dead",
-                "esmodules": true,
-                "debug":true
+                //"browsers": "> 0.25%, not dead",
+                "chrome":56,
+                "ie": 11,
+                // // "esmodules": true,
+                // "debug": true // 加这个会导致报错
             },
-            "useBuiltIns": 'usage',// usage只包括项目中需要的polyfill，而不是全局转换，这样会减少代码冗余量
+            "useBuiltIns": 'usage', // usage只包括项目中需要的polyfill，而不是全局转换，这样会减少代码冗余量
         }
     ],
     '@babel/preset-react'
@@ -161,12 +227,10 @@ module.exports = {
 
 
 
-当你使用 generators/async 函数时，自动引入 babel-runtime/regenerator （使用 regenerator 运行时而不会污染当前环境） 。
-自动引入 babel-runtime/core-js 并映射 ES6 静态方法和内置插件（实现polyfill的功能且无全局污染，但是实例方法无法正常使用，如   "foobar".includes("foo") ）。
-移除内联的 Babel helper 并使用模块 babel-runtime/helpers 代替（提取babel转换语法的代码）。
-
-
-他们分别对应下面三个配置(默认都为true)
+*当你使用 generators/async 函数时，自动引入 babel-runtime/regenerator （使用 regenerator 运行时而不会污染当前环境） 。
+* 自动引入 babel-runtime/core-js 并映射 ES6 静态方法和内置插件（实现polyfill的功能且无全局污染，但是实例方法无法正常使用，如   "foobar".includes("foo") ）。
+* 移除内联的 Babel helper 并使用模块 babel-runtime/helpers 代替（提取babel转换语法的代码）。
+* 他们分别对应下面三个配置(默认都为true)
 {
   "plugins": [
     ["transform-runtime", {
@@ -176,5 +240,8 @@ module.exports = {
     }]
   ]
 }
+*
+*
+*
 *
 */

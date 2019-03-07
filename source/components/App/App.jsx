@@ -2,7 +2,7 @@
 import React, { Suspense,lazy as Lazy } from "react";
 
 // import { BrowserRouter, HashRouter, Link,Route } from 'react-router-dom';
-// import { DatePicker } from 'antd';
+import { DatePicker } from 'antd';
 //
 // // import DatePicker from 'antd/lib/date-picker';  // 加载 JS
 // // import 'antd/lib/date-picker/style/css';        // 加载 CSS
@@ -354,7 +354,9 @@ class App extends React.Component {
         // throw new Error('I crashed!');
         return (
             // this.state.showArticle &&
-            <div>app</div>
+            <div>app
+                <DatePicker />
+            </div>
         )
     }
 }
