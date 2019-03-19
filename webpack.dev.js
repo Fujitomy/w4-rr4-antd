@@ -9,9 +9,6 @@
 *
 */
 
-
-
-
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -33,15 +30,12 @@ const production = process.argv.indexOf('--mode=production') > -1;
 module.exports = {
     // mode: 'production',
     mode: 'development',
-    // 调试工具，错误打印等级，eval-source-map
-    // devtool: "source-map",
     // webpack 4.0 之后独立出来，在配置文件中，配置才能生效，以前直接在packjson.script命令行中配置--colors也行
-    stats: {
-        colors: true,
-        version: true,
-    },
+    stats: { colors: true, version: true },
+    // 调试工具，错误打印等级，可设置不同打印等级 devtool: 'inline-source-map',
     devtool: production ? 'cheap-module-eval-source-map' : 'hidden-source-map',
     entry:{
+        // 简单写法
         // index: path.resolve(__dirname,'./source/entry/index.js'),
         index: [
             // 入口头文件引入会导致编译包体积增大，应该使用babel-runtime和babel-helpers按需引入和防止重复打包，
@@ -57,7 +51,10 @@ module.exports = {
         chunkFilename: "[name].chunk.js",
         // 这里业务代码为何输出到公共包目录了··
         path: path.resolve(__dirname,'./source/vendors/'),
-        publicPath: "/"
+        // 对于按需加载(on-demand-load)或加载外部资源(external resources)（如图片、文件等）来说，output.publicPath 是很重要的选项。如果指定了一个错误的值，则在加载这些资源时会收到 404 错误。
+        publicPath: "/",
+        // 模块注释信息，默认为false,不应该使用到生产环境
+        pathinfo: true
     },
     optimization:{
         runtimeChunk: true,

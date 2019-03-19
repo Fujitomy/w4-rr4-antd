@@ -348,7 +348,7 @@ class App extends React.Component {
         if(Array.includes){
             console.log([1,2].includes(1));
         }else{
-            console.log('我不支持呀');
+            console.log('111111212211212我不支持呀?!!!!1212');
         }
         
         return (

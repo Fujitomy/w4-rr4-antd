@@ -6,7 +6,7 @@ const plugins = [
     // 编译一些es7语法
     '@babel/plugin-proposal-class-properties',
     // 按需加载polyfill，且不污染全局变量，
-    // 入口处引入polyfill会全量引入，且污染全局
+    // 入口处引入polyfill会全量引入，且污染全局，但是可以编译原型（实例）方法和类（静态）方法，比如Array.includes
     [
         "@babel/plugin-transform-runtime",
         {

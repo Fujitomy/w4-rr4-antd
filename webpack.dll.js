@@ -31,6 +31,7 @@ module.exports = {
     entry: {
         // 抽离公共包文件名和模块
         vendor: [
+            // 
             'react',
             'react-dom',
             // 'react-router',
@@ -77,7 +78,7 @@ module.exports = {
 
 }
 
-
+{
 // Manifest 
 // 那么，一旦你的应用程序中，形如 index.html 文件、一些 bundle 和各种资源加载到浏览器中，会发生什么？
 // 你精心安排的 /src 目录的文件结构现在已经不存在，所以 webpack 如何管理所有模块之间的交互呢？
@@ -88,3 +89,4 @@ module.exports = {
 // 无论你选择哪种模块语法，那些 import 或 require 语句现在都已经转换为 __webpack_require__ 方法，
 // 此方法指向模块标识符(module identifier)。
 // 通过使用 manifest 中的数据，runtime 将能够查询模块标识符，检索出背后对应的模块。
+}
