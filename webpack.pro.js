@@ -11,6 +11,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
 const manifest = require('./source/vendors/vendor.manifest.json');
 const dllchunkname = manifest.name.split('_')[1];
@@ -27,12 +28,141 @@ module.exports = {
     // devtool: "source-map",
     devtool: 'none',
     // 统计信息-编译控制台
-    // stats: 'normal',
+    // stats: 'none',
     stats: {
-        colors: true,
-        version: true,
+        // 未定义选项时，stats 选项的备用值(fallback value)（优先级高于 webpack 本地默认值）
+        // all: undefined,
+
         // 添加资源信息
         assets: false,
+
+        // 对资源按指定的字段进行排序
+        // 你可以使用 `!field` 来反转排序。
+        assetsSort: "field",
+
+        // 添加构建日期和构建时间信息
+        builtAt: true,
+
+        // 添加缓存（但未构建）模块的信息
+        cached: false,
+
+        // 显示缓存的资源（将其设置为 `false` 则仅显示输出的文件）
+        cachedAssets: false,
+
+        // 添加 children 信息
+        children: false,
+
+        // 添加 chunk 信息（设置为 `false` 能允许较少的冗长输出）
+        chunks: false,
+
+        // 将构建模块信息添加到 chunk 信息
+        chunkModules: false,
+
+        // 添加 chunk 和 chunk merge 来源的信息
+        chunkOrigins: false,
+
+        // 按指定的字段，对 chunk 进行排序
+        // 你可以使用 `!field` 来反转排序。默认是按照 `id` 排序。
+        chunksSort: "field",
+
+        // 用于缩短 request 的上下文目录
+        // context: "../src/",
+
+        // `webpack --colors` 等同于
+        colors: true,
+
+        // 显示每个模块到入口起点的距离(distance)
+        depth: false,
+
+        // 通过对应的 bundle 显示入口起点
+        entrypoints: true,
+
+        // 添加 --env information
+        env: false,
+
+        // 添加错误信息
+        errors: true,
+
+        // 添加错误的详细信息（就像解析日志一样）
+        errorDetails: true,
+
+        // 将资源显示在 stats 中的情况排除
+        // 这可以通过 String, RegExp, 获取 assetName 的函数来实现
+        // 并返回一个布尔值或如下所述的数组。
+        excludeAssets: (assetName) => { 
+            console.log(moduleSource,'---------excludeAssets-----------');
+            return false 
+        },
+        //"filter", 
+        // | /filter/ | (assetName) => ... return true|false |
+        //     ["filter"] | [/filter/] | [(assetName) => ... return true|false],
+
+        // 将模块显示在 stats 中的情况排除
+        // 这可以通过 String, RegExp, 获取 moduleSource 的函数来实现
+        // 并返回一个布尔值或如下所述的数组。
+        excludeModules: (moduleSource) => {return false},
+        // "filter",
+        // | /filter/ | (moduleSource) => ... return true|false |
+        //     ["filter"] | [/filter/] | [(moduleSource) => ... return true|false]
+            
+
+        // 和 excludeModules 相同
+        exclude: (moduleSource) => {
+            console.log(moduleSource,'---------moduleSource-----------');
+            return false
+        },
+        // "filter", 
+        // | /filter/ | (moduleSource) => ... return true|false |
+        //     ["filter"] | [/filter/] | [(moduleSource) => ... return true|false],
+
+        // 添加 compilation 的哈希值
+        hash: false,
+
+        // 设置要显示的模块的最大数量
+        maxModules: 15,
+
+        // 添加构建模块信息
+        modules: false,
+
+        // 按指定的字段，对模块进行排序
+        // 你可以使用 `!field` 来反转排序。默认是按照 `id` 排序。
+        modulesSort: "field",
+
+        // 显示警告/错误的依赖和来源（从 webpack 2.5.0 开始）
+        moduleTrace: false,
+
+        // 当文件大小超过 `performance.maxAssetSize` 时显示性能提示
+        performance: false,
+
+        // 显示模块的导出
+        providedExports: true,
+
+        // 添加 public path 的信息
+        publicPath: false,
+
+        // 添加模块被引入的原因
+        reasons: false,
+
+        // 添加模块的源码
+        source: false,
+
+        // 添加时间信息
+        timings: true,
+
+        // 显示哪个模块导出被用到
+        usedExports: false,
+
+        // 添加 webpack 版本信息
+        version: false,
+
+        // 添加警告
+        warnings: true,
+
+        // 过滤警告显示（从 webpack 2.4.0 开始），
+        // 可以是 String, Regexp, 一个获取 warning 的函数
+        // 并返回一个布尔值或上述组合的数组。第一个匹配到的为胜(First match wins.)。
+        warningsFilter: (warning) => { return false }
+        //  "filter" // | /filter/ | ["filter", /filter/] | (warning) => ... return true|false
     },
     // 启用 Watch 模式。这意味着在初始构建之后，webpack 将继续监听任何已解析文件的更改。Watch 模式默认关闭。
     watch: true,
@@ -44,13 +174,14 @@ module.exports = {
         ignored: /node_modules/
     },
     // 配置如何展示性能提示。例如，如果一个资源超过 250kb，webpack 会对此输出一个警告来通知你。
-    performance:{
-        hints: 'warning', // || 'error' || 'warning'
-        // 入口起点表示针对指定的入口，对于所有资源，要充分利用初始加载时(initial load time)期间。此选项根据入口起点的最大体积，控制 webpack 何时生成性能提示。默认值是：250000 (bytes)。
-        maxEntrypointSize: 5000000,
-        // 资源(asset)是从 webpack 生成的任何文件。此选项根据单个资源体积，控制 webpack 何时生成性能提示。默认值是：250000 (bytes)。
-        maxAssetSize: 100000,
-    },
+    // performance:{
+    //     // hints: 'warning', // false | 'error' | 'warning'
+    //     hints: 'warning',
+    //     // 入口起点表示针对指定的入口，对于所有资源，要充分利用初始加载时(initial load time)期间。此选项根据入口起点的最大体积，控制 webpack 何时生成性能提示。默认值是：250000 (bytes)。
+    //     maxEntrypointSize: 25000,
+    //     // 资源(asset)是从 webpack 生成的任何文件。此选项根据单个资源体积，控制 webpack 何时生成性能提示。默认值是：250000 (bytes)。
+    //     maxAssetSize: 25000,
+    // },
     // 基础目录，绝对路径，用于从配置中解析入口起点(entry point)和 loader 其上下文是入口文件所处的目录的绝对路径的字符串
     // context: path.resolve(__dirname, "./source/entry/"),
     // entry 对象是用于 webpack 查找启动并构建 bundle。其上下文 context 是入口文件所处的目录的绝对路径的字符串。
@@ -122,7 +253,7 @@ module.exports = {
             //   // exclude `my-excluded-chunk`
             //   return chunk.name !== 'react' && chunk.name !== 'react-router-dom'  && chunk.name !== 'react-dom';
             // },
-            chunks: 'async',
+            chunks: 'all',
             minSize: 30000, // 模块大于30k会被抽离到公共模块
             maxSize: 512*1000, // 超过指定的大小就抽离成模块
             minChunks: 1, // 模块出现1次就会被抽离到公共模块
@@ -193,7 +324,8 @@ module.exports = {
             {
                 // webpack文件夹的绝对路径,Default: root of your package
                 root: __dirname,
-                verbose: true,
+                verbose: false,
+                dry: true,
                 // 删除排除选项，无法排除指定正则文件格式,so,要排除从第一个参数吧
                 // exclude: ['manifest.json'],
             }
@@ -217,12 +349,33 @@ module.exports = {
                 force: true
             }]
         ),
+        // 编译控制台打印美化
+        // new FriendlyErrorsWebpackPlugin(
+        //     {
+        //         compilationSuccessInfo: {
+        //             messages: ['You app is running at http://localhost:3000'],
+        //             notes: ['------------compile-over-----------------']
+        //         },
+        //         onErrors: function (severity, errors) {
+        //             // You can listen to errors transformed and prioritized by the plugin
+        //             // severity can be 'error' or 'warning'
+        //         },
+        //         // should the console be cleared between each compilation?
+        //         // default is true
+        //         clearConsole: true,
+        //         // add formatters and transformers (see below)
+        //         additionalFormatters: [],
+        //         additionalTransformers: []
+        //     }
+        // ),
         // Antd icon 本地化
         // new StringReplacePlugin(),
         // 打包分析
-        new BundleAnalyzerPlugin(),
+        // new BundleAnalyzerPlugin(),
     ],
     module:{
+        // 排除编译项   有些库是自成一体不依赖其他库的没有使用模块化的，比如jquey、momentjs、chart.js，要使用它们必须整体全部引入。 webpack是模块化打包工具完全没有必要去解析这些文件的依赖，因为它们都不依赖其它文件体积也很庞大，要忽略它们配置如下：
+        noParse: /node_modules\/(moment\.js)/,
         rules:[
             {
                 // 需要检查打包的各种js资源文件
@@ -230,8 +383,8 @@ module.exports = {
                 // 排除查找模块的目录,提升编译速度
                 exclude: /node_modules/,
                 use: {
-                    // loader: 'babel-loader?compact=true',
-                    loader: 'babel-loader',
+                    // babel编译过程很耗时，好在babel-loader提供缓存编译结果选项，在重启webpack时不需要创新编译而是复用缓存结果减少编译流程。babel-loader缓存机制默认是关闭的，打开的配置如下babel-loader?cacheDirectory
+                    loader: 'babel-loader?cacheDirectory',
                 },
             },
             {
@@ -278,17 +431,21 @@ module.exports = {
     resolve: {
         // 默认后缀名，配置后可省略
         extensions: ['.js', '.jsx','.es6'],
-        // 指定模块查找目录，提升runtime模块查找速度
-        // modules:['source/components','node_modules'],
+        // 指定模块查找目录，import 'redux'这样不是相对也不是绝对路径的写法时会去node_modules目录下找。但是默认的配置会采用向上递归搜索的方式去寻找node_modules
+        modules: [path.resolve(__dirname, 'node_modules')],
         // 文件夹别名配置
         alias: {
-            components: path.resolve(__dirname, './source/components'),
-            com: path.resolve(__dirname, './source/components'),
-            pages: path.resolve(__dirname, './source/pages'),
-            utils: path.resolve(__dirname, './source/utils'),
+            // 配置缩写路径 
+            '@': path.resolve('source'),
+            // components: path.resolve(__dirname, './source/components'),
+            // com: path.resolve(__dirname, './source/components'),
+            // pages: path.resolve(__dirname, './source/pages'),
+            // utils: path.resolve(__dirname, './source/utils'),
             // $缩小查询范围，提升查询速度
             // react$: path.resolve(__dirname, 'react'),
-            '@antd/icons/lib/dist$': path.resolve(__dirname, './source/icons.js')
+            // 减少递归查询  发布到npm的库大多数都包含两个目录，一个是放着cmd模块化的lib目录，一个是把所有文件合成一个文件的dist目录，多数的入口文件是指向lib里面下的。 默认情况下webpack会去读lib目录下的入口文件再去递归加载其它依赖的文件这个过程很耗时，alias配置可以让webpack直接使用dist目录的整体文件减少文件递归解析。配置如下：
+            // 'react': 'react/dist/react.js',
+            '@antd/icons/lib/dist$': path.resolve(__dirname, './source/icons.js'),
         },
     },
     // 排除打包配置，如果单独引入了lodash或者jquery这样的库，则没必要在业务代码中作为依赖打包，externals用于排除配置

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from 'components/App/App.jsx';
+import App from '@/components/App/App.jsx';
 
 // if (module.hot) module.hot.accept();
 

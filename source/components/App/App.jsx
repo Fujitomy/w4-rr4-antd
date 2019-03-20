@@ -2,10 +2,12 @@
 import React, { Suspense, lazy as Lazy } from "react";
 
 // import { BrowserRouter, HashRouter, Link,Route } from 'react-router-dom';
- import { DatePicker } from 'antd';
+import { DatePicker } from 'antd';
+import Loading from '@/components/Loading';
+
 // import DatePicker from 'antd/lib/date-picker';  // 加载 JS
 // import 'antd/lib/date-picker/style/css';        // 加载 CSS
-//
+
 // // import DatePicker from 'antd/lib/date-picker';  // 加载 JS
 // // import 'antd/lib/date-picker/style/css';        // 加载 CSS
 // // import Loadable from 'react-loadable';
@@ -348,9 +350,8 @@ class App extends React.Component {
         if(Array.includes){
             console.log([1,2].includes(1));
         }else{
-            console.log('111111212211212我不支持呀?!!!!1212');
+            console.log('111111212121212我不支持呀?!!!!1212');
         }
-        
         return (
             // this.state.showArticle &&
             <div>app
