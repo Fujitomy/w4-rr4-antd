@@ -234,14 +234,7 @@ module.exports = {
           }),
           new OptimizeCssAssetsPlugin({})
         ],
-        // usedExports: true,
-        // 识别package.json中的sideEffects以剔除无用的模块，用来做tree-shake
-        // 依赖于optimization.providedExports和optimization.usedExports
-        // sideEffects: true,
-        // 取代 new webpack.optimize.ModuleConcatenationPlugin()
-        // concatenateModules: true,
-        // 取代 new webpack.NoEmitOnErrorsPlugin()，编译错误时不打印输出资源。
-        noEmitOnErrors: false,
+        // 默认情况下，webpack v4 +为动态导入的模块提供了开箱即用的新的共同块（共享块）打包策略。
         splitChunks: {
             name: true,
             // all 抽离所有共享模块，即便是异步和同步模块间共享的也抽离出来
@@ -282,6 +275,52 @@ module.exports = {
             //   }
             // }
         },
+        // object string boolean 将optimization.runtimeChunk设置为true或“multiple”会为每个仅包含运行时的入口点添加一个额外的块。
+        // 默认值为false：为每个entry chunk嵌入运行时。
+        runtimeChunk: false,
+        // 取代 new webpack.NoEmitOnErrorsPlugin()，编译错误时不输出资源。 在编译时出现错误时，使用optimization.noEmitOnErrors跳过发射阶段。 这可确保不会发出错误资产。
+        noEmitOnErrors: true,
+        // 告诉webpack生成代码时使用可读的模块(modules)标识符以获得更好的调试。生产环境默认关闭，开发环境默认开启
+        namedModules: false,
+        // 告诉webpack使用可读的块(chunks)标识符以获得更好的调试。生产环境默认关闭，开发环境默认开启
+        namedChunks: false,
+        // 告诉webpack在打包选择模块（module）ID时使用哪种算法。默认值为false，不使用任何内建算法，可以指定通过其他插件来指定算法
+        moduleIds: false,
+        // 告诉webpack在选择块（chunk）ID时使用哪种算法。bool: false string: natural, named, size, total-size 配置规则同上moduleIds
+        chunkIds: false,
+        // 无需特殊设置-告诉webpack将process.env.NODE_ENV设置为给定的字符串值。 // 可能的值：1、任何字符串：给process.env.NODE_ENV设置的值。2、false：不修改/设置process.env.NODE_ENV的值。
+        nodeEnv: 'production',
+        // 无需单独设置 bool: false 设置为true时，告诉webpack通过将导入更改为更短的字符串来减小WASM的大小。它会破坏模块和导出名称。
+        mangleWasmImports: false,
+        // 无需单独设置 bool: true 当这些子模块存在于父级中的时候，告诉webpack检测并从块中删除这些模块
+        removeAvailableModules: true,
+        // 无需单独设置 bool: true 告诉webpack检测并删除空的块。
+        removeEmptyChunks: true,
+        // 无需单独设置 bool: true  告诉webpack合并包含相同模块的块。
+        mergeDuplicateChunks:true,
+        // 无需单独设置 告诉webpack确定并标记作为其他块的子集的块，其方式是当已经加载较大的块时不必加载子集。默认在生产模式下开启，否则禁用
+        flagIncludedChunks: true, 
+        // 无需单独设置 告诉webpack找出模块的顺序，这样可以让初始包变到最小。 默认在生产模式下启用，否则禁用。
+        occurrenceOrder: true,
+
+        // 无需单独设置 告诉webpack确定模块提供哪些导出，以便为 `export * from 'xxx.js'这种模式` 生成更高效的代码, 默认开启
+        providedExports: true,
+        // 无需单独设置 告诉webpack确定每个模块的已使用导出。这取决于providedExports。默认在生产模式下启用，否则禁用
+        usedExports: true,
+        // 无需单独设置 告诉webpack查找模块结构图的各个部分，这些部分可以安全地连接成一个模块。 取决于providedExports和usedExports。默认在生产模式下启用，否则禁用
+        concatenateModules: true,
+        // sideEffects主要用来用来做tree-shake
+        // sideEffects告诉webpack 识别引入模 package.json中的sideEffects标志或规则,以跳出 没有在(未使用) 导出时标记为不包含副作用的模块，
+        // 依赖于optimization.providedExports和optimization.usedExports
+        // 通过给 package.json 加入 sideEffects: false|true 声明该包模块是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。 默认在生产模式下启用，否则禁用
+        // 比如比如vue库的 package.json 设置为 sideEffects:false ，则optimization.sideEffects:true 之后 
+        // import { xxx } from 'vue' 将 打包成 import xxx from 'vue/xxx', 因为标记vue将自己标记为没有副作用的包(vue就sideEffects设置为false了)，所以符合跳过规则
+        // Webpack 中的 sideEffects 到底该怎么用？ https://segmentfault.com/a/1190000015689240
+        // 如果我们引入的 包/模块 被标记为 sideEffects: false 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块/包 都会被完整的移除
+        sideEffects: true,
+
+        // 无需单独设置 bool: false 告诉webpack生成具有相对路径的记录，以便能够移动上下文文件夹。
+        portableRecords: false,
     },
     // 编译插件
     plugins: [
