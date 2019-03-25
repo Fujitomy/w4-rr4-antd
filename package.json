@@ -4,7 +4,7 @@
   "description": "wepack4-react-router4-antd",
   "main": "index.js",
   "scripts": {
-    "dll": "webpack --config webpack.dll.js",
+    "dll": "webpack --config  webpack.dll.js",
     "dev": "webpack-dev-server --hotOnly --color --watch --config webpack.dev.js",
     "pro": "webpack --color --config webpack.pro.js"
   },
@@ -13,20 +13,27 @@
   ],
   "author": "tomy",
   "license": "ISC",
+  "browserslist": [
+    "> 0.2%"
+  ],
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
     "@babel/runtime": "^7.3.1",
-    "antd": "^3.11.2",
+    "@babel/runtime-corejs2": "^7.4.2",
+    "antd": "^3.13.0",
     "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
+    "core-js": "^2.5.1",
     "fs": "^0.0.1-security",
+    "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.11",
     "mockjs": "^1.0.1-beta3",
-    "prop-types": "^15.6.2",
+    "prop-types": "^15.7.1",
     "qs": "^6.6.0",
-    "react": "^16.7.0-alpha.2",
-    "react-dom": "^16.7.0-alpha.2",
+    "react": "^16.8.2",
+    "react-dom": "^16.8.2",
     "react-loadable": "^5.5.0",
+    "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1"
   },
   "devDependencies": {
@@ -47,8 +54,10 @@
     "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^2.0.0",
+    "cssnano": "^4.1.10",
     "file-loader": "^2.0.0",
     "friendly-errors-webpack-plugin": "^1.7.0",
+    "happypack": "^5.0.1",
     "html-webpack-plugin": "^3.2.0",
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
@@ -56,13 +65,14 @@
     "node-sass": "^4.11.0",
     "open-browser-webpack-plugin": "^0.0.5",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
+    "os": "^0.1.1",
     "resolve-from": "^4.0.0",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
     "uglifyjs-webpack-plugin": "^2.1.2",
     "webpack": "^4.28.2",
     "webpack-bundle-analyzer": "^3.0.4",
-    "webpack-cli": "^3.2.3",
+    "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.1.10",
     "webpack-merge": "^4.1.4"
   },
@@ -85,6 +95,5 @@
     "clean-webpack-plugin": "文件清除插件",
     "html-webpack-plugin": "用于html模板文件构建，如/source/html/index.ejs",
     "open-browser-webpack-plugin": "自动打开页面插件"
-  },
-  "sideEffects": false
+  }
 }

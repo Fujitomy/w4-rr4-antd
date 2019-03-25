@@ -1,3 +1,11 @@
+/*
+ * @author: tomy
+ * @date: 2019/03/22 12:00:00
+ * @last modified: tomy
+ * @last modified date: 2019/03/22 10:45
+ * @Description: production dist config
+ * 
+ */
 
 const os = require("os");
 const path = require('path');
@@ -14,12 +22,16 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
 const manifest = require('./source/vendors/vendor.manifest.json');
-const dllchunkname = manifest.name.split('_')[1];
+const dllchunkname = manifest.name.split('_')[3];
+console.log(manifest.name.split('_'),'-dllchunkname',dllchunkname);
+
 const production = process.argv.indexOf('--mode=production') > -1;
 
 process.traceDeprecation = false; // 是否打印调用栈
 process.noDeprecation = false; // 是否关闭弃用警告
 // console.log(dllchunkname,'dllchunkname');
+
+// webpack 三种chunk类型 entry chunk, children chunk , common chunk
 
 module.exports = {
     // tree shaking 新的 webpack 4 正式版本，扩展了这个检测能力，通过 package.json 的 "sideEffects" 属性作为标记，向 compiler 提供提示，表明项目中的哪些文件是 "pure(纯的 ES2015 模块)"，由此可以安全地删除文件中未使用的部分。
@@ -89,10 +101,10 @@ module.exports = {
         // 将资源显示在 stats 中的情况排除
         // 这可以通过 String, RegExp, 获取 assetName 的函数来实现
         // 并返回一个布尔值或如下所述的数组。
-        excludeAssets: (assetName) => { 
-            console.log(moduleSource,'---------excludeAssets-----------');
-            return false 
-        },
+        // excludeAssets: (assetName) => { 
+        //     console.log(moduleSource,'---------excludeAssets-----------');
+        //     return false 
+        // },
         //"filter", 
         // | /filter/ | (assetName) => ... return true|false |
         //     ["filter"] | [/filter/] | [(assetName) => ... return true|false],
@@ -161,18 +173,18 @@ module.exports = {
         // 过滤警告显示（从 webpack 2.4.0 开始），
         // 可以是 String, Regexp, 一个获取 warning 的函数
         // 并返回一个布尔值或上述组合的数组。第一个匹配到的为胜(First match wins.)。
-        warningsFilter: (warning) => { return false }
+        // warningsFilter: (warning) => { return false }
         //  "filter" // | /filter/ | ["filter", /filter/] | (warning) => ... return true|false
     },
     // 启用 Watch 模式。这意味着在初始构建之后，webpack 将继续监听任何已解析文件的更改。Watch 模式默认关闭。
     watch: true,
     // --watch --info-verbosity verbose
     // 监听配置项
-    watchOptions:{
-        aggregateTimeout: 300, // 编译延迟时长，默认300毫秒，如果不想频繁编译，可以加大时长
-        // poll: 1000,  // 编译轮询时长，危险操作,高内存
-        ignored: /node_modules/
-    },
+    // watchOptions:{
+    //     aggregateTimeout: 300, // 编译延迟时长，默认300毫秒，如果不想频繁编译，可以加大时长
+    //     // poll: 1000,  // 编译轮询时长，危险操作,高内存
+    //     ignored: /node_modules/
+    // },
     // 配置如何展示性能提示。例如，如果一个资源超过 250kb，webpack 会对此输出一个警告来通知你。
     // performance:{
     //     // hints: 'warning', // false | 'error' | 'warning'
@@ -189,7 +201,7 @@ module.exports = {
         // 起点或是应用程序的起点入口。从这个起点开始，应用程序启动执行。如果传递一个数组，那么数组的每一项都会执行
         index: [
             // 全局编译，会污染全局变量
-            // 'babel-polyfill',
+            'babel-polyfill',
             path.resolve(__dirname, './source/entry/index.js')
         ]
     },
@@ -227,54 +239,81 @@ module.exports = {
         // minimize: true, 
         // 允许用户使用其他最小化插件，覆盖webpack默认最小化编译器
         minimizer: [
-          new UglifyJsPlugin({
-              cache: true,
-              parallel: true,
-              sourceMap: false // set to true if you want JS source maps
-          }),
-          new OptimizeCssAssetsPlugin({})
+            new UglifyJsPlugin({
+                cache: true,
+                parallel: true,
+                sourceMap: false // set to true if you want JS source maps
+            }),
+            new OptimizeCssAssetsPlugin({})
         ],
-        // 默认情况下，webpack v4 +为动态导入的模块提供了开箱即用的新的共同块（共享块）打包策略。
+        // webpack 默认配置
         splitChunks: {
-            name: true,
-            // all 抽离所有共享模块，即便是异步和同步模块间共享的也抽离出来
-            // chunks: 'all', 
-            // 仅抽离异步模块间的共享
-            // chunks: 'async',
-            // 自定义抽离模块，可以排除掉一些已经抽离的模块，比如react，react-router，antd等相对稳定的模块
-            // chunks (chunk) {
-            //   // exclude `my-excluded-chunk`
-            //   return chunk.name !== 'react' && chunk.name !== 'react-router-dom'  && chunk.name !== 'react-dom';
-            // },
             chunks: 'all',
-            minSize: 30000, // 模块大于30k会被抽离到公共模块
-            maxSize: 512*1000, // 超过指定的大小就抽离成模块
-            minChunks: 1, // 模块出现1次就会被抽离到公共模块
-            maxAsyncRequests: 5, // 异步模块并行加载模块数，默认值为5
-            maxInitialRequests: 3, // 初始加载模块最大并行请求数，默认值为3
-            automaticNameDelimiter: '~',
-            // name: 'tomy_vendor', // 指定缓存组块的名称
+            minSize: 30000,
+            minChunks: 1,
+            maxAsyncRequests: 9,
+            maxInitialRequests: 6,
+            automaticNameDelimiter: '_+_',
+            name: true,
             cacheGroups: {
                 vendors: {
                     test: /[\\/]node_modules[\\/]/,
-                    priority: -10,
-                    reuseExistingChunk: true
+                    priority: -10
                 },
-                // default:false,
-                // default: {
-                //     minChunks: 2,
-                //     priority: -20,
-                //     reuseExistingChunk: true
-                // }
-            },
-            // cacheGroups: {
-            //   vendor: {
-            //     test: /[\\/]node_modules[\\/]/,
-            //     name: 'vendors',
-            //     chunks: 'all'
-            //   }
-            // }
+                antd: {
+                    name: 'chunk-antd',
+                    test: /[\\/]node_modules[\\/]antd[\\/]/,
+                    priority: 20,
+                    chunks: 'async'
+                },
+                default: {
+                    minChunks: 2,
+                    priority: -20,
+                    reuseExistingChunk: true
+                }
+            }
         },
+        // 默认情况下，webpack v4 +为动态导入的模块提供了开箱即用的新的共同块（共享块）打包策略。
+        // splitChunks: {
+        //     name: true,
+        //     // all 抽离所有共享模块，即便是异步和同步模块间共享的也抽离出来
+        //     // chunks: 'all', 
+        //     // 仅抽离异步模块间的共享
+        //     // chunks: 'async',
+        //     // 自定义抽离模块，可以排除掉一些已经抽离的模块，比如react，react-router，antd等相对稳定的模块
+        //     // chunks (chunk) {
+        //     //   // exclude `my-excluded-chunk`
+        //     //   return chunk.name !== 'react' && chunk.name !== 'react-router-dom'  && chunk.name !== 'react-dom';
+        //     // },
+        //     chunks: 'all',
+        //     minSize: 30000, // 模块大于30k会被抽离到公共模块
+        //     maxSize: 512*1000, // 超过指定的大小就抽离成模块
+        //     minChunks: 1, // 模块出现1次就会被抽离到公共模块
+        //     maxAsyncRequests: 5, // 异步模块并行加载模块数，默认值为5
+        //     maxInitialRequests: 3, // 初始加载模块最大并行请求数，默认值为3
+        //     automaticNameDelimiter: '~',
+        //     // name: 'tomy_vendor', // 指定缓存组块的名称
+        //     cacheGroups: {
+        //         vendors: {
+        //             test: /[\\/]node_modules[\\/]/,
+        //             priority: -10,
+        //             reuseExistingChunk: true
+        //         },
+        //         // default:false,
+        //         // default: {
+        //         //     minChunks: 2,
+        //         //     priority: -20,
+        //         //     reuseExistingChunk: true
+        //         // }
+        //     },
+        //     // cacheGroups: {
+        //     //   vendor: {
+        //     //     test: /[\\/]node_modules[\\/]/,
+        //     //     name: 'vendors',
+        //     //     chunks: 'all'
+        //     //   }
+        //     // }
+        // },
         // object string boolean 将optimization.runtimeChunk设置为true或“multiple”会为每个仅包含运行时的入口点添加一个额外的块。
         // 默认值为false：为每个entry chunk嵌入运行时。
         runtimeChunk: false,
@@ -317,7 +356,7 @@ module.exports = {
         // import { xxx } from 'vue' 将 打包成 import xxx from 'vue/xxx', 因为标记vue将自己标记为没有副作用的包(vue就sideEffects设置为false了)，所以符合跳过规则
         // Webpack 中的 sideEffects 到底该怎么用？ https://segmentfault.com/a/1190000015689240
         // 如果我们引入的 包/模块 被标记为 sideEffects: false 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块/包 都会被完整的移除
-        sideEffects: true,
+        sideEffects: false,
 
         // 无需单独设置 bool: false 告诉webpack生成具有相对路径的记录，以便能够移动上下文文件夹。
         portableRecords: false,
@@ -499,3 +538,6 @@ module.exports = {
     // 引入意义？
     // dependencies: ["vendor.dll.92e3e6cb242f782bd03e.js"],
 };
+
+
+
