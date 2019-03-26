@@ -119,7 +119,7 @@ import "./more-helpers"; // more-helpers is also 40kb in size
 条件3：导入调用的并行请求数为2
 条件4：不影响初始页面加载时的请求
 
-将助手的内容放入每个块中将导致其代码被下载两次。 通过使用单独的块，这将只发生一次。
+将helpers的内容放入每个块中将导致其代码被下载两次。 通过使用单独的块，这将只发生一次。
 我们以新增一个额外的请求为代价，来避免该共享模块被重复下载，这是一种权衡后的结果。 这就是为什么最小尺寸为30kb。
 
 Configuration：配置项
@@ -150,7 +150,7 @@ maxInitialRequests（默认值3）入口点处的最大并行请求数
 maxAsyncRequests（默认值为5）按需加载时的最大并行请求数
 
 
-{ name }
+optimization.splitChunks.name 
 To control the chunk name of the split chunk the name option can be used.
 要控制拆分块的块名称，可以使用name选项。
 
@@ -162,7 +162,7 @@ true是一个神奇的值，会根据块和缓存组键自动选择名称，否�
 
 当名称与入口点名称匹配时，将删除入口点。
 
-{ automaticNameDelimiter }
+
 optimization.splitChunks.automaticNameDelimiter
 默认情况下，webpack将使用源块和名称生成名称，例如vendors~main.js。
 
@@ -173,15 +173,14 @@ optimization.splitChunks.automaticNameDelimiter
 automaticNameDelimiter更改生成共享文件名称的链接符，默认为~
 
 
-{ test } 共享模块选择方式
+optimization.test  共享模块选择方式
 test参数控制选择哪一个模块打包到cacheGroups共享文件中。
 忽略该参数不写将选择所有模块。
 test的值它可以是正则，字符串或函数。
 它可以匹配绝对模块资源路径或块名称。
 匹配块名称时，将选择此块中的所有模块。
 
-{ chunks }
-使用chunks参数，可以配置选定的块。
+optimization.chunks 使用chunks参数，可以配置选定的块。
 可选值"initial", "async" and "all"
  配置时，优化仅选择初始块，按需块或所有块。
 

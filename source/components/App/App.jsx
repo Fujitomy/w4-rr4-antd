@@ -11,14 +11,13 @@ import Loading from '@/components/Loading';
 // // import DatePicker from 'antd/lib/date-picker';  // 加载 JS
 // // import 'antd/lib/date-picker/style/css';        // 加载 CSS
 // // import Loadable from 'react-loadable';
-// import Loading from 'components/Loading/';
 // // import ReactDOM from 'react-dom';
-//
-// const supportHistory = 'pushState' in window.history;
-// import ErrBoundary from './ErrBoundary.jsx';
-// import { Button } from 'antd';
-//
-// import axios from 'axios';
+
+const supportHistory = 'pushState' in window.history;
+import ErrBoundary from './ErrBoundary.jsx';
+import { Button } from 'antd';
+import axios from 'axios';
+
 // const style = require('./App.less');
 // // const Mock = require('mockjs');
 // // import qs from 'qs';
@@ -38,8 +37,8 @@ import Sidebar from '../Sidebar/index.jsx';
 // // 文章
 const Article = Lazy(() => import('../Article/Article.jsx'));
 // // const Home = Lazy(() => import('@/pages/home/home'));
-const One = Lazy(() => import('@/pages/home/one'));
-const Two = Lazy(() => import('@/pages/home/two'));
+const One = Lazy(() => import(/* webpackChunkName: "one.js" */'@/pages/home/one'));
+const Two = Lazy(() => import(/* webpackChunkName: "two.js" */'@/pages/home/two'));
 const User = Lazy(() => import('@/pages/user/user'));
 //
 // // 进入退出提示
@@ -64,19 +63,20 @@ const User = Lazy(() => import('@/pages/user/user'));
 //     }
 // };
 //
-// const AndYetAnotherLazyComponent = React.lazy(() =>
-//     import('../Article/AndYetAnotherLazyComponent')
-// );
-//
-// function AnotherLazyComponent() {
-//     return (
-//         <div>
-//             <span>So...so..lazy..</span>
-//             <AndYetAnotherLazyComponent />
-//         </div>
-//     );
-// };
-//
+
+const AndYetAnotherLazyComponent = React.lazy(() =>
+    import('../Article/AndYetAnotherLazyComponent')
+);
+
+function AnotherLazyComponent() {
+    return (
+        <div>
+            <span>So...so..lazy..</span>
+            <AndYetAnotherLazyComponent />
+        </div>
+    );
+};
+
 class App extends React.Component {
     static state = {
         screenWidth: null,
@@ -90,7 +90,7 @@ class App extends React.Component {
         this.main = React.createRef();
         this.state = {
             showArticle: false,
-            projectName: '书与月光',
+            projectName: '诚品生活',
             projectLogo: '',
             routes: [
                 { name:'one', url: 'one' },
@@ -100,7 +100,6 @@ class App extends React.Component {
             ]
         }
     }
-
     componentDidMount(){
         // 异步加载文章
         setTimeout(()=>{
@@ -336,6 +335,10 @@ class App extends React.Component {
     }
 }
 
+export default App;
+
+
+
 // class App extends React.Component {
 //     constructor(props) {
 //         super(props);
@@ -357,4 +360,4 @@ class App extends React.Component {
 //     }
 // }
 
-export default App;
+// export default App;

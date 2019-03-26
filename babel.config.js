@@ -42,7 +42,7 @@ const presets = [
                 browsers: ["> 1%", "last 2 versions", "not ie <= 8"]
                 // "chrome": 52,
                 // "ie": 10,
-                //"browsers": "> 0.25%, not dead",
+                // "browsers": "> 0.25%, not dead",
                 // "esmodules": true,
                 // "debug": true // 加这个会导致报错
             },
