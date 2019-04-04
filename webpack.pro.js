@@ -11,6 +11,9 @@
  * 临时解决方案
  * https://github.com/HeskeyBaozi/reduce-antd-icons-bundle-demo
  * 
+ * 抽离css
+ * http://wangwl.net/static/pages/npm_minicssextractplugin.html
+ * 
  */
 
 const os = require("os");
@@ -32,7 +35,7 @@ const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 4 }); //
 const manifest = require('./source/vendors/vendor.manifest.json');
 const dllchunkname = manifest.name.split('_')[3];
 
-const production = process.argv.indexOf('--mode=production') > -1;
+const nodeEnv = process.argv.indexOf('--mode=production') > -1;
 
 process.traceDeprecation = true; // 是否打印调用栈
 process.noDeprecation = true; // 是否关闭弃用警告
@@ -59,12 +62,16 @@ module.exports = {
     },
     // 位于对象最顶级键(key)，包括了一组选项，指示 webpack 如何去输出、以及在哪里输出你的「bundle、asset 和其他你所打包或使用 webpack 载入的任何内容」
     output: {
+        
         // 此选项决定了每个输出 bundle 的名称。这些 bundle 将写入到 output.path 选项指定的目录下。
         filename: '[name].[hash:8].js',  // 此选项不会影响那些「按需加载 chunk」的输出文件。对于这些文件，请使用 output.chunkFilename 选项来控制输出。通过 loader 创建的文件也不受影响。在这种情况下，你必须尝试 loader 特定的可用选项。
+        
         // output 目录对应一个绝对路径，指定bundle文件输出路径
         path: path.resolve(__dirname,'./dist/build/'),
+
         // 此选项决定了非入口(non-entry) chunk 文件的名称。有关可取的值的详细信息，请查看 output.filename 选项
         chunkFilename: "[name].chunk.[chunkhash:8].js",
+
         // 对于按需加载(on-demand-load)或加载外部资源(external resources)（如图片、文件等）来说，output.publicPath 是很重要的选项。如果指定了一个错误的值，则在加载这些资源时会收到 404 错误。
         publicPath: './build/',
 

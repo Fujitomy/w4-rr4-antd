@@ -37,8 +37,8 @@ import Sidebar from '../Sidebar/index.jsx';
 // // 文章
 const Article = Lazy(() => import('../Article/Article.jsx'));
 // // const Home = Lazy(() => import('@/pages/home/home'));
-const One = Lazy(() => import(/* webpackChunkName: "one.js" */'@/pages/home/one'));
-const Two = Lazy(() => import(/* webpackChunkName: "two.js" */'@/pages/home/two'));
+const One = Lazy(() => import('@/pages/home/one'));
+const Two = Lazy(() => import('@/pages/home/two'));
 const User = Lazy(() => import('@/pages/user/user'));
 //
 // // 进入退出提示

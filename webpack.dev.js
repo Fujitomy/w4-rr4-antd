@@ -15,7 +15,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OpenBrowserWebpackPlugin = require('open-browser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const manifest = require('./source/vendors/vendor.manifest.json');
-const dllchunkname = manifest.name.split('_')[2];
+const dllchunkname = manifest.name.split('_')[3];
 
 console.log(dllchunkname,'dllchunkname');
 
@@ -258,6 +258,7 @@ module.exports = {
         // modules:['source/components','node_modules'],
         // 文件夹别名配置
         alias: {
+            //'@': path.resolve('source'),
             components: path.resolve(__dirname, './source/components'),
             com: path.resolve(__dirname, './source/components'),
             pages: path.resolve(__dirname, './source/pages'),
