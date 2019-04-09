@@ -60,11 +60,12 @@ module.exports = {
             path.resolve(__dirname, './source/entry/index.js')
         ]
     },
-    // 位于对象最顶级键(key)，包括了一组选项，指示 webpack 如何去输出、以及在哪里输出你的「bundle、asset 和其他你所打包或使用 webpack 载入的任何内容」
+    // 指示 webpack 如何去输出、以及在哪里输出你的「bundle、asset 和其他你所打包或使用 webpack 载入的任何内容」
     output: {
-        
         // 此选项决定了每个输出 bundle 的名称。这些 bundle 将写入到 output.path 选项指定的目录下。
-        filename: '[name].[hash:8].js',  // 此选项不会影响那些「按需加载 chunk」的输出文件。对于这些文件，请使用 output.chunkFilename 选项来控制输出。通过 loader 创建的文件也不受影响。在这种情况下，你必须尝试 loader 特定的可用选项。
+        // 此选项不会影响那些「按需加载 chunk」的输出文件。对于按需加载的文件，请使用 output.chunkFilename 选项来控制输出。
+        // 通过 loader 创建的文件也不受影响。在这种情况下，你必须尝试 loader 特定的可用选项。
+        filename: '[name].[hash:8].js',  
         
         // output 目录对应一个绝对路径，指定bundle文件输出路径
         path: path.resolve(__dirname,'./dist/build/'),
@@ -659,7 +660,7 @@ module.exports = {
         // 默认后缀名，配置后可省略
         extensions: ['.js', '.jsx','.es6'],
         // 指定模块查找目录，import 'redux'这样不是相对也不是绝对路径的写法时会去node_modules目录下找。但是默认的配置会采用向上递归搜索的方式去寻找node_modules
-        modules: [path.resolve(__dirname, 'node_modules')],
+        modules: [ path.resolve(__dirname, 'node_modules') ],
         // 文件夹别名配置
         alias: {
             // 配置缩写路径 应用如下 @/components/App.jsx

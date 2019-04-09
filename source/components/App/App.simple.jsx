@@ -1,157 +1,69 @@
-'use strict'
+
 import React, { Suspense, lazy as Lazy } from "react";
+
 import { BrowserRouter, HashRouter, Link,Route } from 'react-router-dom';
+import { DatePicker } from 'antd';
 import Loading from '@/components/Loading';
-import ErrBoundary from './ErrBoundary.jsx';
-import axios from 'axios';
-import qs from 'qs';
-import { DatePicker,Select,Button } from 'antd';
-const Option = Select.Option;
 
-// const style = require('./App.less');
-// const fs = require('fs');
-// const supportHistory = 'pushState' in window.history;
-
-// 页面进入退出提示
-// import { Prompt } from 'react-router';
-
-// 第三方异步加载方式
-// import Loadable from 'react-loadable';
-// import ReactDOM from 'react-dom';
-// asynchronous load
-// const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
-// const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
-// const Two  = Loadable({loader: () => import('pages/home/two'),loading:Loading});
-// const User = Loadable({loader: () => import('pages/user/user'),loading:Loading});
-
-// 手动按需加载antd组件
 // import DatePicker from 'antd/lib/date-picker';  // 加载 JS
 // import 'antd/lib/date-picker/style/css';        // 加载 CSS
 
+// // import DatePicker from 'antd/lib/date-picker';  // 加载 JS
+// // import 'antd/lib/date-picker/style/css';        // 加载 CSS
+// // import Loadable from 'react-loadable';
+// // import ReactDOM from 'react-dom';
 
-// mock virtual data
-const Mock = require('mockjs');
-const Random = Mock.Random;
-window.Mock = Mock;
-const obj = { a:1, b:2, c:3, d:4 };
-const array = [1,2,3,4,5,'hello world'];
-const fun = x=> x + 10;
-const dataFloat = Mock.mock({
-    // 数字
-    'number1|1-100.1-10': 1,
-    'number2|123.1-5': 1,// 1-5位小数
-    'number3|123.3': 1, // 三位小数
-    'number4|123.10': 1.123,
-    // 布尔值
-    'boolean1|1': true, // 生成一个布尔值，各一半 true/false 各一半
-    'boolean2|1-3':true, // 1/4是true，3/4是false
-    // 对象
-    'name|1-3':obj,      // 随机从obj中寻找1到3个属性，新对象
-    'name2|2':obj,         // 随机从onj中找到两个属性，新对象
-    // 数组
-    'array|1': array, // 从属性值 array 中随机选取 1 个元素，作为最终值
-    'array2|+1': array, // 从属性值 array 中顺序选取 1 个元素，作为最终值
-    'array3|1-4': array, // 通过重复属性值 array 生成一个新数组，重复次数大于等于 min，小于等于 max
-    'array3|2': array, // 通过重复属性值 array 生成一个新数组，重复次数为 count
-    'list|8': [{
-        // 属性 id 是一个自增数，起始值为 1，每次增 1
-        'id|+1': 1
-    }],
-    // 函数
-    'fun': fun(10), // 返回函数的返回值20
-    // 正则
-    'reg':/\d{1,3}/, // 根据正则表达式 regexp 反向生成可以匹配它的字符串。用于生成自定义格式的字符串。 
-    'regexp1': /[a-z][A-Z][0-9]/,
-    'regexp2': /\w\W\s\S\d\D/,
-    'regexp3': /\d{5,10}/,
-     // 占位符 
-     'placeholder':{
-        'name1':'@first', // mmp 黑魔法呀 Name下的佔位符:first, last, name, cfirst, clast, cname
-        'name2':'@cfirst', 
-        'name3':'@clast',
-        'fullName': '@name1 @name2 @name3'
-    },
-    // 生成随机数
-    "random": {
-        "mtime": "@datetime",//随机生成日期时间
-        "score":  "@natural(1, 800)",//随机生成1-800的数字
-        "rank":  "@natural(1, 100)",//随机生成1-100的数字
-        "stars": "@natural(0, 5)",//随机生成1-5的数字
-        "nickname": "@cname",//随机生成中文名字
-    }
-});
-// console.log(JSON.stringify(dataFloat, null, 4));
+const supportHistory = 'pushState' in window.history;
+import ErrBoundary from './ErrBoundary.jsx';
+import { Button } from 'antd';
+import axios from 'axios';
 
-// 拦截所有后缀为.json的get请求
-Mock.mock(/\.json/,'GET', {
-    'list|1-10': [{
-        'id|+1': 1,
-        'email': '@EMAIL'
-    }]
-});
-
-Mock.mock('/water/common/admin/loginCheck','GET', {
-    'list|1-10': [{
-        'id|+1': 1,
-        'email': '@EMAIL'
-    }]
-});
-
-function originAjax(url,type)
-{
-	const xmlhttp = new XMLHttpRequest();
-	xmlhttp.onreadystatechange = function()
-	{
-		if (xmlhttp.readyState==4 && xmlhttp.status==200)
-		{
-            console.log(xmlhttp,'xmlhttp.responseText');
-			// document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
-		}
-	}
-	xmlhttp.open(type||"GET",url,true);
-	xmlhttp.send();
-}
-originAjax('./configxxxxx.json');
-// originAjax('/water/common/admin/loginCheck');
-axios.get(`/water/common/admin/loginCheck`).then((res) => {
-    console.log(res,'----------res');
-}).catch(function (error) {
-    console.log(error);
-});
-  
-
-const handleRequest = (res,callback)=>{
-    console.log(res,'--res');
-    const { code } = res || {};
-    switch (code) {
-        case 0:
-            typeof callback === 'function' && callback(res);
-            break;
-        case 100010110:
-            const unLogin = `您还未登录，请重新登录！`;
-            console.log(unLogin);
-            break;
-        default:
-            const baseMsg = res.msg ? res.msg : res.data;
-            const localMsg = `请求异常，请检查网络或稍后重试`;
-            const msg = Object.prototype.toString.call(baseMsg)!== "[object String]"?localMsg:baseMsg;
-            console.log(msg);
-    }
-};
-
-// Iterator learn
+// const style = require('./App.less');
+// // const Mock = require('mockjs');
+// // import qs from 'qs';
+//
 // import Iterator from '../Demo/Iterator';
-
+//
+// // const fs = require('fs');
+// // asynchronous load
+// // const Home = Loadable({loader: () => import('pages/home/home'),loading:Loading});
+// // const One  = Loadable({loader: () => import('pages/home/one.jsx'),loading:Loading});
+// // const Two  = Loadable({loader: () => import('pages/home/two'),loading:Loading});
+// // const User = Loadable({loader: () => import('pages/user/user'),loading:Loading});
+//
 import Header from '../Header/index.jsx';
 import Sidebar from '../Sidebar/index.jsx';
-
-// asynchronous modules
+//
+// // 文章
 const Article = Lazy(() => import('../Article/Article.jsx'));
-// const Home = Lazy(() => import('@/pages/home/home'));
+// // const Home = Lazy(() => import('@/pages/home/home'));
 const One = Lazy(() => import('@/pages/home/one'));
 const Two = Lazy(() => import('@/pages/home/two'));
 const User = Lazy(() => import('@/pages/user/user'));
-// asynchronous components
+//
+// // 进入退出提示
+// // import { Prompt } from 'react-router';
+//
+// const handleRequest = (res,callback)=>{
+//     console.log(res,'--res');
+//     const { code } = res || {};
+//     switch (code) {
+//         case 0:
+//             typeof callback === 'function' && callback(res);
+//             break;
+//         case 100010110:
+//             const unLogin = `您还未登录，请重新登录！`;
+//             console.log(unLogin);
+//             break;
+//         default:
+//             const baseMsg = res.msg ? res.msg : res.data;
+//             const localMsg = `请求异常，请检查网络或稍后重试`;
+//             const msg = Object.prototype.toString.call(baseMsg)!== "[object String]"?localMsg:baseMsg;
+//             console.log(msg);
+//     }
+// };
+//
+
 const AndYetAnotherLazyComponent = React.lazy(() =>
     import('../Article/AndYetAnotherLazyComponent')
 );
@@ -190,7 +102,7 @@ class App extends React.Component {
     }
     componentDidMount(){
         // 异步加载文章
-        this.timer = setTimeout(()=>{
+        setTimeout(()=>{
             this.setState({ showArticle:true });
         },3000);
 
@@ -256,6 +168,7 @@ class App extends React.Component {
         console.log(iterators.next().value); // 2
         console.log(iterators.next().value); // 3
 
+
         // const url = `https://www.easy-mock.com/mock/5bf4fa20fa81633e1ba92d78/miniApp/getInfo`;
         // const params = { user: 'tomy' }
         // const callback = (fetchRes)=>{
@@ -273,50 +186,50 @@ class App extends React.Component {
         //     this.setState({screenWidth:screen.width})
         // },false);
     }
-    componentWillUnmount(){
-        clearTimeout(this.timer);
-    }
-    fetchApi=(method,url,params,callback,allConfig)=>{
-        return new Promise((resolve,reject)=>{
-            switch (method) {
-                case 'get':
-                    axios({
-                        method:'get',
-                        url:`${url}?${qs.stringify(params)}`,
-                        // timeout: 2000,
-                    }).then(res => {
-                        console.log(res,'request success');
-                        handleRequest(res,callback);
-                        resolve(res);
-                    }).catch(error => {
-                        reject('请求失败');
-                        console.log('');
-                        console.log(error,'----------请求错误----------');
-                    });
-                    break;
-                case 'post':
-                    axios.post(`${url}`,qs.stringify(params)).then((res) => {});
-                    break;
-            }
-        });
-    }
+
     onChange=(date, dateString)=>{
         console.log(date, dateString,'打印时间选择');
     }
-    handleChange=(value,options)=>{
-        console.log(value, options,'-----------');
-    }
+
+    // fetchApi=(method,url,params,callback,allConfig)=>{
+    //     return new Promise((resolve,reject)=>{
+    //         switch (method) {
+    //             case 'get':
+    //                 axios({
+    //                     method:'get',
+    //                     url:`${url}?${qs.stringify(params)}`,
+    //                     // timeout: 2000,
+    //                 }).then(res => {
+    //                     console.log(res,'request success');
+    //                     handleRequest(res,callback);
+    //                     resolve(res);
+    //                 }).catch(error => {
+    //                     reject('请求失败');
+    //                     console.log('');
+    //                     console.log(error,'----------请求错误----------');
+    //                 });
+    //                 break;
+    //             case 'post':
+    //                 axios.post(`${url}`,qs.stringify(params)).then((res) => {});
+    //                 break;
+    //         }
+    //     });
+    // }
+
     render() {
-        const children = null;
         const getConfirmation = (message, callback) => {
             const allowTransition = window.confirm(message);
             callback(allowTransition);
         }
+
+        const children = null;
+
         const {
             projectName,
             projectLogo,
         } = this.state;
-        const headerInfo = { projectName, projectLogo };
+
+        const headerInfo = { projectName, projectLogo }
 
         return (
             <HashRouter basename='manage' >
@@ -331,15 +244,7 @@ class App extends React.Component {
                         {/*<li><Link to="/user">User</Link></li>*/}
                         {/*<li><Link to="/article">Article</Link></li>*/}
                     {/*</ul>*/}
-
-                    {/* <Select defaultValue="lucy" style={{ width: 120 }} onChange={this.handleChange}>
-                        <Option value="jack">Jack</Option>
-                        <Option value="lucy">Lucy</Option>
-                        <Option value="disabled" disabled>Disabled</Option>
-                        <Option value="Yiminghe">yiminghe</Option>
-                    </Select> */}
-
-                    <DatePicker onChange={this.onChange(new Date(),'YYYY-MM-DD')} />
+                    <DatePicker onChange={this.onChange} />
                     <Button>Antd Button</Button>
                     {/*{renderRoutes(routes)}*/}
                     <aside ref={'ajaxData'}></aside>
@@ -423,6 +328,7 @@ class App extends React.Component {
                         {/*</div>*/}
                     {/*</aside>*/}
                     {/*<h1>React Web App 16.0+</h1>*/}
+
                 </main>
             </HashRouter>
         )
@@ -430,3 +336,56 @@ class App extends React.Component {
 }
 
 export default App;
+
+
+
+// class App extends React.Component {
+//     constructor(props) {
+//         super(props);
+//         // this.main = React.createRef();
+//     }
+//     render() {
+//         // throw new Error('I crashed!');
+//         if(Array.includes){
+//             console.log([1,2].includes(1));
+//         }else{
+//             console.log('111111212121212我不支持呀?!!!!1212');
+//         }
+//         return (
+//             // this.state.showArticle &&
+//             <div>app
+//                 <DatePicker />
+//             </div>
+//         )
+//     }
+// }
+
+// export default App;
+// import React, { Suspense, lazy as Lazy } from "react";
+
+// import { BrowserRouter, HashRouter, Link,Route } from 'react-router-dom';
+// import { DatePicker } from 'antd';
+// // import Loading from '@/components/Loading';
+
+// class App extends React.Component {
+//     constructor(props) {
+//         super(props);
+//         // this.main = React.createRef();
+//     }
+//     render() {
+//         // throw new Error('I crashed!');
+//         if(Array.includes){
+//             console.log([1,2].includes(1));
+//         }else{
+//             console.log('111111212121212我不支持呀?!!!!1212');
+//         }
+//         return (
+//             // this.state.showArticle &&
+//             <div>app
+//                 <DatePicker />
+//             </div>
+//         )
+//     }
+// }
+
+// export default App;

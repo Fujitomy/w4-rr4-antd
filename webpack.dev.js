@@ -25,20 +25,15 @@ console.log(dllchunkname,'dllchunkname');
 process.noDeprecation = false;
 
 const dev = Boolean(process.env.WEBPACK_SERVE);
-const production = process.argv.indexOf('--mode=production') > -1;
+const isProduction = process.argv.indexOf('--mode=production') > -1;
 
 module.exports = {
-    // mode: 'production',
     mode: 'development',
-    // webpack 4.0 之后独立出来，在配置文件中，配置才能生效，以前直接在packjson.script命令行中配置--colors也行
-    stats: { colors: true, version: true },
-    // 调试工具，错误打印等级，可设置不同打印等级 devtool: 'inline-source-map',
-    devtool: production ? 'cheap-module-eval-source-map' : 'hidden-source-map',
+    devtool: isProduction ? 'cheap-module-eval-source-map' : 'hidden-source-map',
     entry:{
-        // 简单写法
-        // index: path.resolve(__dirname,'./source/entry/index.js'),
         index: [
-            // 入口头文件引入会导致编译包体积增大，应该使用babel-runtime和babel-helpers按需引入和防止重复打包，
+            // 入口头文件引入 babel-polyfill 会导致编译包体积增大，
+            // 应该使用babel-runtime和babel-helpers按需引入和防止重复打包，
             // 比如有50个文件使用了Object.assign()方法，
             // 应该是抽一个es5 版Object.assign()的js模块，给其他各个文件引入，而不是打得到50个文件中，这个引入babel抽离到babel-helpers中了
             'babel-polyfill',
@@ -55,31 +50,6 @@ module.exports = {
         publicPath: "/",
         // 模块注释信息，默认为false,不应该使用到生产环境
         pathinfo: true
-    },
-    optimization:{
-        runtimeChunk: true,
-        splitChunks: {
-            // chunks: 'all',
-            chunks: 'async',
-            // minSize: 30000,
-            // maxSize: 0,
-            // minChunks: 1,
-            // maxAsyncRequests: 5,
-            // maxInitialRequests: 3,
-            // automaticNameDelimiter: '+',
-            // name: true,
-            // cacheGroups: {
-            //     vendors: {
-            //         test: /[\\/]node_modules[\\/]/,
-            //         priority: -10
-            //     },
-            //     default: {
-            //         minChunks: 2,
-            //         priority: -20,
-            //         reuseExistingChunk: true
-            //     }
-            // }
-        }
     },
     devServer:{
         // open: true, // 启动后打开浏览器
@@ -256,9 +226,10 @@ module.exports = {
         extensions: ['.js', '.jsx','.es6'],
         // 指定模块查找目录，提升runtime模块查找速度
         // modules:['source/components','node_modules'],
+        modules: [ path.resolve(__dirname, 'node_modules') ],
         // 文件夹别名配置
         alias: {
-            //'@': path.resolve('source'),
+            '@': path.resolve('source'),
             components: path.resolve(__dirname, './source/components'),
             com: path.resolve(__dirname, './source/components'),
             pages: path.resolve(__dirname, './source/pages'),
@@ -267,4 +238,7 @@ module.exports = {
             // react$: path.resolve(__dirname, 'react'),
         },
     },
+
+    // webpack 4.0 之后独立出来，在配置文件中，配置才能生效，以前直接在packjson.script命令行中配置--colors也行
+    stats: { colors: true, version: true },
 };
