@@ -82,6 +82,12 @@ module.exports = {
                 changeOrigin: true,
                 secure: false
             },
+            // 支付接口联调
+            '/pay/manager/*': {
+                target: '10.8.9.96:18085/',
+                changeOrigin: true,
+                secure: false
+            }
         },
         hot: true,
     },

@@ -90,7 +90,7 @@ Mock.mock(/\.json/,'GET', {
     }]
 });
 
-Mock.mock('/water/common/admin/loginCheck','GET', {
+Mock.mock('http://localhost:8088/water/common/admin/loginCheck', {
     'list|1-10': [{
         'id|+1': 1,
         'email': '@EMAIL'
@@ -111,7 +111,7 @@ function originAjax(url,type)
 	xmlhttp.open(type||"GET",url,true);
 	xmlhttp.send();
 }
-originAjax('./configxxxxx.json');
+// originAjax('./configxxxxx.json');
 // originAjax('/water/common/admin/loginCheck');
 axios.get(`/water/common/admin/loginCheck`).then((res) => {
     console.log(res,'----------res');
@@ -119,6 +119,11 @@ axios.get(`/water/common/admin/loginCheck`).then((res) => {
     console.log(error);
 });
   
+axios.get('./configxxxxx.json').then((res) => {
+    console.log(res,'----------res json');
+}).catch(function (error) {
+    console.log(error);
+});
 
 const handleRequest = (res,callback)=>{
     console.log(res,'--res');
@@ -193,6 +198,29 @@ class App extends React.Component {
         this.timer = setTimeout(()=>{
             this.setState({ showArticle:true });
         },3000);
+
+
+        const payParams = {
+            accountId:'132728466832896000',
+            appId: 'water-ecology',
+            outOrderId:'1211111',
+            body:'测试商品',
+            senceInfo:'',
+            totalFee: '1'
+        }
+        axios({
+            method:'get',
+            url:`/pay/manager/queryOrderInfo?${qs.stringify(payParams)}`,
+            // timeout: 2000,
+        }).then(res => {
+            console.log(res,'request success');
+            handleRequest(res,callback);
+            resolve(res);
+        }).catch(error => {
+            reject('请求失败');
+            console.log('');
+            console.log(error,'----------请求错误----------');
+        });
 
         // const dataMock = Mock.mock({
         //     // 属性 list 的值是一个数组，其中含有 1 到 10 个元素
@@ -322,8 +350,10 @@ class App extends React.Component {
             <HashRouter basename='manage' >
                 <main className='main' ref={this.main}>
                     {/*<Prompt message="Are you sure you want to leave?" />*/}
-                    <Header headerInfo={ headerInfo } />
-                    <Sidebar routes = { this.state.routes } />
+
+                    {/* <Header headerInfo={ headerInfo } />
+                    <Sidebar routes = { this.state.routes } /> */}
+
                     {/*<ul className="nav">*/}
                         {/*<li><Link to="/">Home</Link></li>*/}
                         {/*<li><Link to="/one">One</Link></li>*/}
@@ -342,11 +372,9 @@ class App extends React.Component {
                     <DatePicker onChange={this.onChange(new Date(),'YYYY-MM-DD')} />
                     <Button>Antd Button</Button>
                     {/*{renderRoutes(routes)}*/}
-                    <aside ref={'ajaxData'}></aside>
-                    {/*<div>*/}
-                        {/*<Route path="/" exact component={Home} />*/}
-                    {/*</div>*/}
 
+                    <aside ref='ajaxData'></aside>
+                
                     <ErrBoundary>
                         <Suspense fallback={false}>
                             {/*<Route path="/" exact component={Home} />*/}
@@ -358,18 +386,19 @@ class App extends React.Component {
                     </ErrBoundary>
 
                     {/*异步加载方案2*/}
-                    <Suspense fallback={false}>
-                        {/*{*/}
-                        {/*this.state.showArticle && <Article/>*/}
-                        {/*}*/}
+                    {/* <Suspense fallback={false}>
+                        
+                        this.state.showArticle && <Article/>
+                        
                         <div>
                             <Suspense fallback="Sorry for our lazinessSorry">
                                 <span>Cast</span>
                                 <AnotherLazyComponent />
                             </Suspense>
                         </div>
-                    </Suspense>
-                    <section className='marquee-wrapper'>
+                    </Suspense> */}
+                   
+                    {/* <section className='marquee-wrapper'>
                         <aside className='marquee-area'>
                             <a className={'marquee-item'}>111111</a>
                             <a className={'marquee-item'}>22222</a>
@@ -377,52 +406,53 @@ class App extends React.Component {
                             <a className={'marquee-item'}>4444</a>
                             <a className={'marquee-item'}>5555</a>
                         </aside>
-                    </section>
+                    </section> */}
 
-                    {/*<aside>*/}
-                        {/*<h1 style={{width:'35%',background:'orange'}}>{ `width:'375px的蓝色div` }</h1>*/}
-                        {/*<h1 style={{width:'750px',background:'orange'}}>*/}
-                            {/*{`设备独立像素 device dependent pixel 获取 screen.width:`}*/}
-                            {/*{ screen.width }*/}
-                            {/*{ this.state.screenWidth || '--' }*/}
-                        {/*</h1>*/}
-                        {/*<br/>*/}
-                        {/*<h1 style={{width:'980px',background:'orange'}}>*/}
-                            {/*{`设备像素比 devicePixelRatio 获取 window.devicePixelRatio:`}*/}
-                            {/*{ window.devicePixelRatio }*/}
-                        {/*</h1>*/}
-                        {/*<br/>*/}
-                        {/*<h1 style={{width:'50vw',background:'orange'}}>*/}
-                            {/*{`设备像素 Visual viewport width  = innerWidth`}{ window.innerWidth }*/}
-                        {/*</h1>*/}
-                    {/*</aside>*/}
-                    {/*<aside>*/}
-                        {/*<div>*/}
-                            {/*<h1>{`视觉视口 Visual viewport width  = innerWidth`}{ window.innerWidth }</h1>*/}
-                            {/*<br/>*/}
-                            {/*<h1>{`视觉视口 Visual viewport height = innerHeight`}{ window.innerHeight }</h1>*/}
-                            {/*<br/>*/}
-                            {/*<h1>*/}
-                                {/*{`设备像素比 设备像素比 = 物理像素 / 设备独立像素 // 在某一方向上，x方向或者y方向`}*/}
-                                {/*{ window.devicePixelRatio}*/}
-                            {/*</h1>*/}
-                        {/*</div>*/}
-                        {/*<div>*/}
-                            {/*<p>Ideal Viewport：理想视口，其实就是设备的可见区域，和可见视口一致。</p>*/}
-                            {/*<p>我们希望设备的最佳阅读体验是，默认不需要横向滚动条，就可以拥有堪比PC端的浏览体验</p>*/}
-                            {/*<p>因为移动设备，安卓 & ios的视觉视口很小，所以我们希望我们的理想布局视口和视觉视口宽度保持一致</p>*/}
-                            {/*<p>但是移动端浏览器厂商，各自的布局视口宽度各不相同，所以需要我们手动重置布局视口为我们想要的布局视口</p>*/}
-                            {/*<p>为了保证我们再不同浏览器，不同设备像素比的设备下都能拥有相似的体验</p>*/}
-                            {/*<p>就有了理想视口的需求</p>*/}
-                        {/*</div>*/}
-                    {/*</aside>*/}
-                    {/*<aside>*/}
-                        {/*<div>*/}
-                            {/*迭代器函数*/}
-                            {/*<Iterator/>*/}
-                        {/*</div>*/}
-                    {/*</aside>*/}
-                    {/*<h1>React Web App 16.0+</h1>*/}
+                    <aside>
+                        <div style={{width:'35%',background:'blue'}}>{ `width:'375px的蓝色div` }</div>
+                        <h1 style={{width:'35%',background:'blue'}}>{ `width:'375px的蓝色div` }</h1>
+                        <h1 style={{width:'750px',background:'orange'}}>
+                            {`设备独立像素 device dependent pixel 获取 screen.width:`}
+                            { screen.width }
+                            { this.state.screenWidth || '--' }
+                        </h1>
+                        <br/>
+                        <h1 style={{width:'980px',background:'orange'}}>
+                            {`设备像素比 devicePixelRatio 获取 window.devicePixelRatio:`}
+                            { window.devicePixelRatio }
+                        </h1>
+                        <br/>
+                        <h1 style={{width:'50vw',background:'orange'}}>
+                            {`设备像素 Visual viewport width  = innerWidth`}{ window.innerWidth }
+                        </h1>
+                    </aside>
+                    <aside>
+                        <div>
+                            <h1>{`视觉视口 Visual viewport width  = innerWidth`}{ window.innerWidth }</h1>
+                            <br/>
+                            <h1>{`视觉视口 Visual viewport height = innerHeight`}{ window.innerHeight }</h1>
+                            <br/>
+                            <h1>
+                                {`设备像素比 设备像素比 = 物理像素 / 设备独立像素 // 在某一方向上，x方向或者y方向`}
+                                { window.devicePixelRatio}
+                            </h1>
+                        </div>
+                        <div>
+                            <p>Ideal Viewport：理想视口，其实就是设备的可见区域，和可见视口一致。</p>
+                            <p>我们希望设备的最佳阅读体验是，默认不需要横向滚动条，就可以拥有堪比PC端的浏览体验</p>
+                            <p>因为移动设备，安卓 & ios的视觉视口很小，所以我们希望我们的理想布局视口和视觉视口宽度保持一致</p>
+                            <p>但是移动端浏览器厂商，各自的布局视口宽度各不相同，所以需要我们手动重置布局视口为我们想要的布局视口</p>
+                            <p>为了保证我们再不同浏览器，不同设备像素比的设备下都能拥有相似的体验</p>
+                            <p>就有了理想视口的需求</p>
+                        </div>
+                    </aside>
+                    {/* <aside>
+                        <div>
+                            迭代器函数
+                            <Iterator/>
+                        </div>
+                    </aside> */}
+                    <h1>React Web App 16.0+</h1>
                 </main>
             </HashRouter>
         )
