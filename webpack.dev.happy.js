@@ -1,6 +1,7 @@
 
 /**
- * @description: development compile config / 开发环境编译文件
+ * 
+ * @description: development compile config / 开发环境编译配置 - happypack 多线程版
  * @author: tomy
  * @last modified: tomy 2019/04/09 11:43:00
  * 
@@ -29,22 +30,31 @@ const manifest = require('./source/vendors/vendor.manifest.json');
 const dllchunkname = manifest.name.split('_')[3];
 const devMode = process.argv.indexOf('--mode=development') > -1;
 const HappyPack = require('happypack');
-const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 4 }); // 开启一个多线程，线程数量等于最大线程减一，几乎全开
+const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 }); // 开启一个多线程，线程数量等于最大线程减4，几乎全开
 
 // console.log(dllchunkname,'dllchunkname');
-
+console.log(os.type(),'current os type');
 process.traceDeprecation = true; // 跟踪弃用警告的调用栈,默认true
 process.noDeprecation = false; // 关闭弃用警告,默认true
 
 module.exports = {
+    // 编译模式
     mode: 'development',
+    // 错误跟踪工具
     devtool: true ? 'cheap-module-eval-source-map' : 'hidden-source-map',
+    // 编译控制台打印配置
+    stats: { 
+        colors: true,
+        version: true 
+    },
+    // 入口文件配置
     entry:{
         index: [
             // 入口头文件引入 babel-polyfill 会导致编译包体积增大，
             // 应该使用babel-runtime和babel-helpers按需引入和防止重复打包，
             // 比如有50个文件使用了Object.assign()方法，
             // 应该是抽一个es5 版Object.assign()的js模块，给其他各个文件引入，而不是打到这50个文件中，这个引入babel抽离到babel-helpers中了
+            // 可以在这里配置hot-loader吗
             'babel-polyfill',
             path.resolve(__dirname, './source/entry/index.js')
         ]
@@ -104,14 +114,16 @@ module.exports = {
         hot: true,
     },
     module:{
-        // 排除编译项   有些库是自成一体不依赖其他库的没有使用模块化的，比如jquey、momentjs、chart.js，要使用它们必须整体全部引入。 webpack是模块化打包工具完全没有必要去解析这些文件的依赖，因为它们都不依赖其它文件体积也很庞大，要忽略它们配置如下：
+        // 排除模块依赖解析项 => 有些库是自成一体,不依赖其他库,没有使用模块化的，比如jquey、momentjs、chart.js，要使用它们必须整体全部引入。 webpack是模块化打包工具完全没有必要去解析这些文件的依赖，因为它们都不依赖其它文件体积也很庞大，要忽略它们配置如下：
         noParse: /node_modules\/(moment\.js)/,
         rules:[
             {
                 // 需要检查打包的各种js资源文件
                 test: /(\.jsx|\.js|\.es6)$/,
                 use: {
-                    // babel编译过程很耗时，好在babel-loader提供缓存编译结果选项，在重启webpack时不需要创新编译而是复用缓存结果减少编译流程。babel-loader缓存机制默认是关闭的，打开的配置如下babel-loader?cacheDirectory
+                    // babel编译过程很耗时，好在babel-loader提供缓存编译结果选项，在重启webpack时不需要重新编译而是复用缓存结果减少编译时间。
+                    // babel-loader缓存机制默认是关闭的，打开的配置如下：babel-loader?cacheDirectory
+                    // happypack/loader?id=js_modules 线程id用于下文plugins,使用该id分配解析js使用多少线程数和其他配置
                     loader:  'happypack/loader?id=js' || 'babel-loader?cacheDirectory',
                 },
                 // 排除查找模块的目录,提升编译速度
@@ -121,21 +133,21 @@ module.exports = {
             {
                 test: /\.css$/,
                 // use: 'happypack/loader?id=css' || ['style-loader', 'css-loader'],
-                include: [path.resolve(__dirname, 'node_modules')],
                 use: [
                     // MiniCssExtractPlugin.loader,
                     'happypack/loader?id=node_moudles_css'
-                ]
+                ],
+                include: [path.resolve(__dirname, 'node_modules')],
             },
+
             {
                 test: /\.scss/,
+                use: 'happypack/loader?id=node_moudles_sass' ||  ['style-loader', 'css-loader', 'sass-loader'],
                 include: [path.resolve(__dirname, 'node_modules')],
-                use: 'happypack/loader?id=node_moudles_sass' ||  ['style-loader', 'css-loader', 'sass-loader']
             },
             // 自定义样式-模块化
             {
                 test: /\.scss$/,
-                exclude: [path.resolve(__dirname, 'node_modules')],
                 use: [
                     // { 
                     //     loader: MiniCssExtractPlugin.loader,
@@ -144,11 +156,12 @@ module.exports = {
                     //     // }
                     // },
                     'happypack/loader?id=customizeSass'
-                ]
+                ],
+                exclude: [path.resolve(__dirname, 'node_modules')],
+
             },
             {
                 test: /\.less$/,
-                exclude: [path.resolve(__dirname, 'node_modules')],
                 use: 'happypack/loader?id=less' ||
                 [
                     { loader:'style-loader' },
@@ -160,29 +173,24 @@ module.exports = {
                             javascriptEnabled: true
                         }
                     }
-                ]  ||  ['style-loader', 'css-loader', 'less-loader']
+                ]  ||  ['style-loader', 'css-loader', 'less-loader'],
+                exclude: [path.resolve(__dirname, 'node_modules')],
             },
             {
-                test: /\.(png|svg|jpg|gif)$/,
+                test: /\.(png|svg|jpg|gif|woff|woff2|eot|ttf|otf)$/,
                 use:[
                     'file-loader'
                 ]
-            },
-            {
-                test: /\.(woff|woff2|eot|ttf|otf)$/,
-                use: 'file-loader'
-            },
+            }
         ],
     },
     plugins: [
-        // 热更新，不刷新页面异步更新,熱更新需要引入額外代碼在入口文件
-        new webpack.HotModuleReplacementPlugin(),
-        // 引入dll
+        // 引入dll => 里面打包了基础依赖模块react,react-router,reflux,antd等
         new webpack.DllReferencePlugin({
             context: __dirname,
             manifest: require('./source/vendors/vendor.manifest.json'),
         }),
-        // 模板插件
+        // Html模板插件
         new HtmlWebpackPlugin({
             title: 'react-router 4 && webpack4.0+ && antd.design',
             template: './source/html/index.ejs', // html模板文档地址，webpack默认模板为ejs
@@ -193,32 +201,22 @@ module.exports = {
             // 动态引入dll， manifest就是dll生成的json
             vendor: /*manifest.name*/'vendor.dll.' + dllchunkname + '.js',
         }),
+        // 打开浏览器插件
         new OpenBrowserWebpackPlugin({
-            browser: 'Chrome',
+            browser: os.type()==='Darwin' ?'Google Chrome':'Chrome',
             url: 'http://localhost:8088',
         }),
-        // new CleanWebpackPlugin([
-        //         './source/vendors/index.*.js',
-        //         './source/vendors/index.*.map',
-        //     ],
-        //     {
-        //         // webpack文件夹的绝对路径,Default: root of your package
-        //         root: __dirname,
-        //         verbose: true,
-        //         // 删除排除选项，无法排除指定正则文件格式,so,要排除从第一个参数吧
-        //         exclude: ['manifest.json'],
-        //     }
-        // ),
-        // 经常使用的模块提取到打包编译文件靠前位置，提升查找效率和运行速度
+        // 热更新，不刷新页面异步更新,熱更新需要引入額外代碼在入口文件
+        new webpack.HotModuleReplacementPlugin(),
+        // 经常使用的模块提取到打包编译文件靠前位置，提升编译查找效率和运行速度
         new webpack.optimize.OccurrenceOrderPlugin(),
         // // NamedModulesPlugin使用模块的相对路径作为模块的 id，
         // // 所以只要我们不重命名一个模块文件，那么它的id就不会变，更不会影响到其它模块了
         // new webpack.NamedModulesPlugin(),
 
-
-        // js线程 id：jsh 对应上文的 module.rules.use: happypack/loader?id=js
+        // 根据HappyPack线程id分配不同loader的线程资源：js 对应上文的 module.rules.use:happypack/loader?id=js
         new HappyPack({
-            id: 'js',
+            id: 'js'||'js_modules',
             threads: 4,
             // 指定使用哪个线程池
             threadPool: HappyThreadPool,
@@ -317,10 +315,5 @@ module.exports = {
             '@': path.resolve('source'),
             // react$: path.resolve(__dirname, 'react'), // $缩小查询范围，提升查询速度
         },
-    },
-    // 编译控制台打印配置
-    stats: { 
-        colors: true,
-        version: true 
     }
 };

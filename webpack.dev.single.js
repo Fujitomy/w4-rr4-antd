@@ -1,11 +1,7 @@
-/*
-* 开发环境编译文件
-* NamedModulesPlugin && OccurrenceOrderPlugin
-* https://blog.csdn.net/chenqiuge1984/article/details/80128021
-*
-*
-*
-*/
+/** 
+ * 开发环境编译配置-单线程版
+ * 
+ */
 
 const path = require('path');
 const webpack = require('webpack');
