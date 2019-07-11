@@ -33,9 +33,9 @@ const HappyPack = require('happypack');
 const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 }); // 开启一个多线程，线程数量等于最大线程减4，几乎全开
 
 // console.log(dllchunkname,'dllchunkname');
-console.log(os.type(),'current os type');
-process.traceDeprecation = true; // 跟踪弃用警告的调用栈,默认true
-process.noDeprecation = false; // 关闭弃用警告,默认true
+
+process.traceDeprecation = false; // 跟踪弃用警告的调用栈,默认true
+process.noDeprecation = true; // 关闭弃用警告,默认true
 
 module.exports = {
     // 编译模式
