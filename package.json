@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dll": "webpack --config  webpack.dll.js",
-    "dev": "webpack-dev-server --hotOnly --color --watch --config webpack.dev.new.js",
-    "pro": "webpack --color --config webpack.pro.js"
+    "dev": "webpack-dev-server --hotOnly --color --watch --config webpack.dev.js",
+    "pro": "webpack --color --config webpack.pro.js",
+    "test": "node --inspect-brk ./node_modules/jest/bin/jest --runInBand --no-cache --no-watchman --hotOnly --color --watch --config webpack.dev.js"
   },
   "keywords": [
     "wepack4-react-router4-antd"
@@ -23,13 +24,13 @@
     }
   },
   "dependencies": {
-    "@babel/polyfill": "^7.2.5",
+    "@babel/polyfill": "^7.4.4",
     "@babel/runtime": "^7.3.1",
     "@babel/runtime-corejs2": "^7.4.2",
     "antd": "^3.13.0",
     "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
-    "core-js": "^2.5.1",
+    "core-js": "^2.6.5",
     "fs": "^0.0.1-security",
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.11",
@@ -61,6 +62,7 @@
     "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^2.0.0",
     "cssnano": "^4.1.10",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^2.0.0",
     "friendly-errors-webpack-plugin": "^1.7.0",
     "happypack": "^5.0.1",
@@ -88,14 +90,15 @@
     "name": "依赖注释",
     "babel-loader": "babel-loader是告诉webpack我要对js文件进行代码兼容性编译，那么webpack接下来就是要找babel",
     "@babel/register": "babel-register 模块改写 require 命令，为它加上一个钩子。此后，每当使用 require 加载 .js、.jsx、.es 和 .es6后缀名的文件，就会先用 babel 进行转码。使用时，必须首先加载 require('babel-register')。需要注意的是，babel-register 只会对 require 命令加载的文件转码，而 不会对当前文件转码。另外，由于它是实时转码，所以 只适合在开发环境使用。",
-    "@babel/xxx": "以@babel/前缀开头的表示babel官方发现的库，正版，非@babel/开头的，与babel官网无关，撇清关系",
+    "@babel/xxx": "以@babel/前缀开头的表示babel官方发行的库，正版，非@babel/开头的，与babel官网无关，撇清关系",
     "@babel/core": "而babel的入口就是babel-core 只有通过它，webpack才能使用各种babel的api（前提是你安装了相关的api）@babel/core：babel核心包,babel-loader的核心依赖",
-    "@babel/runtime": "@babel/plugin-transform-runtimez只是一个分析工具，es6+新增的BOM对象和api语法转换依赖于@babel/runtime，",
+    "@babel/runtime": "@babel/plugin-transform-runtime只是一个分析工具，es6+新增的BOM对象和api语法转换依赖于@babel/runtime，该插件用于转比如 Promise,Set,Symbol,Array.from,async 等等的一些API",
     "@babel/plugin-transform-runtime": "babel 编译时只转换语法，几乎可以编译所有时新的 JavaScript 语法，但并不会转化BOM（浏览器）里面不兼容的API。比如 Promise,Set,Symbol,Array.from,async 等等的一些API。这2个包就是来搞定这些api的。",
     "@babel/polyfill": "楼上两个的旧的方案，但需要配合使用，主要在实例方法的时候还是得依赖它，Babel默认只转换新的JavaScript句法（syntax），而不转换新的API，比如Iterator、Generator、Set、Maps、Proxy、Reflect、Symbol、Promise等全局对象，以及一些定义在全局对象上的方法（比如Object.assign）都不会转码",
     "@babel/preset-react": "用于编译react jsx的插件,在编译配置文件中开启设置options: {presets: ['@babel/preset-react']}",
-    "@babel/plugin-syntax-dynamic-import": "动态引入语法编译插件 Allow parsing of import()，已发布到标准规范的语法或api",
+    "@babel/plugin-syntax-dynamic-import": "动态引入语法编译插件 Allow parsing of import('mathjs')，已发布到标准规范的语法或api",
     "@babel/plugin-proposal-class-properties": "babel7中去掉了对提案阶段新增api的编译，但是可以采用提案api插件来转译",
+    "@babel/runtime-corejs2": "无副作用打包Promise等新增BOM对象的Api,需要设置为corejs：2",
     "less-loader sass-loader sass-loader style-loader": "样式处理的loader",
     "file-loader": "文件处理字体图片等",
     "webpack-cli": "webpack命令行插件，安装之后可以不用全局安装webpack，也可以使用使用webpack命令行",

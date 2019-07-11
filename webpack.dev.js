@@ -1,14 +1,25 @@
-/*
-* 开发环境编译文件
-* NamedModulesPlugin && OccurrenceOrderPlugin
-* https://blog.csdn.net/chenqiuge1984/article/details/80128021
-*
-* https://blog.csdn.net/weixiaoderensheng/article/details/82993332 编译异常
-* https://blog.csdn.net/ZYC88888/article/details/80592654
-* https://blog.csdn.net/u013738122/article/details/81809002 编译配置
-*
-*/
 
+/**
+ * @description: development compile config / 开发环境编译文件
+ * @author: tomy
+ * @last modified: tomy 2019/04/09 11:43:00
+ * 
+ * NamedModulesPlugin && OccurrenceOrderPlugin
+ * https://blog.csdn.net/chenqiuge1984/article/details/80128021
+ *
+ * 编译异常
+ * https://blog.csdn.net/weixiaoderensheng/article/details/82993332 
+ * https://blog.csdn.net/ZYC88888/article/details/80592654
+ * 
+ * 编译配置
+ * https://blog.csdn.net/u013738122/article/details/81809002 
+ * 
+ * core-js warning solve method
+ * https://blog.csdn.net/kai_vin/article/details/88700181
+ * 
+ */
+
+const os = require("os");
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -16,47 +27,47 @@ const OpenBrowserWebpackPlugin = require('open-browser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const manifest = require('./source/vendors/vendor.manifest.json');
 const dllchunkname = manifest.name.split('_')[3];
+const devMode = process.argv.indexOf('--mode=development') > -1;
+const HappyPack = require('happypack');
+const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 4 }); // 开启一个多线程，线程数量等于最大线程减一，几乎全开
 
-console.log(dllchunkname,'dllchunkname');
+// console.log(dllchunkname,'dllchunkname');
 
-// 是否打印调用栈
-// process.traceDeprecation = true;
-// 是否关闭弃用警告
-process.noDeprecation = false;
-
-const dev = Boolean(process.env.WEBPACK_SERVE);
-const isProduction = process.argv.indexOf('--mode=production') > -1;
+process.traceDeprecation = true; // 跟踪弃用警告的调用栈,默认true
+process.noDeprecation = false; // 关闭弃用警告,默认true
 
 module.exports = {
     mode: 'development',
-    devtool: isProduction ? 'cheap-module-eval-source-map' : 'hidden-source-map',
+    devtool: true ? 'cheap-module-eval-source-map' : 'hidden-source-map',
     entry:{
         index: [
             // 入口头文件引入 babel-polyfill 会导致编译包体积增大，
             // 应该使用babel-runtime和babel-helpers按需引入和防止重复打包，
             // 比如有50个文件使用了Object.assign()方法，
-            // 应该是抽一个es5 版Object.assign()的js模块，给其他各个文件引入，而不是打得到50个文件中，这个引入babel抽离到babel-helpers中了
+            // 应该是抽一个es5 版Object.assign()的js模块，给其他各个文件引入，而不是打到这50个文件中，这个引入babel抽离到babel-helpers中了
             'babel-polyfill',
             path.resolve(__dirname, './source/entry/index.js')
         ]
     },
     // devServer模式下不配置output也是可以的
-    output: {
-        filename: '[name].[hash].js',
-        chunkFilename: "[name].chunk.js",
-        // 这里业务代码为何输出到公共包目录了··
-        path: path.resolve(__dirname,'./source/vendors/'),
-        // 对于按需加载(on-demand-load)或加载外部资源(external resources)（如图片、文件等）来说，output.publicPath 是很重要的选项。如果指定了一个错误的值，则在加载这些资源时会收到 404 错误。
-        publicPath: "/",
-        // 模块注释信息，默认为false,不应该使用到生产环境
-        pathinfo: true
-    },
+    // output: {
+    //     // 入口文件名，如果是单入口文件的话，没有配置优化项的话只有一个，多入口文件的话会有多个
+    //     filename: '[name].[hash].js',
+    //     // 按需加载模块的js名称
+    //     chunkFilename: "[name].chunk.js",
+    //     // 这里业务代码为何输出到公共包目录了··
+    //     path: path.resolve(__dirname,'./source/vendors/'),
+    //     // 对于按需加载(on-demand-load)或加载外部资源(external resources)（如图片、文件等）来说，output.publicPath 是很重要的选项。如果指定了一个错误的值，则在加载这些资源时会收到 404 错误。
+    //     publicPath: "/",
+    //     // 模块注释信息，默认为false,不应该使用到生产环境
+    //     pathinfo: true
+    // },
     devServer:{
         // open: true, // 启动后打开浏览器
         // 告诉服务器从哪个目录中提供内容。只有在你想要提供静态文件时才需要,
         // 若配置错误，是找不到资源文件的
         // 默认情况下，将使用当前工作目录作为提供内容的目录，但是你可以修改为其他目录
-        // 这个很重要，比如你的静态公共包资源放在./source/vendors/目录下，如果你不配置到此，那么devServer启动可能会找不到依赖文件
+        // 这个很重要，比如你的静态资源（图片多媒体）或者react公共包放在./source/vendors/目录下，如果你不配置到此，那么devServer启动可能会找不到这些依赖的静态资源文件或公共包
         contentBase: path.resolve(__dirname,'./source/vendors/'),
         // 一切服务都启用gzip压缩(所有来自 './source/vendors' 目录的文件都做 gzip 压缩)
         compress: true,
@@ -83,8 +94,85 @@ module.exports = {
                 changeOrigin: true,
                 secure: false
             },
+            // 支付接口联调
+            '/pay/manager/*': {
+                target: '10.8.9.96:18085/',
+                changeOrigin: true,
+                secure: false
+            }
         },
         hot: true,
+    },
+    module:{
+        // 排除编译项   有些库是自成一体不依赖其他库的没有使用模块化的，比如jquey、momentjs、chart.js，要使用它们必须整体全部引入。 webpack是模块化打包工具完全没有必要去解析这些文件的依赖，因为它们都不依赖其它文件体积也很庞大，要忽略它们配置如下：
+        noParse: /node_modules\/(moment\.js)/,
+        rules:[
+            {
+                // 需要检查打包的各种js资源文件
+                test: /(\.jsx|\.js|\.es6)$/,
+                use: {
+                    // babel编译过程很耗时，好在babel-loader提供缓存编译结果选项，在重启webpack时不需要创新编译而是复用缓存结果减少编译流程。babel-loader缓存机制默认是关闭的，打开的配置如下babel-loader?cacheDirectory
+                    loader:  'happypack/loader?id=js' || 'babel-loader?cacheDirectory',
+                },
+                // 排除查找模块的目录,提升编译速度
+                exclude: path.resolve(__dirname, 'node_modules'),
+            },
+           
+            {
+                test: /\.css$/,
+                // use: 'happypack/loader?id=css' || ['style-loader', 'css-loader'],
+                include: [path.resolve(__dirname, 'node_modules')],
+                use: [
+                    // MiniCssExtractPlugin.loader,
+                    'happypack/loader?id=node_moudles_css'
+                ]
+            },
+            {
+                test: /\.scss/,
+                include: [path.resolve(__dirname, 'node_modules')],
+                use: 'happypack/loader?id=node_moudles_sass' ||  ['style-loader', 'css-loader', 'sass-loader']
+            },
+            // 自定义样式-模块化
+            {
+                test: /\.scss$/,
+                exclude: [path.resolve(__dirname, 'node_modules')],
+                use: [
+                    // { 
+                    //     loader: MiniCssExtractPlugin.loader,
+                    //     // options: {
+                    //     //     publicPath: '../'
+                    //     // }
+                    // },
+                    'happypack/loader?id=customizeSass'
+                ]
+            },
+            {
+                test: /\.less$/,
+                exclude: [path.resolve(__dirname, 'node_modules')],
+                use: 'happypack/loader?id=less' ||
+                [
+                    { loader:'style-loader' },
+                    { loader:'css-loader'   },
+                    {
+                        loader:'less-loader',
+                        options: {
+                            // 将less打包到js行内
+                            javascriptEnabled: true
+                        }
+                    }
+                ]  ||  ['style-loader', 'css-loader', 'less-loader']
+            },
+            {
+                test: /\.(png|svg|jpg|gif)$/,
+                use:[
+                    'file-loader'
+                ]
+            },
+            {
+                test: /\.(woff|woff2|eot|ttf|otf)$/,
+                use: 'file-loader'
+            },
+        ],
     },
     plugins: [
         // 热更新，不刷新页面异步更新,熱更新需要引入額外代碼在入口文件
@@ -128,117 +216,111 @@ module.exports = {
         // new webpack.NamedModulesPlugin(),
 
 
-    ],
-    module:{
-        rules:[
-            {
-                // 需要检查打包的各种js资源文件
-                test: /(\.jsx|\.js|\.es6)$/,
-                // 排除查找模块的目录
-                use: {
-                    loader: 'babel-loader',
+        // js线程 id：jsh 对应上文的 module.rules.use: happypack/loader?id=js
+        new HappyPack({
+            id: 'js',
+            threads: 4,
+            // 指定使用哪个线程池
+            threadPool: HappyThreadPool,
+            loaders: ['babel-loader?cacheDirectory=true'],
+            verbose: false,
+        }),
+
+        new HappyPack({
+            id: 'node_moudles_css',
+            threads: 4,
+            // 指定使用哪个线程池
+            threadPool: HappyThreadPool,
+            loaders: [
+                'style-loader', 
+                'css-loader',
+                'postcss-loader'
+            ],
+            verbose: false,
+        }),
+
+        new HappyPack({
+            id: 'node_moudles_less',
+            threads: 4,
+            // less文件和js文件都指定了使用HappyThreadPool线程池
+            threadPool: HappyThreadPool,
+            loaders: [
+                'style-loader',
+                'css-loader',
+                'postcss-loader',
+                {
+                    loader:'less-loader',
                     options: {
-                        // // 编译规则，如果不开启，编译jsx会报错，旧配置presets: ['es2015', 'react']
-                        // presets: ['@babel/preset-react'],
-                        // // plugins: ['syntax-dynamic-import'],
-                        // // plugins: ['@babel/plugin-transform-runtime']
-                        // // 这个也可以在.babelrc中配置
-                        // // plugins:[
-                        // //     // 数组写法在babel7中已经弃用
-                        // //     ['import',{libraryName:'antd', style:true}]
-                        // // ],
-                        // // This is a feature of `babel-loader` for webpack (not Babel itself).It enables caching results in ./node_modules/.cache/babel-loader/directory for faster rebuilds.
-                        // // 这是webpack的“babel-loader”特征（不是Babel本身）。
-                        // // 它可以在./node_modules/.cache/babel-loader/目录中启用缓存结果，以便更快地进行重建。
-                        // cacheDirectory: true,
-
-
-                        presets: ['@babel/preset-env','@babel/preset-react'],
-                        // plugins: ['syntax-dynamic-import'],
-                        // plugins: ['@babel/plugin-transform-runtime']
-                        // 这个也可以在.babelrc中配置
-                        // plugins:[
-                        //     // 数组写法在babel7中已经弃用
-                        //     ['import',{libraryName:'antd', style:true}]
-                        // ],
-                        // This is a feature of `babel-loader` for webpack (not Babel itself).It enables caching results in ./node_modules/.cache/babel-loader/directory for faster rebuilds.
-                        // 这是webpack的“babel-loader”特征（不是Babel本身）。
-                        // 它可以在./node_modules/.cache/babel-loader/目录中启用缓存结果，以便更快地进行重建。
-
-                        cacheDirectory: true,
-                        plugins: [
-                            // '@babel/plugin-proposal-object-rest-spread',
-                            // 编译动态引入语法，e.g: import('./xxx.js')
-                            "syntax-dynamic-import",
-                            // 编译一些es7语法
-                            "@babel/plugin-proposal-class-properties",
-                            [
-                                // "import",
-                                // {
-                                //     "libraryName": "antd",
-                                //     // "libraryDirectory": "lib",
-                                //     "style": "css" // `style: true` 会加载 less 文件
-                                // }
-                                "import",
-                                {
-                                    "libraryName": "antd",
-                                    "libraryDirectory": "es",
-                                    "style": "css"
-                                }
-                            ]
-                        ]
-
-
+                        // 将less打包到js行内
+                        javascriptEnabled: true
                     }
-                },
-            },
-            {
-                test: /\.css$/,
-                use: ['style-loader', 'css-loader']
-                // use: [
-                //     { loader: 'style-loader' },
-                //     { loader: 'css-loader?modules' },
-                // ]
-            },
-            {
-                test: /\.scss/,
-                use: ['style-loader', 'css-loader', 'sass-loader']
-            },
-            {
-                test: /\.less$/,
-                use: ['style-loader', 'css-loader', 'less-loader']
-            },
-            {
-                test: /\.(png|svg|jpg|gif)$/,
-                use:[
-                    'file-loader'
-                ]
-            },
-            {
-                test: /\.(woff|woff2|eot|ttf|otf)$/,
-                use: 'file-loader'
-            },
-        ],
-    },
+                }
+            ],
+            verbose: false,
+        }),
+
+        new HappyPack({
+            id: 'less',
+            threads: 4,
+            // less文件和js文件都指定了使用HappyThreadPool线程池
+            threadPool: HappyThreadPool,
+            loaders: [
+                'style-loader',
+                'css-loader',
+                'postcss-loader',
+                {
+                    loader: 'less-loader',
+                    options: {
+                        // 将less打包到js行内
+                        javascriptEnabled: true
+                    }
+                }
+            ],
+            verbose: false,
+        }),
+
+        new HappyPack({
+            id: 'node_moudles_sass',
+            threads: 3,
+            // less文件和js文件都指定了使用HappyThreadPool线程池
+            threadPool: HappyThreadPool,
+            loaders: [
+                'style-loader',
+                'css-loader',
+                'postcss-loader',
+                'sass-loader'
+            ],
+            verbose: false,
+        }),
+
+        new HappyPack({
+            id: 'customizeSass',
+            threads: 3,
+            // less文件和js文件都指定了使用HappyThreadPool线程池
+            threadPool: HappyThreadPool,
+            loaders: [
+                'style-loader',
+                'css-loader',
+                'postcss-loader',
+                'sass-loader'
+            ],
+            verbose: false,
+            debug: false
+        }),
+    ],
     // 文件解析配置
     resolve: {
         // 默认后缀名，配置后可省略
         extensions: ['.js', '.jsx','.es6'],
-        // 指定模块查找目录，提升runtime模块查找速度
-        // modules:['source/components','node_modules'],
-        modules: [ path.resolve(__dirname, 'node_modules') ],
         // 文件夹别名配置
         alias: {
             '@': path.resolve('source'),
-            components: path.resolve(__dirname, './source/components'),
-            com: path.resolve(__dirname, './source/components'),
-            pages: path.resolve(__dirname, './source/pages'),
-            utils: path.resolve(__dirname, './source/utils'),
-            // $缩小查询范围，提升查询速度
-            // react$: path.resolve(__dirname, 'react'),
+            // react$: path.resolve(__dirname, 'react'), // $缩小查询范围，提升查询速度
         },
     },
-
-    // webpack 4.0 之后独立出来，在配置文件中，配置才能生效，以前直接在packjson.script命令行中配置--colors也行
-    stats: { colors: true, version: true },
+    // 编译控制台打印配置
+    stats: { 
+        colors: true,
+        version: true 
+    }
 };

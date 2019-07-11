@@ -231,7 +231,7 @@ class App extends React.Component {
         // });
         // 输出结果
         // console.log(JSON.stringify(dataMock, null, 4));
-
+        `111`
         console.log(this.main.current,'mainRef ref object');
         // fs.readFile("./config.json", function(err, contents) {
         //     if (err) {
