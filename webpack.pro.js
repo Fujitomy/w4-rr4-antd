@@ -3,12 +3,14 @@
  * @date: 2019/03/22 12:00:00
  * @last modified: tomy
  * @last modified date: 2019/03/22 10:45
- * @Description: production dist config
+ * @Description: Production dist config
  * 
- * antd 按需加载全量引入了icon，期待后续antd给出新的api，控制入口文件大小在700kkb以下，暂时这么处理
+ * Antd 按需加载
+ * 原因：由于其全量引入了icon，期待后续antd给出新的api，控制入口文件大小在700kb以下
+ *
+ * 临时解决方案
  * https://github.com/ant-design/ant-design/issues/12011
  * https://www.zhihu.com/question/308898834
- * 临时解决方案
  * https://github.com/HeskeyBaozi/reduce-antd-icons-bundle-demo
  * 
  * 抽离css
@@ -41,15 +43,16 @@ process.traceDeprecation = true; // 是否打印调用栈
 process.noDeprecation = true; // 是否关闭弃用警告
 // console.log(dllchunkname,'dllchunkname');
 
-// webpack 三种chunk类型 entry chunk, children chunk , common chunk
+// webpack的三种chunk类型 entry chunk, children chunk , common chunk
 
 module.exports = {
     // tree shaking 新的 webpack 4 正式版本，扩展了这个检测能力，通过 package.json 的 "sideEffects" 属性作为标记，向 compiler 提供提示，表明项目中的哪些文件是 "pure(纯的 ES2015 模块)"，由此可以安全地删除文件中未使用的部分。
     mode: 'production',
-    // 调试工具，错误打印等级，eval-source-map
-    // devtool: "source-map",
-    devtool: 'none',
-    // 基础目录，绝对路径，用于从配置中解析入口起点(entry point)和 loader 其上下文是入口文件所处的目录的绝对路径的字符串
+    // 调试工具，浏览器控制台错误打印配置，eval-source-map
+    devtool: 'none', // devtool: "source-map",
+    // 启用 Watch 模式。这意味着在初始构建之后，webpack 将继续监听任何已解析文件的更改。默认关闭。
+    watch: true,
+    // 基础目录，绝对路径，用于从配置中解析入口起点(entry point)和 loader，其上下文是入口文件所处的目录的绝对路径的字符串
     // context: path.resolve(__dirname, "./source/entry/"),
     // entry 对象是用于 webpack 查找启动并构建 bundle。其上下文 context 是入口文件所处的目录的绝对路径的字符串。
     entry:{
@@ -62,19 +65,20 @@ module.exports = {
     },
     // 指示 webpack 如何去输出、以及在哪里输出你的「bundle、asset 和其他你所打包或使用 webpack 载入的任何内容」
     output: {
-        // 此选项决定了每个输出 bundle 的名称。这些 bundle 将写入到 output.path 选项指定的目录下。
-        // 此选项不会影响那些「按需加载 chunk」的输出文件。对于按需加载的文件，请使用 output.chunkFilename 选项来控制输出。
+        // filename 决定了每个 打包文件/bundle 的名称。这些 bundle 将写入到 output.path 选项指定的目录下。
+        // 此选项，不会影响那些「按需加载 chunk」的输出文件，filename 基本上都是入口文件和基础依赖文件
         // 通过 loader 创建的文件也不受影响。在这种情况下，你必须尝试 loader 特定的可用选项。
         filename: '[name].[hash:8].js',  
         
-        // output 目录对应一个绝对路径，指定bundle文件输出路径
+        // output 目录对应一个绝对路径，指定 bundle 文件输出路径
         path: path.resolve(__dirname,'./dist/build/'),
 
-        // 此选项决定了非入口(non-entry) chunk 文件的名称。有关可取的值的详细信息，请查看 output.filename 选项
+        // 此选项决定了非入口(non-entry) chunk 文件的名称。配置方式和filename类似，在 optimization.splitChunks.cacheGroups.vender 中可以重命名
         chunkFilename: "[name].chunk.[chunkhash:8].js",
 
-        // 对于按需加载(on-demand-load)或加载外部资源(external resources)（如图片、文件等）来说，output.publicPath 是很重要的选项。如果指定了一个错误的值，则在加载这些资源时会收到 404 错误。
-        publicPath: './build/',
+        // 输出解析文件的目录，url 相对于 HTML 页面
+        // publicPath 指定按需加载(on-demand-load)或加载外部资源(external resources)（如图片、文件等）路径，output.publicPath 是很重要的选项。如果指定了一个错误的值，则在加载这些资源时会收到 404 错误。
+        publicPath: './build/', 
 
         // publicPath: "https://cdn.example.com/assets/", // CDN（总是 HTTPS 协议）
         // publicPath: "//cdn.example.com/assets/", // CDN (协议相同)
@@ -82,21 +86,26 @@ module.exports = {
         // publicPath: "assets/", // 相对于 HTML 页面
         // publicPath: "../assets/", // 相对于 HTML 页面
         // publicPath: "", // 相对于 HTML 页面（目录相同）
+
         // 告诉 webpack 在 bundle 中引入「所包含模块信息」的相关注释。此选项默认值是 false，并且不应该用于生产环境(production)，但是对阅读开发环境(development)中的生成代码(generated code)极其有用。
-        // pathinfo: true,
-        // 此选项会向硬盘写入一个输出文件，只在 devtool 启用了 SourceMap 选项时才使用。 我们建议只使用 [file] 占位符，因为其他占位符在非 chunk 文件(non-chunk files)生成的 SourceMap 时不起作用。
-        // sourceMapFilename: "[file].map", 
+        pathinfo: true,
+
         // 修改输出 bundle 中每行的前缀。 注意，默认情况下使用空字符串。使用一些缩进会看起来更美观，但是可能导致多行字符串中的问题。
         // sourcePrefix:'\t',
+
         // 暴露自定义js库的文件名 暴露 library 使其在各种用户环境(consumption)中可用
-        // library: 'tomyjs',
+        // library: 'xxxjs',
         // 暴露 library 的方式 var(全局变量tomyjs),this(通过this访问this.tomyjs),window(window.tomyjs),UMD(require('tomyjs'))
-        // libraryTarget: 'umd', // https://www.webpackjs.com/configuration/output/#%E9%80%9A%E8%BF%87%E5%9C%A8%E5%AF%B9%E8%B1%A1%E4%B8%8A%E8%B5%8B%E5%80%BC%E6%9A%B4%E9%9C%B2
+        // https://www.webpackjs.com/configuration/output/#通过在对象上赋值暴露
+        // libraryTarget: 'umd', 
+
+        // 此选项会向硬盘写入一个输出文件，只在 devtool 启用了 SourceMap 选项时才使用。 我们建议只使用 [file] 占位符，因为其他占位符在非 chunk 文件(non-chunk files)生成的 SourceMap 时不起作用。
+        // sourceMapFilename: "[file].map", 
     },
-    // 编译控制台打印项配置
+    // 编译控制台打印配置
     // stats: 'none',
     stats: {
-        // 未定义选项时，stats 选项的备用值(fallback value)（优先级高于 webpack 本地默认值）
+        // 未定义选项时，stats 选项的备用值（默认值）（优先级高于 webpack 本地默认值）
         // all: undefined,
 
         // 打印非入口文件的chunk编译信息
@@ -152,35 +161,6 @@ module.exports = {
         // 添加错误的详细信息（就像解析日志一样）
         errorDetails: true,
 
-        // 将资源显示在 stats 中的情况排除
-        // 这可以通过 String, RegExp, 获取 assetName 的函数来实现
-        // 并返回一个布尔值或如下所述的数组。
-        // excludeAssets: (assetName) => { 
-        //     console.log(moduleSource,'---------excludeAssets-----------');
-        //     return false 
-        // },
-        //"filter", 
-        // | /filter/ | (assetName) => ... return true|false |
-        //     ["filter"] | [/filter/] | [(assetName) => ... return true|false],
-
-        // 将模块显示在 stats 中的情况排除
-        // 这可以通过 String, RegExp, 获取 moduleSource 的函数来实现
-        // 并返回一个布尔值或如下所述的数组。
-        // excludeModules: (moduleSource) => {return false},
-        // "filter",
-        // | /filter/ | (moduleSource) => ... return true|false |
-        //     ["filter"] | [/filter/] | [(moduleSource) => ... return true|false]
-            
-
-        // 和 excludeModules 相同
-        // exclude: (moduleSource) => {
-        //     console.log(moduleSource,'---------moduleSource-----------');
-        //     return false
-        // },
-        // "filter", 
-        // | /filter/ | (moduleSource) => ... return true|false |
-        //     ["filter"] | [/filter/] | [(moduleSource) => ... return true|false],
-
         // 添加 compilation 的哈希值
         hash: false,
 
@@ -190,7 +170,6 @@ module.exports = {
         // 添加构建模块信息
         modules: false,
 
-        // 按指定的字段，对模块进行排序
         // 你可以使用 `!field` 来反转排序。默认是按照 `id` 排序。
         modulesSort: "field",
 
@@ -230,8 +209,6 @@ module.exports = {
         // warningsFilter: (warning) => { return false }
         // "filter" // | /filter/ | ["filter", /filter/] | (warning) => ... return true|false
     },
-    // 启用 Watch 模式。这意味着在初始构建之后，webpack 将继续监听任何已解析文件的更改。Watch 模式默认关闭。
-    watch: true,
     // --watch --info-verbosity verbose
     // 监听配置项
     // watchOptions:{
@@ -263,8 +240,7 @@ module.exports = {
             }),
             new OptimizeCssAssetsPlugin({})
         ],
-
-        // webpack 默认配置 webpack 4 Code Splitting 的 splitChunks 配置探索 https://imweb.io/topic/5b66dd601402769b60847149
+        // webpack 4 Code Splitting 的 splitChunks 配置探索： https://imweb.io/topic/5b66dd601402769b60847149
         splitChunks: {
             chunks: 'all',
             minSize: 30000,
@@ -275,11 +251,13 @@ module.exports = {
             automaticNameDelimiter: '~',
             name: true,
             cacheGroups: {
+                // 把所有 node_modules 的模块被不同的 chunk 引入超过 1 次的抽取为 vender
                 vender: {
                     test: /[\\/]node_modules[\\/]/,
-                    name: 'entry-vender',
+                    name: 'entry-vender', // 入口文件的chunk的文件名前缀
                     chunks: 'initial',
-                    priority: 10
+                    priority: 10,
+                    minChunks: 2, // 抽取超过引入并使用1次的模块
                 },
                 antd: {
                     name: 'chunk-antd',
@@ -287,11 +265,21 @@ module.exports = {
                     priority: 20,
                     chunks: 'async'
                 },
+                // 把 lodash 模块抽取为 lodash
                 lodash: {
                     name: 'chunk-lodash',
                     test: /[\\/]node_modules[\\/]lodash[\\/]/,
                     priority: 30,
                     chunks: 'async'
+                },
+                // 把 lodash 模块抽取为 lodash
+                lodashChunk: {
+                    name: 'reactBase',
+                    test: (module) => {
+                        return /lodash/.test(module.context);
+                    },
+                    chunks: 'initial',
+                    priority: 12,
                 },
                 default: {
                     minChunks: 2,
@@ -370,7 +358,6 @@ module.exports = {
         flagIncludedChunks: true, 
         // 无需单独设置 告诉webpack找出模块的顺序，这样可以让初始包变到最小。 默认在生产模式下启用，否则禁用。
         occurrenceOrder: true,
-
         // 无需单独设置 告诉webpack确定模块提供哪些导出，以便为 `export * from 'xxx.js'这种模式` 生成更高效的代码, 默认开启
         providedExports: true,
         // 无需单独设置 告诉webpack确定每个模块的已使用导出。这取决于providedExports。默认在生产模式下启用，否则禁用
@@ -390,7 +377,6 @@ module.exports = {
         // 无需单独设置 bool: false 告诉webpack生成具有相对路径的记录，以便能够移动上下文文件夹。
         portableRecords: false,
     },
-
     module:{
         // 排除编译项   有些库是自成一体不依赖其他库的没有使用模块化的，比如jquey、momentjs、chart.js，要使用它们必须整体全部引入。 webpack是模块化打包工具完全没有必要去解析这些文件的依赖，因为它们都不依赖其它文件体积也很庞大，要忽略它们配置如下：
         noParse: /node_modules\/(moment\.js)/,
@@ -466,14 +452,13 @@ module.exports = {
     },
     // 编译插件
     plugins: [
-
-        // 引入dll
+        // 引入dll（react，react-router之类的基础依赖库文件）
         new webpack.DllReferencePlugin({
             context: __dirname,
             manifest: require('./source/vendors/vendor.manifest.json')
         }),
 
-        // 模板插件
+        // HTML模板插件
         new HtmlWebpackPlugin({
             title: 'react-router 4 && webpack4.0+ && antd.design',
              // html模板文档地址，webpack默认模板为ejs
@@ -484,7 +469,7 @@ module.exports = {
             inject: 'body',
             author: 'tomy',
             vendor: /*manifest.name*/'./vendors/vendor.dll.' + dllchunkname + '.js', // 动态引入dll， manifest就是dll生成的json
-            // manifest: './vendors/vendor.manifest.json', // manifest ???
+            // manifest: './vendors/vendor.manifest.json', // manifest只是运行时构建映射文件，不需要单独引入
             // inline: true, // ????
             // 标签格式化配置，生产环境建议开启
             minify: {
@@ -500,9 +485,9 @@ module.exports = {
             }
         }),
 
-        // js线程 id：jsh 对应上文的 module.rules.use: happypack/loader?id=js
+        // js线程 id：js 对应上文的 module.rules.use: happypack/loader?id=js
         new HappyPack({
-            id: 'js',
+            id: 'js', // 自定义的线程id='js'
             threads: 4,
             // 指定使用哪个线程池
             threadPool: HappyThreadPool,
@@ -511,7 +496,7 @@ module.exports = {
         }),
 
         new HappyPack({
-            id: 'node_moudles_css',
+            id: 'node_moudles_css', // 自定义的线程id='node_moudles_css'
             threads: 4,
             // 指定使用哪个线程池
             threadPool: HappyThreadPool,
@@ -612,10 +597,10 @@ module.exports = {
             // 删除排除选项，无法排除指定正则文件格式,so,要排除从第一个参数吧
             // exclude: ['manifest.json'],
         }),
+
         // 经常使用的模块提取到打包编译文件靠前位置，提升查找效率和运行速度
         new webpack.optimize.OccurrenceOrderPlugin(),
-        // // NamedModulesPlugin使用模块的相对路径作为模块的 id，
-        // // 所以只要我们不重命名一个模块文件，那么它的id就不会变，更不会影响到其它模块了
+        // // NamedModulesPlugin使用模块的相对路径作为模块的 id，只要我们不重命名一个模块文件，那么它的id就不会变，更不会影响到其它模块了
         // new webpack.NamedModulesPlugin(),
 
         // 拷贝文件

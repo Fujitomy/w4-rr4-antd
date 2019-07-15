@@ -28,9 +28,29 @@ const path = require('path');
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin'); // js压缩插件
 // const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 
-module.exports = {
+// const devMode = env.NODE_ENV === 'dev';
+// console.log(env.NODE_ENV,'devMode');
+const TerserOptimization = {
+    minimizer: [
+      new TerserPlugin({
+        test: /\.js$/i,
+        parallel: true
+      })
+    ]
+}
+
+const InitOptimization = {
+    minimizer: [
+        new UglifyJsPlugin({
+            parallel: os.cpus().length - 1  // 开启多线程打包 比如 happypack，这里将开启全部线程打包
+        })
+    ],
+}
+
+const dllconfig = {
     // mode: "development",
     mode: "production",
     devtool: 'none',
@@ -60,13 +80,7 @@ module.exports = {
         // 输出文件存放路径
         path: path.join(__dirname, './source/vendors/'),
     },
-    optimization: {
-        minimizer: [
-            new UglifyJsPlugin({
-                parallel: os.cpus().length - 1  // 开启多线程打包 比如 happypack，这里将开启全部线程打包
-            })
-        ],
-    },
+    optimization:InitOptimization,
     plugins:[
         // 打包前，先清除旧的打包文件
         new CleanWebpackPlugin([
@@ -91,4 +105,8 @@ module.exports = {
             path: path.join(__dirname, './source/vendors/','[name].manifest.json'),
         }),
     ]
-}
+};
+
+
+// if(devMode) dllconfig.mode = 'development';
+module.exports = dllconfig;
