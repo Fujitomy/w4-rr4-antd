@@ -4328,7 +4328,7 @@ var DateTable_DateTable = function (_React$Component) {
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/_babel-runtime@6.26.0@babel-runtime/helpers/possibleConstructorReturn.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/_moment@2.24.0@moment/moment.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/_rc-calendar@9.15.3@rc-calendar/es/calendar/CalendarFooter.js because of ./node_modules/_antd@3.20.1@antd/es/date-picker/index.js */
-/*! ModuleConcatenation bailout: Cannot concat with ./node_modules/_rc-calendar@9.15.3@rc-calendar/es/calendar/CalendarHeader.js because of ./node_modules/_antd@3.20.1@antd/es/date-picker/index.js */
+/*! ModuleConcatenation bailout: Cannot concat with ./node_modules/_rc-calendar@9.15.3@rc-calendar/es/calendar/CalendarHeader.js because of ./node_modules/_antd@3.20.1@antd/es/date-picker/RangePicker.js */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/_rc-calendar@9.15.3@rc-calendar/es/date/DateInput.js because of ./node_modules/_antd@3.20.1@antd/es/date-picker/RangePicker.js */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/_rc-calendar@9.15.3@rc-calendar/es/date/DateTable.js because of ./node_modules/_antd@3.20.1@antd/es/date-picker/RangePicker.js */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/_rc-calendar@9.15.3@rc-calendar/es/mixin/CalendarMixin.js because of ./node_modules/_antd@3.20.1@antd/es/date-picker/index.js */

@@ -1,5 +1,7 @@
 /**
- *  很混乱整理中，很混乱整理中，很混乱整理中
+ * 很混乱整理中，很混乱整理中，很混乱整理中
+ * 
+ * https://juejin.im/post/5af1677c6fb9a07ab508dabb 一步一步的了解webpack4的splitChunk插件
  * 
  */
 
