@@ -32,3 +32,14 @@
   `
 }
 
+
+{
+
+ `
+    // cnpm install babel-loader@8.0.0-beta.0 @babel/core @babel/preset-env
+    #Error: Plugin/Preset files are not allowed to export objects, only functions. In D:\OtherX\Webpack4+\node_modules\babel-preset-react\lib\index.js
+    https://github.com/babel/babel-loader/issues/540
+    #Error: Module build failed: TypeError: this.setDynamic is not a function #560
+    https://github.com/babel/babel-loader/issues/560
+ `
+}

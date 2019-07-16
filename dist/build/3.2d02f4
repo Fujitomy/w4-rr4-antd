@@ -1,0 +1,91 @@
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[3],{
+
+/***/ 731:
+/*!***********************************!*\
+  !*** ./source/pages/home/one.jsx ***!
+  \***********************************/
+/*! exports provided: default */
+/*! all exports used */
+/*! ModuleConcatenation bailout: Module is referenced from these modules with unsupported syntax: ./source/components/App/App.jsx (referenced with import()) */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var C_Users_80011266_Desktop_w4_rr4_antd_node_modules_babel_runtime_corejs2_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node_modules/@babel/runtime-corejs2/helpers/esm/classCallCheck */ 83);
+/* harmony import */ var C_Users_80011266_Desktop_w4_rr4_antd_node_modules_babel_runtime_corejs2_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./node_modules/@babel/runtime-corejs2/helpers/esm/createClass */ 84);
+/* harmony import */ var C_Users_80011266_Desktop_w4_rr4_antd_node_modules_babel_runtime_corejs2_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./node_modules/@babel/runtime-corejs2/helpers/esm/possibleConstructorReturn */ 86);
+/* harmony import */ var C_Users_80011266_Desktop_w4_rr4_antd_node_modules_babel_runtime_corejs2_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/@babel/runtime-corejs2/helpers/esm/getPrototypeOf */ 85);
+/* harmony import */ var C_Users_80011266_Desktop_w4_rr4_antd_node_modules_babel_runtime_corejs2_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./node_modules/@babel/runtime-corejs2/helpers/esm/inherits */ 87);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react */ 2);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-router-dom */ 123);
+
+
+
+
+
+ // import { renderRoutes } from 'react-router-config'
+
+ // require('./home.scss')
+
+var One =
+/*#__PURE__*/
+function (_React$Component) {
+  Object(C_Users_80011266_Desktop_w4_rr4_antd_node_modules_babel_runtime_corejs2_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(One, _React$Component);
+
+  function One(props, context) {
+    var _this;
+
+    Object(C_Users_80011266_Desktop_w4_rr4_antd_node_modules_babel_runtime_corejs2_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"])(this, One);
+
+    _this = Object(C_Users_80011266_Desktop_w4_rr4_antd_node_modules_babel_runtime_corejs2_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__[/* default */ "a"])(this, Object(C_Users_80011266_Desktop_w4_rr4_antd_node_modules_babel_runtime_corejs2_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__[/* default */ "a"])(One).call(this, props, context));
+    _this.state = {
+      username: 'wang'
+    };
+    return _this;
+  }
+
+  Object(C_Users_80011266_Desktop_w4_rr4_antd_node_modules_babel_runtime_corejs2_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"])(One, [{
+    key: "handle",
+    value: function handle(e) {// console.log(this);
+    }
+  }, {
+    key: "handlePage",
+    value: function handlePage(e) {
+      // console.log('000');
+      var id = 0;
+      this.props.history.push("/other/".concat(id));
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
+        className: "tc"
+      }, "\u52A0\u8F7Dchild /one/child \u8DEF\u7531", react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_6__["Link"], {
+        to: "/one/child"
+      }, "/one/child")), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
+        className: "tc mt20"
+      }, "\u52A0\u8F7D\u52A8\u6001\u8DEF\u7531", react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("button", {
+        className: "home-button",
+        onClick: this.handlePage.bind(this)
+      }, "\u52A0\u8F7D\u52A8\u6001\u8DEF\u7531")), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
+        className: "home"
+      }, this.state.username, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("br", null), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("img", {
+        src: "http://img4.imgtn.bdimg.com/it/u=2064784076,1799293544&fm=200&gp=0.jpg"
+      })), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
+        className: "tc fs-20"
+      }), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("input", {
+        value: this.state.username,
+        onChange: this.handle.bind(this)
+      }));
+    }
+  }]);
+
+  return One;
+}(react__WEBPACK_IMPORTED_MODULE_5___default.a.Component);
+
+/* harmony default export */ __webpack_exports__["default"] = (One);
+
+/***/ })
+
+}]);

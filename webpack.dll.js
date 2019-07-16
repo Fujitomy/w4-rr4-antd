@@ -23,90 +23,94 @@
  * 
  */
 
-const os = require("os");
 const path = require('path');
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin'); // js压缩插件
+const TerserPlugin = require('terser-webpack-plugin'); // js压缩混淆插件
 // const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 
-// const devMode = env.NODE_ENV === 'dev';
-// console.log(env.NODE_ENV,'devMode');
-const TerserOptimization = {
+const devConfig = { mode: 'development' };
+
+const proConfig = {
+  mode: 'production',
+  optimization: {
     minimizer: [
       new TerserPlugin({
         test: /\.js$/i,
-        parallel: true
+        parallel: true,
+        terserOptions: {
+          compress: { 
+            drop_console: true 
+          },
+          output: { 
+            comments: false 
+          }
+        }
       })
     ]
+  }
 }
 
-const InitOptimization = {
-    minimizer: [
-        new UglifyJsPlugin({
-            parallel: os.cpus().length - 1  // 开启多线程打包 比如 happypack，这里将开启全部线程打包
-        })
+const baseConfig = {
+  devtool: 'none',
+  stats: { 
+    colors: true, // 编译器控制台代码变色
+    version: true, // 打印webpack版本
+  },
+  entry: {
+    // 抽离公共包的文件名和需要抽离的模块
+    vendor: [
+      'react',
+      'react-dom',
+      'react-router',
+      'react-router-dom',
+      // 'react-loadable',
+      'axios',
     ],
-}
-
-const dllconfig = {
-    // mode: "development",
-    mode: "production",
-    devtool: 'none',
-    stats: { 
-        colors: true, // 编译器控制台代码变色
-        version: true, // 打印webpack版本
-    },
-    entry: {
-        // 抽离公共包的文件名和需要抽离的模块
-        vendor: [
-            'react',
-            'react-dom',
-            'react-router',
-            'react-router-dom',
-            // 'react-loadable',
-            'axios',
-            // 'antd'
-        ],
-        // antd:['antd']
+    // 先不抽离antd
+    // antd:['antd'] 
     },
     output: {
-        // 输出文件名 [name].dll.[chunkhash].js 中 [name] 对应上文的entry.vendor中的vendor，则生成的动态链接库文件名为 vendor.dll.[chunkhash].js
-        filename: '[name].dll.[chunkhash].js',
-        // dll 动态链接库文件内的全局变量名称命名（映射关系），与下文 webpack.DllPlugin的name配置项对应，
-        // 例如对于 react 来说就是 _dll_react,  加上 _dll_ 防止全局变量冲突
-        library: '_dll_[name]_[chunkhash]', // 这里因为抽取文件名为vendor 则抽取出的dll文件中的 全面全局变量名为 _dll_ + _[name]_ + [chunkhashe] => _dll_vendor_adce4022019e7220216
-        // 输出文件存放路径
-        path: path.join(__dirname, './source/vendors/'),
+      // 输出文件名 [name].dll.[chunkhash].js 中 [name] 对应上文的entry.vendor中的vendor，则生成的动态链接库文件名为 vendor.dll.[chunkhash].js
+      filename: '[name].dll.[chunkhash].js',
+      // dll 动态链接库文件内的全局变量名称命名（映射关系），与下文 webpack.DllPlugin的name配置项对应，
+      // 例如对于 react 来说就是 _dll_react,  加上 _dll_ 防止全局变量冲突
+      library: '_dll_[name]_[chunkhash]', // 这里因为抽取文件名为vendor 则抽取出的dll文件中的 全面全局变量名为 _dll_ + _[name]_ + [chunkhashe] => _dll_vendor_adce4022019e7220216
+      // 输出文件存放路径
+      path: path.join(__dirname, './source/vendors/'),
     },
-    optimization:InitOptimization,
     plugins:[
-        // 打包前，先清除旧的打包文件
-        new CleanWebpackPlugin([
-            './source/vendors/manifest.*.json',
-            './source/vendors/vendor.dll.*.js',
-            './source/vendors/vendor.*.js'
+      // 打包前，先清除旧的打包文件
+      new CleanWebpackPlugin([
+        './source/vendors/'
+            // './source/vendors/manifest.*.json',
+            // './source/vendors/vendor.dll.*.js',
+            // './source/vendors/vendor.*.js'
         ], {
-            root: __dirname, // webpack配置文件的绝对路径, Default: root of your package
-            verbose: true,
-            dry: true,
-            // 删除排除选项，无法排除指定正则文件格式,so,要排除从第一个参数吧
-            // exclude: ['manifest.json'], 
-        }),
-        // 抽离公共包配置
-        new webpack.DllPlugin({
-            // context是解析包路径的上下文
-            context: __dirname,
-            // name是dll內部暴露的对象名(manifest清单索引文件内的name),与output.library的library保持一致
-            name: '_dll_[name]_[chunkhash]',
-            // TODO 生成manifest索引清单的文件名，竟然是path属性，这里更改manifest的文件名，叫 manifestFilename不是更贴切吗
-            // path 是 manifest.json 文件的输出路径，这个文件会用于后续的业务代码打包；
-            path: path.join(__dirname, './source/vendors/','[name].manifest.json'),
-        }),
+          root: __dirname, // webpack配置文件的绝对路径, Default: root of your package
+          verbose: true,
+          dry: true,
+          // 删除排除选项，无法排除指定正则文件格式,so,要排除从第一个参数吧
+          // exclude: ['manifest.json'], 
+      }),
+      // 抽离公共包配置
+      new webpack.DllPlugin({
+        // context是解析包路径的上下文
+        context: __dirname,
+        // name是dll內部暴露的对象名(manifest清单索引文件内的name),与output.library的library保持一致
+        name: '_dll_[name]_[chunkhash]',
+        // TODO 生成manifest索引清单的文件名，竟然是path属性，这里更改manifest的文件名，叫 manifestFilename不是更贴切吗
+        // path 是 manifest.json 文件的输出路径，这个文件会用于后续的业务代码打包；
+        path: path.join(__dirname, './source/vendors/','[name].manifest.json'),
+      }),
     ]
 };
 
+const dllconfig = (env) =>{
+    const devMode = env.NODE_ENV === 'dev'; // 区分环境
+    const config = devMode ? { ...baseConfig, ...devConfig } : { ...baseConfig, ...proConfig };
+    return config;
+}
 
-// if(devMode) dllconfig.mode = 'development';
 module.exports = dllconfig;

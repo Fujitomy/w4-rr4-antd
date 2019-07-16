@@ -1,0 +1,19 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[0],{715:
+/*!*************************************!*\
+  !*** ./source/pages/home/home.scss ***!
+  \*************************************/
+/*! no static exports found */
+/*! all exports used */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */function(n,e,t){var r=t(/*! !../../../node_modules/_css-loader@2.1.1@css-loader/dist/cjs.js!../../../node_modules/_postcss-loader@3.0.0@postcss-loader/src!../../../node_modules/_sass-loader@7.1.0@sass-loader/lib/loader.js!./home.scss */716);"string"==typeof r&&(r=[[n.i,r,""]]);var o={hmr:!0,transform:void 0,insertInto:void 0};t(/*! ../../../node_modules/_style-loader@0.23.1@style-loader/lib/addStyles.js */28)(r,o);r.locals&&(n.exports=r.locals)},716:
+/*!*****************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/_css-loader@2.1.1@css-loader/dist/cjs.js!./node_modules/_postcss-loader@3.0.0@postcss-loader/src!./node_modules/_sass-loader@7.1.0@sass-loader/lib/loader.js!./source/pages/home/home.scss ***!
+  \*****************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/*! all exports used */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */function(n,e,t){(n.exports=t(/*! ../../../node_modules/_css-loader@2.1.1@css-loader/dist/runtime/api.js */27)(!1)).push([n.i,".home {\n  font-size: 20px;\n  font-weight: bold;\n  text-align: center;\n  margin-top: 50px; }\n  .home .but {\n    padding: 8px 10px;\n    border: solid 1px #ccc;\n    border-radius: 3px;\n    cursor: pointer;\n    box-shadow: 0 0 5px #ccc; }\n\n.mt20 {\n  margin-top: 20px; }\n\n.redux {\n  font-size: 25px;\n  color: red; }\n\n.button_add {\n  font-size: 18px;\n  border: solid 1px #000;\n  color: #000;\n  margin-left: 20px;\n  cursor: pointer; }\n\n.home-button {\n  padding: 5px 10px;\n  border: solid 1px #6f8fb7;\n  margin-left: 10px;\n  cursor: pointer;\n  color: #fff;\n  background: #6f8fb7;\n  border-radius: 3px; }\n",""])},732:
+/*!**********************************!*\
+  !*** ./source/pages/home/two.js ***!
+  \**********************************/
+/*! exports provided: default */
+/*! all exports used */
+/*! ModuleConcatenation bailout: Module is referenced from these modules with unsupported syntax: ./source/components/App/App.jsx (referenced with import()) */function(n,e,t){"use strict";t.r(e),t.d(e,"default",function(){return d});var o=t(/*! ./node_modules/@babel/runtime-corejs2/helpers/esm/classCallCheck */83),i=t(/*! ./node_modules/@babel/runtime-corejs2/helpers/esm/createClass */84),a=t(/*! ./node_modules/@babel/runtime-corejs2/helpers/esm/possibleConstructorReturn */86),c=t(/*! ./node_modules/@babel/runtime-corejs2/helpers/esm/getPrototypeOf */85),p=t(/*! ./node_modules/@babel/runtime-corejs2/helpers/esm/inherits */87),r=t(/*! react */2),s=t.n(r);t(/*! ./home.scss */715);var d=function(n){function r(n,e){var t;return Object(o.a)(this,r),(t=Object(a.a)(this,Object(c.a)(r).call(this,n,e))).state={username:"wei"},t}return Object(p.a)(r,n),Object(i.a)(r,[{key:"render",value:function(){return s.a.createElement("div",null,s.a.createElement("div",{className:"home"},this.state.username,s.a.createElement("br",null),s.a.createElement("img",{src:"http://img0.imgtn.bdimg.com/it/u=3713291312,3766811990&fm=200&gp=0.jpg"})))}}]),r}(s.a.Component)}}]);

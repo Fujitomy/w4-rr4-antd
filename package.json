@@ -4,7 +4,8 @@
   "description": "wepack4-react-router4-antd",
   "main": "index.js",
   "scripts": {
-    "dll": "webpack --config  webpack.dll.js",
+    "dll": "webpack --config webpack.dll.js --env.NODE_ENV=pro",
+    "dll:dev": "webpack --progress --config webpack.dll.js --env.NODE_ENV=dev",
     "dev": "webpack-dev-server --hotOnly --colors --watch --config webpack.dev.happy.js",
     "pro": "webpack --color --config webpack.pro.js",
     "test": "node --inspect-brk ./node_modules/jest/bin/jest --runInBand --no-cache --no-watchman --hotOnly --color --watch --config webpack.dev.js"

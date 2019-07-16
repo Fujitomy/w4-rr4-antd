@@ -1,8 +1,6 @@
 /**
  * @author: tomy
- * @date: 2019/03/22 12:00:00
  * @last modified: tomy
- * @last modified date: 2019/03/22 10:45
  * @Description: Production dist config
  * 
  * Antd 按需加载
@@ -32,7 +30,7 @@ const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const HappyPack = require('happypack');
-const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 4 }); // 开启一个多线程，线程数量等于最大线程减一，几乎全开
+const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 }); // 开启一个多线程，线程数量等于最大线程减一，几乎全开
 
 const manifest = require('./source/vendors/vendor.manifest.json');
 const dllchunkname = manifest.name.split('_')[3];
@@ -68,13 +66,13 @@ module.exports = {
         // filename 决定了每个 打包文件/bundle 的名称。这些 bundle 将写入到 output.path 选项指定的目录下。
         // 此选项，不会影响那些「按需加载 chunk」的输出文件，filename 基本上都是入口文件和基础依赖文件
         // 通过 loader 创建的文件也不受影响。在这种情况下，你必须尝试 loader 特定的可用选项。
-        filename: '[name].[hash:8].js',  
+        filename: '[name].js',   // '[id].[hash:4].js'
         
         // output 目录对应一个绝对路径，指定 bundle 文件输出路径
         path: path.resolve(__dirname,'./dist/build/'),
 
         // 此选项决定了非入口(non-entry) chunk 文件的名称。配置方式和filename类似，在 optimization.splitChunks.cacheGroups.vender 中可以重命名
-        chunkFilename: "[name].chunk.[chunkhash:8].js",
+        chunkFilename: '[name].js' ||"[id].[chunkhash:6]", //"[name].[chunkhash:8].js"
 
         // 输出解析文件的目录，url 相对于 HTML 页面
         // publicPath 指定按需加载(on-demand-load)或加载外部资源(external resources)（如图片、文件等）路径，output.publicPath 是很重要的选项。如果指定了一个错误的值，则在加载这些资源时会收到 404 错误。
@@ -229,9 +227,8 @@ module.exports = {
     },
     // 编译优化项，主要用于生产环境包请求，加载以及长效缓存优化
     optimization:{
-        // 告诉webpack使用其默认默认最小化混淆UglifyJs插件混淆代码
-        // minimize: true, 
-        // 允许用户使用其他最小化插件，覆盖webpack默认最小化编译器
+        // minimize: true, // 告诉webpack使用其默认的压缩混淆插件 UglifyJs 混淆代码
+        // minimizer 允许用户使用其他最小化插件，覆盖webpack默认压缩混淆插件
         minimizer: [
             new UglifyJsPlugin({
                 cache: true,
@@ -240,24 +237,36 @@ module.exports = {
             }),
             new OptimizeCssAssetsPlugin({})
         ],
+        // https://www.cnblogs.com/wmhuang/p/8967639.html webpack4：连奏中的进化
         // webpack 4 Code Splitting 的 splitChunks 配置探索： https://imweb.io/topic/5b66dd601402769b60847149
         splitChunks: {
             chunks: 'all',
-            minSize: 30000,
-            maxSize: 500000,
-            minChunks: 1,
-            maxAsyncRequests: 9,
-            maxInitialRequests: 6,
-            automaticNameDelimiter: '~',
-            name: true,
+            minSize: 30000, // 模块大于30k会被抽离到公共模块
+            maxSize: 500000, // 超过指定的大小就抽离成更小的模块
+            minChunks: 1, // 模块出现1次就会被抽离到公共（共享）模块
+            maxAsyncRequests: 9, // 异步模块并行加载模块数，默认值为5
+            maxInitialRequests: 6, // 初始加载模块最大并行请求数，默认值为3
+            automaticNameDelimiter: '-', // 模块名称的连接符号
+            name:(module, chunks, cacheGroupKey)=> {
+                // generate a chunk name...
+                // console.log( cacheGroupKey,'-----------module name');
+                return 'index-chunk'||cacheGroupKey; //...
+            },
+            // name:'home',  // 指定缓存组块的名称,true 默认开头为vendors ,也可以指定为字符串
+            /**
+             * 提取公共代码 code-splitting
+             * 第三方库或非入口的组件按需加载： async
+             * 入口处(entry point)： initial
+             */
             cacheGroups: {
                 // 把所有 node_modules 的模块被不同的 chunk 引入超过 1 次的抽取为 vender
-                vender: {
+                vendor: {
+                    name: 'vendor-page', // 入口文件的chunk的文件名前缀
                     test: /[\\/]node_modules[\\/]/,
-                    name: 'entry-vender', // 入口文件的chunk的文件名前缀
                     chunks: 'initial',
                     priority: 10,
-                    minChunks: 2, // 抽取超过引入并使用1次的模块
+                    minChunks: 2,
+                    reuseExistingChunk: true
                 },
                 antd: {
                     name: 'chunk-antd',
@@ -281,56 +290,13 @@ module.exports = {
                     chunks: 'initial',
                     priority: 12,
                 },
-                default: {
-                    minChunks: 2,
-                    priority: -20,
-                    reuseExistingChunk: true
-                }
+                // default: {
+                //     minChunks: 2,
+                //     priority: -20,
+                //     reuseExistingChunk: true
+                // }
             }
         },
-
-
-        // 默认情况下，webpack v4 +为动态导入的模块提供了开箱即用的新的共同块（共享块）打包策略。
-        // splitChunks: {
-        //     name: true,
-        //     // all 抽离所有共享模块，即便是异步和同步模块间共享的也抽离出来
-        //     // chunks: 'all', 
-        //     // 仅抽离异步模块间的共享
-        //     // chunks: 'async',
-        //     // 自定义抽离模块，可以排除掉一些已经抽离的模块，比如react，react-router，antd等相对稳定的模块
-        //     // chunks (chunk) {
-        //     //   // exclude `my-excluded-chunk`
-        //     //   return chunk.name !== 'react' && chunk.name !== 'react-router-dom'  && chunk.name !== 'react-dom';
-        //     // },
-        //     chunks: 'all',
-        //     minSize: 30000, // 模块大于30k会被抽离到公共模块
-        //     maxSize: 512*1000, // 超过指定的大小就抽离成模块
-        //     minChunks: 1, // 模块出现1次就会被抽离到公共模块
-        //     maxAsyncRequests: 5, // 异步模块并行加载模块数，默认值为5
-        //     maxInitialRequests: 3, // 初始加载模块最大并行请求数，默认值为3
-        //     automaticNameDelimiter: '~',
-        //     // name: 'tomy_vendor', // 指定缓存组块的名称
-        //     cacheGroups: {
-        //         vendors: {
-        //             test: /[\\/]node_modules[\\/]/,
-        //             priority: -10,
-        //             reuseExistingChunk: true
-        //         },
-        //         // default:false,
-        //         // default: {
-        //         //     minChunks: 2,
-        //         //     priority: -20,
-        //         //     reuseExistingChunk: true
-        //         // }
-        //     },
-        //     // cacheGroups: {
-        //     //   vendor: {
-        //     //     test: /[\\/]node_modules[\\/]/,
-        //     //     name: 'vendors',
-        //     //     chunks: 'all'
-        //     //   }
-        //     // }
-        // },
         // object string boolean 将optimization.runtimeChunk设置为true或“multiple”会为每个仅包含运行时的入口点添加一个额外的块。
         // 默认值为false：为每个entry chunk嵌入运行时。
         runtimeChunk: false,
@@ -373,7 +339,6 @@ module.exports = {
         // Webpack 中的 sideEffects 到底该怎么用？ https://segmentfault.com/a/1190000015689240
         // 如果我们引入的 包/模块 被标记为 sideEffects: false 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块/包 都会被完整的移除
         sideEffects: false,
-
         // 无需单独设置 bool: false 告诉webpack生成具有相对路径的记录，以便能够移动上下文文件夹。
         portableRecords: false,
     },
@@ -453,21 +418,18 @@ module.exports = {
     // 编译插件
     plugins: [
         // 引入dll（react，react-router之类的基础依赖库文件）
-        new webpack.DllReferencePlugin({
+        new webpack.DllReferencePlugin({ 
             context: __dirname,
             manifest: require('./source/vendors/vendor.manifest.json')
         }),
 
-        // HTML模板插件
         new HtmlWebpackPlugin({
             title: 'react-router 4 && webpack4.0+ && antd.design',
-             // html模板文档地址，webpack默认模板为ejs
-            template: './source/html/index.ejs', 
-            // 由模板生成的文件名和存放位置，可带路径
-            filename: '../index.html', 
-            // 资源文件注入位置true,body,header,false
-            inject: 'body',
-            author: 'tomy',
+            template: './source/html/index.ejs', // html模板文档目录地址，webpack默认模板为ejs
+            filename: '../index.html', // 由模板生成的文件html文件以及存放位置（带路径则表示存放位置）
+            inject: 'body', // script标签位于html文件的 body 底部 注入,默认值:true， 
+            author: 'tomy', // 加上编辑人
+            hash: true, // hash选项的作用是 给生成的 js 文件一个独特的 hash 值 xxx.js?xxxxxx
             vendor: /*manifest.name*/'./vendors/vendor.dll.' + dllchunkname + '.js', // 动态引入dll， manifest就是dll生成的json
             // manifest: './vendors/vendor.manifest.json', // manifest只是运行时构建映射文件，不需要单独引入
             // inline: true, // ????
@@ -498,8 +460,7 @@ module.exports = {
         new HappyPack({
             id: 'node_moudles_css', // 自定义的线程id='node_moudles_css'
             threads: 4,
-            // 指定使用哪个线程池
-            threadPool: HappyThreadPool,
+            threadPool: HappyThreadPool,  // 指定使用哪个线程池
             loaders: [
                 'style-loader', 
                 'css-loader',
@@ -511,7 +472,6 @@ module.exports = {
         new HappyPack({
             id: 'node_moudles_less',
             threads: 4,
-            // less文件和js文件都指定了使用HappyThreadPool线程池
             threadPool: HappyThreadPool,
             loaders: [
                 'style-loader',
@@ -531,7 +491,6 @@ module.exports = {
         new HappyPack({
             id: 'less',
             threads: 4,
-            // less文件和js文件都指定了使用HappyThreadPool线程池
             threadPool: HappyThreadPool,
             loaders: [
                 'style-loader',
@@ -551,7 +510,6 @@ module.exports = {
         new HappyPack({
             id: 'node_moudles_sass',
             threads: 3,
-            // less文件和js文件都指定了使用HappyThreadPool线程池
             threadPool: HappyThreadPool,
             loaders: [
                 'style-loader',
@@ -589,7 +547,7 @@ module.exports = {
             url: 'http://localhost:9090',
         }),
 
-        new CleanWebpackPlugin(['dist/build','dist/vendors'],{
+        new CleanWebpackPlugin(['dist/build/','dist/vendors/'],{
             // webpack文件夹的绝对路径,Default: root of your package
             root: __dirname,
             verbose: false,
