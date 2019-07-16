@@ -5,7 +5,7 @@
 
 {
  `
- * `optimization.splitChunks `
+ `optimization.splitChunks `
  * 最初，chunks(以及其在內部通過import导入的模块)，它们通过webpack graph中的父子关系进行连接
  * 从webpack v4起，删除了CommonsChunkPlugin，转而使用optimization.splitChunks 
  *
@@ -320,22 +320,23 @@ optimization.splitChunks.chunks = all
 optimization.splitChunks的默认配置如下
 
 splitChunks: {
-    chunks: "async",
-    minSize: 30000,
-    minChunks: 1,
-    maxAsyncRequests: 5,
-    maxInitialRequests: 3,
-    automaticNameDelimiter: '~',
-    name: true,
+    chunks: "async", //默认作用于异步chunk，值为all/initial/async/function(chunk),值为function时第一个参数为遍历所有入口chunk时的chunk模块，chunk._modules为chunk所有依赖的模块，通过chunk的名字和所有依赖模块的resource可以自由配置,会抽取所有满足条件chunk的公有模块，以及模块的所有依赖模块，包括css
+    minSize: 30000, // 表示在压缩前的最小模块大小，默认是30kb；
+    minChunks: 1, // 表示被引用次数，默认为1
+    maxAsyncRequests: 5, // 最大的按需(异步)加载次数，默认为5；
+    maxInitialRequests: 3, //最大的初始化加载次数，默认为3；
+    automaticNameDelimiter: '~', // 抽取的chunks的名称分隔符
+    name: true, // 拆分出来块的名字(Chunk Names)，默认由块名和hash值自动生成，如果是true，将自动生成基于块和缓存组键的名称。如果是字符串或函数将允许您使用自定义名称。如果名称与入口点名称匹配，则入口点将被删除。
     cacheGroups: {
         vendors: {
-            test: /[\\/]node_modules[\\/]/,
-            priority: -10
+            test: /[\\/]node_modules[\\/]/, // 可以为字符串，正则表达式，函数，以module为维度进行抽取，只要是满足条件的module都会被抽取到该vendors的chunk中，为函数时第一个参数是遍历到的每一个模块，第二个参数是每一个引用到该模块的chunks数组。[有人尝试过程中发现不能提取出css，待进一步验证]。
+            priority: -10, //优先级，一个chunk很可能满足多个缓存组，会被抽取到优先级高的缓存组中
+            // enforce: true  // 如果cacheGroup中没有设置minSize，则据此判断是否使用上层的minSize，true：则使用0，false：使用上层minSize
         },
         default: {
-            minChunks: 2,
+            minChunks: 2,  // 最少被几个chunk引用
             priority: -20,
-            reuseExistingChunk: true
+            reuseExistingChunk: true, // 如果该chunk中引用了已经被抽取的chunk，直接引用该chunk，不会重复打包代码
         }
     }
 }

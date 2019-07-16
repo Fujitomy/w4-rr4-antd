@@ -72,7 +72,7 @@ module.exports = {
         path: path.resolve(__dirname,'./dist/build/'),
 
         // 此选项决定了非入口(non-entry) chunk 文件的名称。配置方式和filename类似，在 optimization.splitChunks.cacheGroups.vender 中可以重命名
-        chunkFilename: '[name].js' ||"[id].[chunkhash:6]", //"[name].[chunkhash:8].js"
+        chunkFilename: "[name].[chunkhash:6]" || '[name].js' ||"[id].[chunkhash:6]", //"[name].[chunkhash:8].js"
 
         // 输出解析文件的目录，url 相对于 HTML 页面
         // publicPath 指定按需加载(on-demand-load)或加载外部资源(external resources)（如图片、文件等）路径，output.publicPath 是很重要的选项。如果指定了一个错误的值，则在加载这些资源时会收到 404 错误。
@@ -247,25 +247,26 @@ module.exports = {
             maxAsyncRequests: 9, // 异步模块并行加载模块数，默认值为5
             maxInitialRequests: 6, // 初始加载模块最大并行请求数，默认值为3
             automaticNameDelimiter: '-', // 模块名称的连接符号
-            name:(module, chunks, cacheGroupKey)=> {
-                // generate a chunk name...
-                // console.log( cacheGroupKey,'-----------module name');
-                return 'index-chunk'||cacheGroupKey; //...
-            },
-            // name:'home',  // 指定缓存组块的名称,true 默认开头为vendors ,也可以指定为字符串
+            // name:(module, chunks, cacheGroupKey)=> {
+            //     // console.log( cacheGroupKey,'-----------module name');
+            //     return 'index-chunk'||cacheGroupKey; //...
+            // },
+            name:  true,  // 指定缓存组块的名称,true 默认开头为vendors ,也可以指定为字符串
             /**
              * 提取公共代码 code-splitting
              * 第三方库或非入口的组件按需加载： async
              * 入口处(entry point)： initial
              */
             cacheGroups: {
-                // 把所有 node_modules 的模块被不同的 chunk 引入超过 1 次的抽取为 vender
-                vendor: {
+                // 共享模块如果取chunkFileName:[name].xxx.js的话
+                // vendors 缓存组的名字如果没有 叫vendors的，则入口文件的，则会生成vendors~[hashValue].xxx.js
+                // 如果有vendors的话，则入口模块的共享chunks前缀名可能 如果取 filename: '[name].js'的name,如果入口文件叫index则会生成index~[hashValue].js
+                commons: {
                     name: 'vendor-page', // 入口文件的chunk的文件名前缀
                     test: /[\\/]node_modules[\\/]/,
                     chunks: 'initial',
                     priority: 10,
-                    minChunks: 2,
+                    minChunks: 2, // 把所有 node_modules 的模块被不同的 chunk 引入超过 2 次的抽取为 commons
                     reuseExistingChunk: true
                 },
                 antd: {
