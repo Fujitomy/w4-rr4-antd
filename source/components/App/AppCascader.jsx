@@ -210,21 +210,10 @@ class Apps extends React.Component {
         })
 
 
-        this.swiper = new Swiper('.swiper-container', {
-            slidesPerView: 3,
-            spaceBetween: 0,
-            centeredSlides: true,
-            loop: false,
-            pagination: {
-              el: '.swiper-pagination',
-              clickable: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-        });
+
     }
+   
+   
     handleAreaChange = value =>{
         // this.setState({
         //     areaId: value,
@@ -237,33 +226,12 @@ class Apps extends React.Component {
         return (
             <HashRouter basename='manage' >
                 <main className='main' ref={this.main}>
+                    <Cascader 
+                        fieldNames={{ label: 'name', value: 'id', children: 'child' }} 
+                        options={this.state.options} 
+                    />
 
-                <div className="swiper-container" 
-                style={{width:'900px',height:'100vh',margin:'180px auto'}}>
-                   <div className="swiper-wrapper"
-                        style={{width:'900px',margin:'100px auto'}}
-                    >
-                    <div className="swiper-slide"
-                     style={{width:'300px',margin:'0 0 0 0'}}
                     
-                    >Slide 1</div>
-                    <div className="swiper-slide"
-                    style={{width:'300px',margin:'0 0 0 0'}}
-                    >Slide 2</div>
-                    <div className="swiper-slide"
-                     style={{width:'300px',margin:'0 0 0 0'}}
-                    >Slide 3</div>
-                    {/* <div className="swiper-slide"
-                     style={{width:'300px',margin:'0 0 0 0'}}
-                    >Slide 4</div> */}
-                  
-        
-                    </div>
-                    
-                    <div className="swiper-pagination"></div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                </div>
                 </main>
             </HashRouter>
         )
