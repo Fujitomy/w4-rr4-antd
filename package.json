@@ -35,7 +35,7 @@
     "fs": "^0.0.1-security",
     "immutable": "^4.0.0-rc.12",
     "jquery": "^3.4.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "mockjs": "^1.0.1-beta3",
     "prop-types": "^15.7.1",
     "qs": "^6.6.0",
