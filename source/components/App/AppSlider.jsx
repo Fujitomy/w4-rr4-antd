@@ -17,6 +17,7 @@ import { DatePicker,Select,Button,From,message,Cascader } from 'antd';
 const { Option } = Select;
 
 
+console.log(allCity,'allCity');
 
 window.all = allCity;
 
@@ -30,7 +31,7 @@ function getCascaderOptions(all={}){
 	Array.isArray(partitions) && partitions.map(region=>{
 		const provincesList = region.provinces;
 		Array.isArray(provincesList) && provincesList.map(item=>{
-             // console.log(item,'--item-------------');
+             console.log(item,'--item-------------');
              provinces.push({
 				 provinceId:  item.provinceId,
 				 provinceName: item.provinceName,
@@ -182,43 +183,6 @@ const areasList = [
 
 
 
-function ajax(url, type='get', data, successFn,errorFn){
-    const xhr = new XMLHttpRequest();
-    xhr.onreadystatechange=(res)=>{
-        if (xhr.readyState==4 ){
-            if (xhr.status == 200 || xhr.status == 304) {
-                console.log(res,'res---');
-                successFn([xhr.responseText]);
-            } else {
-                errorFn(xhr.status);
-            }
-        }
-    }
-    if (type === 'POST') {
-        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    }
-    xhr.withCredentials = true;
-  
-    xhr.open(type,url,true);
-    xhr.setRequestHeader('*', 'Access-Control-Allow-Origin');
-    
-    xhr.send(makeHttpRequestData(data));
-}
-
-/**
- * 转换json数据为http请求数据格式
- * @param    {json}   data json格式的数据
- * @return   {string} 返回http请求数据格式(形如：name=张三&age=21)
- */
-
-function makeHttpRequestData(data) {
-    let dataString = '';
-    for (let k in data) {
-        dataString += k + '=' + encodeURI(data[k]) + '&';
-    }
-    return dataString.slice(0, -1);
-}
-
 const cityList = {};
 const areaList = {};
 const initProvinces = [{ provinceId:'',provinceName:'请选择' }];
@@ -245,92 +209,61 @@ class Apps extends React.Component {
             options:getCascaderOptions(allCity)
         })
 
-        function* pollydata(userId,token,sign){
-            // onloading();
-            console.log('loding...');
-            token = userId ? yield getAccessToken(userId):'';
-            sign = token ? yield getAccessSign(token):'';
-            sign && token && (yield getUserInfo(token,sign));
-            // exitLoading();
-            console.log('exit loding');
-        }
-        
-        const g = pollydata('tomy');
-        g.next();
 
-
-        function getAccessToken(userId){
-            console.log(userId,'userId获取token');
-           
-            axios.get('http://www.mocky.io/v2/5dd4ddb52f000072c3d4fc832121?mocky-delay=5000ms')
-                .then(function (res) {
-                    typeof res === 'string' ? JSON.parse(res):res;
-                    res.data = typeof res.data === 'string' ? JSON.parse(res.data):res.data;
-                    const { code,data } = res.data || {};
-                    // console.log(res.data,'----response--------',data);
-                    if(code===0 && data){
-                        console.log(data.token,'data.token')
-                        g.next({
-                            token: data.token
-                        });
-                    }
-                })
-                .catch(function (error) {
-                    console.log('获取token失败:',JSON.stringify(error));
-                    g.next();
-                });
-        }
-
-        function getAccessSign(token){
-            console.log(token,'token获取签名------');
-            axios.get('http://www.mocky.io/v2/5dd4dd662f0000a7bed4fc7e')
-                .then(function (res) {
-                    typeof res === 'string' ? JSON.parse(res):res;
-                    res.data = typeof res.data === 'string' ? JSON.parse(res.data):res.data;
-                    const { code,data } = res.data || {};
-                    if(code===0 && data){
-                        console.log(data.sign,'签名');
-                        g.next({
-                            sign: data.sign
-                        });
-                    }
-                })
-                .catch(function (error) {
-                    g.return('结束')
-                    console.log('获取sign签名失败:',error);
-                });
-        }
-
-        function getUserInfo(token,sign){
-            console.log(token,sign,'ttoken,signoken获取用户信息------');
-            axios.get('http://www.mocky.io/v2/5dd4dffb2f00007100d4fc95')
-                .then(function (res) {
-                    typeof res === 'string' ? JSON.parse(res):res;
-                    res.data = typeof res.data === 'string' ? JSON.parse(res.data):res.data;
-                    const { code,data } = res.data || {};
-                    if(code===0 && data){
-                        console.log(data.sign,'签名');
-                        g.next({
-                            sign: data.sign
-                        });
-                    }
-                })
-                .catch(function (error) {
-                    g.return('结束')
-                    console.log('获取用户信息失败或错误:',error);
-                });
-        }
+        this.swiper = new Swiper('.swiper-container', {
+            slidesPerView: 3,
+            spaceBetween: 0,
+            centeredSlides: true,
+            loop: false,
+            pagination: {
+              el: '.swiper-pagination',
+              clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
     }
-
-    
+    handleAreaChange = value =>{
+        // this.setState({
+        //     areaId: value,
+        // },()=>{
+        //     this.returnSelectValue(this.state.areaId,'areaId');
+        // });
+    }
     render() {
         const { provinces,cities,areas } = this.state;
         return (
             <HashRouter basename='manage' >
                 <main className='main' ref={this.main}>
-                    <aside>
-                        数据：{JSON.stringify(this.state.dataInfo)}
-                    </aside>
+
+                <div className="swiper-container" 
+                style={{width:'900px',height:'100vh',margin:'180px auto'}}>
+                   <div className="swiper-wrapper"
+                        style={{width:'900px',margin:'100px auto'}}
+                    >
+                    <div className="swiper-slide"
+                     style={{width:'300px',margin:'0 0 0 0'}}
+                    
+                    >Slide 1</div>
+                    <div className="swiper-slide"
+                    style={{width:'300px',margin:'0 0 0 0'}}
+                    >Slide 2</div>
+                    <div className="swiper-slide"
+                     style={{width:'300px',margin:'0 0 0 0'}}
+                    >Slide 3</div>
+                    {/* <div className="swiper-slide"
+                     style={{width:'300px',margin:'0 0 0 0'}}
+                    >Slide 4</div> */}
+                  
+        
+                    </div>
+                    
+                    <div className="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
                 </main>
             </HashRouter>
         )
@@ -338,6 +271,48 @@ class Apps extends React.Component {
 }
 const App = Apps;
 export default App;
+
+
+// getDataList(params){
+//     const { prefixName,keyId,childPrefixName,childkeyId,url } =params;
+//     this.setState({
+//         [`${prefixName}Loading`]:true,
+//     });
+//     axios.get(`${url}?${prefixName}Id=${keyId}`).then((res) => {
+//             console.log(res,'city data list');
+//             const { data:{code,data:dataList} } = res || {};
+//             const { data:{code,data:dataList} } = res || {};
+//             if(code===0){
+//                 console.log(dataList,'选中省份的城市列表');
+//                 // 过滤下无用的冗余字段太多
+//                 const newList = dataList.map(data=>({
+//                     cityId:data.cityId,
+//                     cityName:data.cityName,
+//                 }));
+
+//                 if([`${prefixName}List`][provinceId]===undefined){
+//                     cityList[provinceId] = newList;
+//                 }
+                
+//                 console.log(cityList,'-----cityList-------');
+
+//                 setTimeout(()=>{
+//                     this.setState({
+//                         cityLoading: false,
+//                         cities: [{cityId:'',cityName:'请选择'},...city],
+//                         cityId: cityId || ''
+//                     })
+//                 },2000)
+//             }
+//         }).catch(function (error) {
+//             console.log(error);
+//             this.setState({
+//                 cityLoading: false,
+//             })
+//             message.info('城市信息请求失败，请稍后重试！');
+//     });
+// }
+
 
 
 

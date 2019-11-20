@@ -109,6 +109,11 @@ module.exports = {
                 target: '10.8.9.96:18085/',
                 changeOrigin: true,
                 secure: false
+            },
+            'hetapi/api/mock/51/deviceTest1': {
+                target: 'https://200.200.200.230/',
+                changeOrigin: true,
+                secure: false
             }
         },
         hot: true,
