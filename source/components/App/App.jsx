@@ -17,7 +17,6 @@ import { DatePicker,Select,Button,From,message,Cascader } from 'antd';
 const { Option } = Select;
 
 
-
 window.all = allCity;
 
 
@@ -241,10 +240,14 @@ class Apps extends React.Component {
         }
     }
     componentDidMount() {
+
+
         this.setState({
             options:getCascaderOptions(allCity)
         })
 
+        // 轮询数据
+        
         function* pollydata(userId,token,sign){
             // onloading();
             console.log('loding...');
@@ -254,75 +257,117 @@ class Apps extends React.Component {
             // exitLoading();
             console.log('exit loding');
         }
+
         
-        const g = pollydata('tomy');
-        g.next();
-
-
-        function getAccessToken(userId){
-            console.log(userId,'userId获取token');
-           
-            axios.get('http://www.mocky.io/v2/5dd4ddb52f000072c3d4fc832121?mocky-delay=5000ms')
+        async function pollyData(){
+            const token = getToken();
+            const sign = await getSign(token);
+            console.log(token,sign,'----------获取签名和token');
+        }
+      
+        function getToken(userId){
+            axios.get('http://www.mocky.io/v2/5dd65bfc3200005e00888974?mocky-delay=5000ms')
                 .then(function (res) {
                     typeof res === 'string' ? JSON.parse(res):res;
                     res.data = typeof res.data === 'string' ? JSON.parse(res.data):res.data;
                     const { code,data } = res.data || {};
-                    // console.log(res.data,'----response--------',data);
+                    console.log(res.data,'----response--------',data);
                     if(code===0 && data){
                         console.log(data.token,'data.token')
-                        g.next({
-                            token: data.token
-                        });
                     }
+                    return data.token
                 })
-                .catch(function (error) {
-                    console.log('获取token失败:',JSON.stringify(error));
-                    g.next();
-                });
+                // .catch(function (error) {
+                //     console.log('获取token失败:',JSON.stringify(error));
+                // });
         }
 
-        function getAccessSign(token){
-            console.log(token,'token获取签名------');
+        function getSign(userId){
             axios.get('http://www.mocky.io/v2/5dd4dd662f0000a7bed4fc7e')
                 .then(function (res) {
                     typeof res === 'string' ? JSON.parse(res):res;
                     res.data = typeof res.data === 'string' ? JSON.parse(res.data):res.data;
                     const { code,data } = res.data || {};
+                    console.log(res.data,'----response--------',data);
                     if(code===0 && data){
-                        console.log(data.sign,'签名');
-                        g.next({
-                            sign: data.sign
-                        });
+                        console.log(data.token,'data.token')
                     }
+                    return data.sign
                 })
-                .catch(function (error) {
-                    g.return('结束')
-                    console.log('获取sign签名失败:',error);
-                });
+                // .catch(function (error) {
+                //     console.log('获取token失败:',JSON.stringify(error));
+                // });
         }
+        pollyData();
+        // const g = pollydata('tomy');
+        // g.next();
 
-        function getUserInfo(token,sign){
-            console.log(token,sign,'ttoken,signoken获取用户信息------');
-            axios.get('http://www.mocky.io/v2/5dd4dffb2f00007100d4fc95')
-                .then(function (res) {
-                    typeof res === 'string' ? JSON.parse(res):res;
-                    res.data = typeof res.data === 'string' ? JSON.parse(res.data):res.data;
-                    const { code,data } = res.data || {};
-                    if(code===0 && data){
-                        console.log(data.sign,'签名');
-                        g.next({
-                            sign: data.sign
-                        });
-                    }
-                })
-                .catch(function (error) {
-                    g.return('结束')
-                    console.log('获取用户信息失败或错误:',error);
-                });
-        }
+        // function getAccessToken(userId){
+        //     console.log(userId,'userId获取token');
+           
+        //     axios.get('http://www.mocky.io/v2/5dd4ddb52f000072c3d4fc832121?mocky-delay=5000ms')
+        //         .then(function (res) {
+        //             typeof res === 'string' ? JSON.parse(res):res;
+        //             res.data = typeof res.data === 'string' ? JSON.parse(res.data):res.data;
+        //             const { code,data } = res.data || {};
+        //             // console.log(res.data,'----response--------',data);
+        //             if(code===0 && data){
+        //                 console.log(data.token,'data.token')
+        //                 g.next({
+        //                     token: data.token
+        //                 });
+        //             }
+        //         })
+        //         .catch(function (error) {
+        //             console.log('获取token失败:',JSON.stringify(error));
+        //             g.next();
+        //         });
+        // }
+
+        // function getAccessSign(token){
+        //     console.log(token,'token获取签名------');
+        //     axios.get('http://www.mocky.io/v2/5dd4dd662f0000a7bed4fc7e')
+        //         .then(function (res) {
+        //             typeof res === 'string' ? JSON.parse(res):res;
+        //             res.data = typeof res.data === 'string' ? JSON.parse(res.data):res.data;
+        //             const { code,data } = res.data || {};
+        //             if(code===0 && data){
+        //                 console.log(data.sign,'签名');
+        //                 g.next({
+        //                     sign: data.sign
+        //                 });
+        //             }
+        //         })
+        //         .catch(function (error) {
+        //             g.return('结束')
+        //             console.log('获取sign签名失败:',error);
+        //         });
+        // }
+
+        // function getUserInfo(token,sign){
+        //     console.log(token,sign,'ttoken,signoken获取用户信息------');
+        //     axios.get('http://www.mocky.io/v2/5dd4dffb2f00007100d4fc95')
+        //         .then(function (res) {
+        //             typeof res === 'string' ? JSON.parse(res):res;
+        //             res.data = typeof res.data === 'string' ? JSON.parse(res.data):res.data;
+        //             const { code,data } = res.data || {};
+        //             if(code===0 && data){
+        //                 console.log(data.sign,'签名');
+        //                 g.next({
+        //                     sign: data.sign
+        //                 });
+        //             }
+        //         })
+        //         .catch(function (error) {
+        //             g.return('结束')
+        //             console.log('获取用户信息失败或错误:',error);
+        //         });
+        // }
     }
 
     
+
+
     render() {
         const { provinces,cities,areas } = this.state;
         return (

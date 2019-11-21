@@ -70,6 +70,7 @@
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^2.0.0",
     "friendly-errors-webpack-plugin": "^1.7.0",
+    "fs": "^0.0.1-security",
     "happypack": "^5.0.1",
     "html-webpack-plugin": "^3.2.0",
     "less": "^3.9.0",
