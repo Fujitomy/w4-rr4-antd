@@ -31,6 +31,7 @@
     "antd": "^3.13.0",
     "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
+    "braft-editor": "^2.3.8",
     "core-js": "^2.6.5",
     "fs": "^0.0.1-security",
     "immutable": "^4.0.0-rc.12",
