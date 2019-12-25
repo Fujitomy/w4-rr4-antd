@@ -47,6 +47,9 @@ module.exports = {
         colors: true,
         version: true 
     },
+    node: {
+        "fs": "empty"
+    },
     // 入口文件配置
     entry:{
         index: [
