@@ -80,6 +80,7 @@ class Apps extends React.Component {
             self.setState({
                     cityInfo: info
                 })
+
         //   var node = new PrettyJSON.view.Node({
         //       el: document.querySelector("#map-city"),
         //       data: info
@@ -274,8 +275,6 @@ class Apps extends React.Component {
                         </div> */}
                         <div id='amapContainer' 
                         style={{width:'100vw',height:"100vh"}}>
-                            
-
                         </div>
                   
                         <h5>输出内容</h5>
