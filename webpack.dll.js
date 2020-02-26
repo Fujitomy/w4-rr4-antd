@@ -1,7 +1,8 @@
 /** 
- * 提取公共包dll文件
+ * @description 提取公共包dll文件 compile dll file
  * @author tomy
- * @intro 详见底部扩展阅读
+ * @date 2020/2/26 11:11
+ * @more 详见底部扩展阅读 Read more at the bottom of this document
  * 
  */
 
@@ -35,19 +36,19 @@ const proConfig = { // dll文件正式环境配置
 };
 
 const config = {
-  devtool: 'none',
-  stats: { 
-    colors: true, // 编译器控制台代码变色
-    version: true, // 打印webpack版本
-  },
-  entry: {
-        // 抽离公共包的文件名和需要抽离的模块
-        vendor: [
-            'react','react-dom','react-router','react-router-dom','axios',// 'react-loadable',
-        ],
-        // 先不抽离antd
-        // antd:['antd'] 
+    devtool: 'none',// dll文件删除warning,error打印
+    stats: { 
+        colors: true, // 编译器控制台代码变色
+        version: true, // 打印webpack版本
     },
+    entry: {
+            // 抽离公共包的文件名和需要抽离的模块
+            vendor: [
+                'react','react-dom','react-router','react-router-dom','axios',// 'react-loadable',
+            ],
+            // 先不抽离antd
+            // antd:['antd'] 
+        },
     output: {
         // filename: 输出文件名 [name].dll.[chunkhash].js中[name]对应上文的entry.vendor中的vendor, 
         // So,如上配置输入的动态链接库文件名为 vendor.dll.[chunkhash].js
@@ -83,12 +84,18 @@ const config = {
                 dry: false, // false才会删除指定目录的文件，true只是模拟删除
                 // 删除排除选项，无法排除指定正则文件格式,so,要排除从第一个参数吧
                 // exclude: ['manifest.json'], 
-        }),
+            }
+        ),
+        // 编译报warn: Critical dependency: the request of a dependency is an expression
+        new webpack.ContextReplacementPlugin(
+            /encoding(\\|\/)lib/,
+            path.resolve(__dirname, './')
+        ),
         // 抽离公共包配置
         new webpack.DllPlugin({
             // context: 解析包路径的上下文
             context: __dirname,
-            // name:dll內部暴露的对象名(manifest清单索引文件内的name),与output.library的library保持一致
+            // name: 暴露出dll文件内的函数名(manifest清单索引文件内的name),与output.library的library保持一致
             name: '_dll_[name]_[chunkhash]',
             // TODO 生成manifest索引清单的文件名，竟然是path属性，这里更改manifest的文件名，叫 manifestFilename不是更贴切吗
             // path 是 manifest.json 文件的输出路径，这个文件会用于后续的业务代码打包；
@@ -107,10 +114,9 @@ module.exports = dllconfig;
 
 /** 
  * 拓展阅读
- * 
- * [dynamic-link-library] 动态链接库 => 一次构建多次受益，提示打包编译速度
- * 概念：初次运行项目时，构建一次，之后不用参与构建，提升开发构建速度，不同于CommonChunks,dll文件涉及具体业务
- * 一个 dll 包，就是一个很纯净的依赖库，它本身不能运行，是用来给你的 app 或者业务代码引用的
+ * [dynamic-link-library] 动态链接库 => 一次构建多次受益，提升打包编译速度
+ * 概念：初次运行项目时，构建一次，之后不用参与构建，提升开发构建速度，与CommonChunks不同，dll文件涉及具体业务
+ * 一个dll包就是一个很纯净的依赖库，它本身不能运行，是用来给你的 app或者业务代码引用的
  * 一般抽取一些固定很少发生更迭的库文件，比如react,react-router,redux这类基础库
  * dll文件的概念,借鉴了windows系统的动态链接库的理念，
  * Related Reading: https://zhuanlan.zhihu.com/p/21748318
@@ -124,6 +130,6 @@ module.exports = dllconfig;
  * 当编译器(compiler)开始执行、解析和映射应用程序时，它会保留所有模块的详细要点
  * 这个数据集合称为 "Manifest"，当完成打包并发送到浏览器时，会在runtime运行时通过 Manifest 来解析和加载模块。
  * 无论你选择哪种模块语法，那些 import 或 require 语句现在都已经转换为 __webpack_require__ 方法，此方法指向模块标识符(module identifier)
- * 通过使用 manifest 中的数据，runtime 将能够查询模块标识符，检索出背后对应的模块。
+ * 通过使用 manifest 中的数据，runtime 将能够查询模块标识符，检索出背后对应的模块
  * 
  */

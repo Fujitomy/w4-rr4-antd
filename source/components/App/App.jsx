@@ -5,8 +5,8 @@ import Loading from '@/components/Loading';
 import ErrBoundary from './ErrBoundary.jsx';
 import './App.less';
 import { DatePicker,Select,Button,From,message,Cascader } from 'antd';
-import 'braft-editor/dist/index.css';
-import BraftEditor from 'braft-editor';
+// import 'braft-editor/dist/index.css';
+// import BraftEditor from 'braft-editor';
 // const fs = require("fs"); 
 // console.log(fs,'file system');
 import { getAccessToken,getAccessSign,getUserInfo,getToken,getSign,login,getIndexData } from '@/components/Api/Axios.js';
@@ -407,7 +407,7 @@ class App extends React.Component {
        
         // 绑定事件
         map.on('click', (e)=>{
-            console.log('您在[ '+e.lnglat.getLng()+','+e.lnglat.getLat()+' ]的位置点击了地图！');
+            console.log('您在--[ '+e.lnglat.getLng()+','+e.lnglat.getLat()+' ]的位置点击了地图！');
         });
       
 

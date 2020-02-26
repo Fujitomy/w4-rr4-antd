@@ -1,6 +1,6 @@
 /** 
- * 开发环境编译配置-单线程版
- * 
+ * @description 开发环境编译配置-单线程版
+ * @author tomy
  */
 
 const path = require('path');

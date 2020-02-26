@@ -1,22 +1,8 @@
-
 /**
- * 
- * @description: development compile config / 开发环境编译配置 - happypack 多线程版
- * @author: tomy
- * @last modified: tomy 2019/04/09 11:43:00
- * 
- * NamedModulesPlugin && OccurrenceOrderPlugin
- * https://blog.csdn.net/chenqiuge1984/article/details/80128021
- *
- * 编译异常
- * https://blog.csdn.net/weixiaoderensheng/article/details/82993332 
- * https://blog.csdn.net/ZYC88888/article/details/80592654
- * 
- * 编译配置
- * https://blog.csdn.net/u013738122/article/details/81809002 
- * 
- * core-js warning solve method
- * https://blog.csdn.net/kai_vin/article/details/88700181
+ * @description development compile config / 开发环境编译配置 - happypack 多线程版
+ * @author tomy
+ * @date 2019/04/09 11:43:00
+ * @more 详见底部扩展阅读 Read more at the bottom of this document
  * 
  */
 
@@ -24,13 +10,14 @@ const os = require("os");
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const OpenBrowserWebpackPlugin = require('open-browser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const manifest = require('./source/vendors/vendor.manifest.json');
 const dllchunkname = manifest.name.split('_')[3];
 const devMode = process.argv.indexOf('--mode=development') > -1;
 const HappyPack = require('happypack');
-const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 }); // 开启一个多线程，线程数量等于最大线程减4，几乎全开
+const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 }); // 开启多线程，线程数量等于最大线程减4，几乎全开
 
 // console.log(dllchunkname,'dllchunkname');
 
@@ -38,26 +25,21 @@ process.traceDeprecation = false; // 跟踪弃用警告的调用栈,默认true
 process.noDeprecation = true; // 关闭弃用警告,默认true
 
 module.exports = {
-    // 编译模式
-    mode: 'development',
-    // 错误跟踪工具
-    devtool: true ? 'cheap-module-eval-source-map' : 'hidden-source-map',
-    // 编译控制台打印配置
-    stats: { 
-        colors: true,
-        version: true 
+    mode: 'development', // 编译模式 compile mode
+    devtool: true ? 'cheap-module-eval-source-map' : 'hidden-source-map', // 错误跟踪工具
+    stats: {  // 编译控制台打印配置
+        colors: true, version: true 
     },
     node: {
         "fs": "empty"
     },
-    // 入口文件配置
-    entry:{
+    entry:{ // 入口文件配置
         index: [
             // 入口头文件引入 babel-polyfill 会导致编译包体积增大，
             // 应该使用babel-runtime和babel-helpers按需引入和防止重复打包，
             // 比如有50个文件使用了Object.assign()方法，
             // 应该是抽一个es5 版Object.assign()的js模块，给其他各个文件引入，而不是打到这50个文件中，这个引入babel抽离到babel-helpers中了
-            // 可以在这里配置hot-loader吗
+            // 可以在这里配置hot-loader吗，how to do?
             'babel-polyfill',
             path.resolve(__dirname, './source/entry/index.js')
         ]
@@ -76,23 +58,27 @@ module.exports = {
     //     pathinfo: true
     // },
     devServer:{
-        // open: true, // 启动后打开浏览器
-        // 告诉服务器从哪个目录中提供内容。只有在你想要提供静态文件时才需要,
+        // open: true, // 启动后打开浏览器,默认为true
+        // contentBase: 告诉服务器从哪个目录中提供内容。只有在你想要提供静态文件时才需要,
         // 若配置错误，是找不到资源文件的
         // 默认情况下，将使用当前工作目录作为提供内容的目录，但是你可以修改为其他目录
-        // 这个很重要，比如你的静态资源（图片多媒体）或者react公共包放在./source/vendors/目录下，如果你不配置到此，那么devServer启动可能会找不到这些依赖的静态资源文件或公共包
+        // 这个很重要，假如你的静态资源（图片多媒体）或者react公共包放在./source/vendors/目录下，
+        // 如果你不配置到此，那么devServer启动可能会找不到这些依赖的静态资源文件或公共包，导致启动失败
         contentBase: path.resolve(__dirname,'./source/vendors/'),
-        // 一切服务都启用gzip压缩(所有来自 './source/vendors' 目录的文件都做 gzip 压缩)
+        // compress: 一切服务都启用gzip压缩(所有来自 './source/vendors' 目录的文件都做 gzip 压缩)
         compress: true,
-        // 启动本地服务端口号
+        // port: 启动本地服务端口号
         port: 8088,
         // 配置host之后才可以使用本地ip打开localhost页面
         host: '0.0.0.0',
         // 需要开启 plugins > new webpack.HotModuleReplacementPlugin()
         quiet: false, // true关闭编译控制台打印，世界一下子安静了
-        // inline: true, // 实时刷新 设置为true，当源文件改变时会自动刷新页面
-        // clientLogLevel: 'none', // 当使用内联模式(inline mode)时，会在开发工具(DevTools)的控制台(console)显示消息，例如：在重新加载之前，在一个错误之前，或者模块热替换(Hot Module Replacement)启用时。这可能显得很繁琐,使用none
+        // inline: true, // 实时刷新 设置为true，当源文件改变时会自动刷新页面,默认为true
+        // clientLogLevel: 当使用内联模式(inline mode)时，会在开发工具(DevTools)的控制台(console)显示消息，
+        // 例如：在重新加载之前，在一个错误之前，或者模块热替换(Hot Module Replacement)启用时。这可能显得很繁琐,So使用none
+        // clientLogLevel: 'none', 
         historyApiFallback: true, // 不跳转
+        hot: true,
         // 接口代理
         proxy: {
             // 业务线接口升级到v4
@@ -118,8 +104,7 @@ module.exports = {
                 changeOrigin: true,
                 secure: false
             }
-        },
-        hot: true,
+        }
     },
     module:{
         // 排除模块依赖解析项 => 有些库是自成一体,不依赖其他库,没有使用模块化的，比如jquey、momentjs、chart.js，要使用它们必须整体全部引入。 webpack是模块化打包工具完全没有必要去解析这些文件的依赖，因为它们都不依赖其它文件体积也很庞大，要忽略它们配置如下：
@@ -193,7 +178,7 @@ module.exports = {
         ],
     },
     plugins: [
-        // 引入dll => 里面打包了基础依赖模块react,react-router,reflux,antd等
+        // 告诉webpack编译器，遇到vendor.manifest.json中的依赖文件，就不再去打包了，直接根据该库id去dll文件中找到对应id索引模块
         new webpack.DllReferencePlugin({
             context: __dirname,
             manifest: require('./source/vendors/vendor.manifest.json'),
@@ -206,9 +191,11 @@ module.exports = {
             author: 'tomy',
             inject: 'true',// 资源文件注入位置true,body,header,false
             chunksSortMode: 'none', //如果使用webpack4将该配置项设置为'none'
-            // 动态引入dll， manifest就是dll生成的json
-            vendor: /*manifest.name*/'vendor.dll.' + dllchunkname + '.js',
+            // 动态引入dll， manifest就是dll生成的json,在index.ejs中引用
+            // vendor: /*manifest.name*/'vendor.dll.' + dllchunkname + '.js',
         }),
+        // Html引入dll文件插件
+        new HtmlWebpackTagsPlugin({ tags: ['vendor.dll.' + dllchunkname + '.js'], append: false }),
         // 打开浏览器插件
         new OpenBrowserWebpackPlugin({
             browser: os.type()==='Darwin' ?'Google Chrome':'Chrome',
@@ -222,11 +209,12 @@ module.exports = {
         // // 所以只要我们不重命名一个模块文件，那么它的id就不会变，更不会影响到其它模块了
         // new webpack.NamedModulesPlugin(),
 
-        // 编译报warn: Critical dependency: the request of a dependency is an expression
-        new webpack.ContextReplacementPlugin(
-            /@0.1.12@encoding(\\|\/)lib/,
-            path.resolve(__dirname, './')
-        ),
+        // // 编译报warn: Critical dependency: the request of a dependency is an expression
+        // new webpack.ContextReplacementPlugin(
+        //     /@0.1.12@encoding(\\|\/)lib/,
+        //     path.resolve(__dirname, './')
+        // ),
+
         // 根据HappyPack线程id分配不同loader的线程资源：js 对应上文的 module.rules.use:happypack/loader?id=js
         new HappyPack({
             id: 'js'||'js_modules',
@@ -330,3 +318,20 @@ module.exports = {
         },
     }
 };
+
+/**
+ * @description: 扩展阅读
+ * NamedModulesPlugin && OccurrenceOrderPlugin
+ * https://blog.csdn.net/chenqiuge1984/article/details/80128021
+ *
+ * 编译异常
+ * https://blog.csdn.net/weixiaoderensheng/article/details/82993332 
+ * https://blog.csdn.net/ZYC88888/article/details/80592654
+ * 
+ * 编译配置
+ * https://blog.csdn.net/u013738122/article/details/81809002 
+ * 
+ * core-js warning solve method
+ * https://blog.csdn.net/kai_vin/article/details/88700181
+ * 
+ */

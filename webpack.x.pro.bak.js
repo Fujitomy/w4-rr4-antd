@@ -20,7 +20,6 @@ const path = require('path');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const OpenBrowserWebpackPlugin = require('open-browser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -30,7 +29,7 @@ const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const HappyPack = require('happypack');
-const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 }); // 开启多线程
+const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 }); // 开启一个多线程，线程数量等于最大线程减一，几乎全开
 
 const manifest = require('./source/vendors/vendor.manifest.json');
 const dllchunkname = manifest.name.split('_')[3];
@@ -44,13 +43,14 @@ process.noDeprecation = true; // 是否关闭弃用警告
 // webpack的三种chunk类型 entry chunk, children chunk , common chunk
 
 module.exports = {
-    mode: 'production', // 生产模式，默认加入 tree shaking
-    // devtool: 调试工具，浏览器console控制台错误打印配置，eval-source-map
+    // tree shaking 新的 webpack 4 正式版本，扩展了这个检测能力，通过 package.json 的 "sideEffects" 属性作为标记，
+    // 向 compiler 提供提示，表明项目中的哪些文件是 "pure(纯的 ES2015 模块)"，由此可以安全地删除文件中未使用的部分。
+    mode: 'production',
+    // 调试工具，浏览器控制台错误打印配置，eval-source-map
     devtool: 'none', // devtool: "source-map",
-    // watch: true 启用 Watch 模式。这意味着在初始构建之后，webpack 将继续监听任何已解析文件的更改。默认false关闭。
+    // 启用 Watch 模式。这意味着在初始构建之后，webpack 将继续监听任何已解析文件的更改。默认关闭。
     watch: true,
-    // 基础目录，绝对路径，用于从配置中解析入口起点(entry point)和 loader，
-    // 其上下文是入口文件所处的目录的绝对路径的字符串
+    // 基础目录，绝对路径，用于从配置中解析入口起点(entry point)和 loader，其上下文是入口文件所处的目录的绝对路径的字符串
     // context: path.resolve(__dirname, "./source/entry/"),
     // entry 对象是用于 webpack 查找启动并构建 bundle。其上下文 context 是入口文件所处的目录的绝对路径的字符串。
     entry:{
@@ -85,8 +85,7 @@ module.exports = {
         // publicPath: "../assets/", // 相对于 HTML 页面
         // publicPath: "", // 相对于 HTML 页面（目录相同）
 
-        // 告诉 webpack 在 bundle 中引入「所包含模块信息」的相关注释。
-        // 此选项默认值是 false，并且不应该用于生产环境(production)，但是对阅读开发环境(development)中的生成代码(generated code)极其有用。
+        // 告诉 webpack 在 bundle 中引入「所包含模块信息」的相关注释。此选项默认值是 false，并且不应该用于生产环境(production)，但是对阅读开发环境(development)中的生成代码(generated code)极其有用。
         pathinfo: true,
 
         // 修改输出 bundle 中每行的前缀。 注意，默认情况下使用空字符串。使用一些缩进会看起来更美观，但是可能导致多行字符串中的问题。
@@ -217,16 +216,14 @@ module.exports = {
     // },
     // 配置如何展示性能提示。例如，如果一个资源超过 250kb，webpack 会对此输出一个警告来通知你。
     performance:{
-        // hints: 性能提示等级 'warning', // false | 'error' | 'warning'
+        // hints: 'warning', // false | 'error' | 'warning'
         hints: 'warning',
-        // 入口起点表示针对指定的入口，对于所有资源，要充分利用初始加载时(initial load time)期间。
-        // 此选项根据入口起点的最大体积，控制 webpack 何时生成性能提示。默认值是：250000 (bytes)。
+        // 入口起点表示针对指定的入口，对于所有资源，要充分利用初始加载时(initial load time)期间。此选项根据入口起点的最大体积，控制 webpack 何时生成性能提示。默认值是：250000 (bytes)。
         maxEntrypointSize: 400*1000,
-        // 资源(asset)是从 webpack 生成的任何文件。此选项根据单个资源体积，控制 webpack 何时生成性能提示。
-        // 默认值是：250000 (bytes)。
+        // 资源(asset)是从 webpack 生成的任何文件。此选项根据单个资源体积，控制 webpack 何时生成性能提示。默认值是：250000 (bytes)。
         maxAssetSize: 250*1000,
         // 提示过滤项
-        assetFilter: assetFilename => assetFilename.indexOf('entry-chunk')!==-1, // 入口文件不提示
+        assetFilter: assetFilename =>  assetFilename.indexOf('entry-chunk')!==-1, // 入口文件不提示
     },
     // 编译优化项，主要用于生产环境包请求，加载以及长效缓存优化
     optimization:{
@@ -243,121 +240,115 @@ module.exports = {
         // 深入理解 Webpack 打包分块 https://juejin.im/post/5cdfb48fe51d4510ac6721b7
         // https://www.cnblogs.com/wmhuang/p/8967639.html webpack4：连奏中的进化
         // webpack 4 Code Splitting 的 splitChunks 配置探索： https://imweb.io/topic/5b66dd601402769b60847149
-        // splitChunks: {
-        //     chunks: 'all',
-        //     minSize: 30000, // 模块大于30k会被抽离到公共模块
-        //     maxSize: 500000, // 超过指定的大小就抽离成更小的模块
-        //     minChunks: 1, // 模块出现1次就会被抽离到公共（共享）模块
-        //     maxAsyncRequests: 9, // 异步模块并行加载模块数，默认值为5
-        //     maxInitialRequests: 6, // 初始加载模块最大并行请求数，默认值为3
-        //     automaticNameDelimiter: '-', // 模块名称的连接符号
-        //     name: true,  // 指定缓存组块的名称,true 默认开头为vendors ,也可以指定为字符串
-        //     // true | string | function(module, chunks, cacheGroupKey){ }
-        //     // name:(module, chunks, cacheGroupKey)=> {
-        //     //   // console.log(cacheGroupKey,'-----------cacheGroupKey name');
-        //     //   cacheGroups里默认自带 vendors 配置来分离node_modules里的类库模块，
-        //     //   所以不设置或者设置为true,cacheGroupKey = vendors，默认名称为vendors，生成，类似 vendors~13asd78sa.js
-        //     //   return cacheGroupKey; 
-        //     // },
-        //     cacheGroups: {
-        //         commons: {
-        //             name: 'vendor-page', // 要缓存的 分隔出来的 chunk 名称 ???
-        //             test: /[\\/]node_modules[\\/]/,
-        //             //chunks: 'initial',
-        //             priority: 10,
-        //             minChunks: 2, // 把所有 node_modules 的模块被不同的 chunk 引入超过 2 次的抽取为 commons
-        //             reuseExistingChunk: true
-        //         },
-        //         antd: {
-        //             name: 'chunk-antd',
-        //             test: /[\\/]node_modules[\\/]antd[\\/]/,
-        //             priority: 20,
-        //             chunks: 'async'
-        //         },
-        //         // 把 lodash 模块抽取为 lodash
-        //         lodash: {
-        //             name: 'chunk-lodash',
-        //             test: /[\\/]node_modules[\\/]lodash[\\/]/,
-        //             priority: 30,
-        //             chunks: 'async'
-        //         },
-        //         // 把 lodash 模块抽取为 lodash
-        //         lodashChunk: {
-        //             name: 'reactBase',
-        //             test: (module) => {
-        //                 return /lodash/.test(module.context);
-        //             },
-        //             chunks: 'initial',
-        //             priority: 12,
-        //         },
-        //         // default: {
-        //         //     minChunks: 2,
-        //         //     priority: -20,
-        //         //     reuseExistingChunk: true
-        //         // }
-        //     }
-        // },
-        // // object string boolean 将optimization.runtimeChunk设置为true或“multiple”会为每个仅包含运行时的入口点添加一个额外的块。
-        // // 默认值为false：为每个entry chunk嵌入运行时。
-        // runtimeChunk: false,
-        // // 取代 new webpack.NoEmitOnErrorsPlugin()，编译错误时不输出资源。 在编译时出现错误时，使用optimization.noEmitOnErrors跳过发射阶段。 这可确保不会发出错误资产。
-        // noEmitOnErrors: true,
-        // // 告诉webpack生成代码时使用可读的模块(modules)标识符以获得更好的调试。生产环境默认关闭，开发环境默认开启
-        // namedModules: false,
-        // // 告诉webpack使用可读的块(chunks)标识符以获得更好的调试。生产环境默认关闭，开发环境默认开启
-        // namedChunks: false,
-        // // 告诉webpack在打包选择模块（module）ID时使用哪种算法。默认值为false，不使用任何内建算法，可以指定通过其他插件来指定算法
-        // moduleIds: false,
-        // // 告诉webpack在选择块（chunk）ID时使用哪种算法。bool: false string: natural, named, size, total-size 配置规则同上moduleIds
-        // chunkIds: false,
-        // // 无需特殊设置-告诉webpack将process.env.NODE_ENV设置为给定的字符串值。 // 可能的值：1、任何字符串：给process.env.NODE_ENV设置的值。2、false：不修改/设置process.env.NODE_ENV的值。
-        // nodeEnv: 'production',
-        // // 无需单独设置 bool: false 设置为true时，告诉webpack通过将导入更改为更短的字符串来减小WASM的大小。它会破坏模块和导出名称。
-        // mangleWasmImports: false,
-        // // 无需单独设置 bool: true 当这些子模块存在于父级中的时候，告诉webpack检测并从块中删除这些模块
-        // removeAvailableModules: true,
-        // // 无需单独设置 bool: true 告诉webpack检测并删除空的块。
-        // removeEmptyChunks: true,
-        // // 无需单独设置 bool: true  告诉webpack合并包含相同模块的块。
-        // mergeDuplicateChunks:true,
-        // // 无需单独设置 告诉webpack确定并标记作为其他块的子集的块，其方式是当已经加载较大的块时不必加载子集。默认在生产模式下开启，否则禁用
-        // flagIncludedChunks: true, 
-        // // 无需单独设置 告诉webpack找出模块的顺序，这样可以让初始包变到最小。 默认在生产模式下启用，否则禁用。
-        // occurrenceOrder: true,
-        // // 无需单独设置 告诉webpack确定模块提供哪些导出，以便为 `export * from 'xxx.js'这种模式` 生成更高效的代码, 默认开启
-        // providedExports: true,
-        // // 无需单独设置 告诉webpack确定每个模块的已使用导出。这取决于providedExports。默认在生产模式下启用，否则禁用
-        // usedExports: true,
-        // // 无需单独设置 告诉webpack查找模块结构图的各个部分，这些部分可以安全地连接成一个模块。 取决于providedExports和usedExports。默认在生产模式下启用，否则禁用
-        // concatenateModules: true,
-        // // sideEffects: 主要用来用来做tree-shake
-        // // tree shaking => webpack 4 正式版本，扩展了这个检测能力，通过 package.json 的 "sideEffects" 属性作为标记，
-        // // 向 compiler 提供提示，表明项目中的哪些文件是 "pure(纯的 ES2015 模块)"，由此可以安全地删除文件中未使用的部分。
-        // // sideEffects告诉webpack 识别引入模 package.json中的sideEffects标志或规则,以跳出 没有在(未使用) 导出时标记为不包含副作用的模块，
-        // // 依赖于optimization.providedExports和optimization.usedExports
-        // // 通过给 package.json 加入 sideEffects: false|true 声明该包模块是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。 默认在生产模式下启用，否则禁用
-        // // 比如比如vue库的 package.json 设置为 sideEffects:false ，则optimization.sideEffects:true 之后 
-        // // import { xxx } from 'vue' 将 打包成 import xxx from 'vue/xxx', 因为标记vue将自己标记为没有副作用的包(vue就sideEffects设置为false了)，所以符合跳过规则
-        // // Webpack 中的 sideEffects 到底该怎么用？ https://segmentfault.com/a/1190000015689240
-        // // 如果我们引入的 包/模块 被标记为 sideEffects: false 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块/包 都会被完整的移除
-        // sideEffects: false,
-        // // 无需单独设置 bool: false 告诉webpack生成具有相对路径的记录，以便能够移动上下文文件夹。
-        // portableRecords: false,
+        splitChunks: {
+            chunks: 'all',
+            minSize: 30000, // 模块大于30k会被抽离到公共模块
+            maxSize: 500000, // 超过指定的大小就抽离成更小的模块
+            minChunks: 1, // 模块出现1次就会被抽离到公共（共享）模块
+            maxAsyncRequests: 9, // 异步模块并行加载模块数，默认值为5
+            maxInitialRequests: 6, // 初始加载模块最大并行请求数，默认值为3
+            automaticNameDelimiter: '-', // 模块名称的连接符号
+            name: true,  // 指定缓存组块的名称,true 默认开头为vendors ,也可以指定为字符串
+            // true | string | function(module, chunks, cacheGroupKey){ }
+            // name:(module, chunks, cacheGroupKey)=> {
+            //   // console.log(cacheGroupKey,'-----------cacheGroupKey name');
+            //   cacheGroups里默认自带 vendors 配置来分离node_modules里的类库模块，
+            //   所以不设置或者设置为true,cacheGroupKey = vendors，默认名称为vendors，生成，类似 vendors~13asd78sa.js
+            //   return cacheGroupKey; 
+            // },
+            cacheGroups: {
+                commons: {
+                    name: 'vendor-page', // 要缓存的 分隔出来的 chunk 名称 ???
+                    test: /[\\/]node_modules[\\/]/,
+                    //chunks: 'initial',
+                    priority: 10,
+                    minChunks: 2, // 把所有 node_modules 的模块被不同的 chunk 引入超过 2 次的抽取为 commons
+                    reuseExistingChunk: true
+                },
+                antd: {
+                    name: 'chunk-antd',
+                    test: /[\\/]node_modules[\\/]antd[\\/]/,
+                    priority: 20,
+                    chunks: 'async'
+                },
+                // 把 lodash 模块抽取为 lodash
+                lodash: {
+                    name: 'chunk-lodash',
+                    test: /[\\/]node_modules[\\/]lodash[\\/]/,
+                    priority: 30,
+                    chunks: 'async'
+                },
+                // 把 lodash 模块抽取为 lodash
+                lodashChunk: {
+                    name: 'reactBase',
+                    test: (module) => {
+                        return /lodash/.test(module.context);
+                    },
+                    chunks: 'initial',
+                    priority: 12,
+                },
+                // default: {
+                //     minChunks: 2,
+                //     priority: -20,
+                //     reuseExistingChunk: true
+                // }
+            }
+        },
+        // object string boolean 将optimization.runtimeChunk设置为true或“multiple”会为每个仅包含运行时的入口点添加一个额外的块。
+        // 默认值为false：为每个entry chunk嵌入运行时。
+        runtimeChunk: false,
+        // 取代 new webpack.NoEmitOnErrorsPlugin()，编译错误时不输出资源。 在编译时出现错误时，使用optimization.noEmitOnErrors跳过发射阶段。 这可确保不会发出错误资产。
+        noEmitOnErrors: true,
+        // 告诉webpack生成代码时使用可读的模块(modules)标识符以获得更好的调试。生产环境默认关闭，开发环境默认开启
+        namedModules: false,
+        // 告诉webpack使用可读的块(chunks)标识符以获得更好的调试。生产环境默认关闭，开发环境默认开启
+        namedChunks: false,
+        // 告诉webpack在打包选择模块（module）ID时使用哪种算法。默认值为false，不使用任何内建算法，可以指定通过其他插件来指定算法
+        moduleIds: false,
+        // 告诉webpack在选择块（chunk）ID时使用哪种算法。bool: false string: natural, named, size, total-size 配置规则同上moduleIds
+        chunkIds: false,
+        // 无需特殊设置-告诉webpack将process.env.NODE_ENV设置为给定的字符串值。 // 可能的值：1、任何字符串：给process.env.NODE_ENV设置的值。2、false：不修改/设置process.env.NODE_ENV的值。
+        nodeEnv: 'production',
+        // 无需单独设置 bool: false 设置为true时，告诉webpack通过将导入更改为更短的字符串来减小WASM的大小。它会破坏模块和导出名称。
+        mangleWasmImports: false,
+        // 无需单独设置 bool: true 当这些子模块存在于父级中的时候，告诉webpack检测并从块中删除这些模块
+        removeAvailableModules: true,
+        // 无需单独设置 bool: true 告诉webpack检测并删除空的块。
+        removeEmptyChunks: true,
+        // 无需单独设置 bool: true  告诉webpack合并包含相同模块的块。
+        mergeDuplicateChunks:true,
+        // 无需单独设置 告诉webpack确定并标记作为其他块的子集的块，其方式是当已经加载较大的块时不必加载子集。默认在生产模式下开启，否则禁用
+        flagIncludedChunks: true, 
+        // 无需单独设置 告诉webpack找出模块的顺序，这样可以让初始包变到最小。 默认在生产模式下启用，否则禁用。
+        occurrenceOrder: true,
+        // 无需单独设置 告诉webpack确定模块提供哪些导出，以便为 `export * from 'xxx.js'这种模式` 生成更高效的代码, 默认开启
+        providedExports: true,
+        // 无需单独设置 告诉webpack确定每个模块的已使用导出。这取决于providedExports。默认在生产模式下启用，否则禁用
+        usedExports: true,
+        // 无需单独设置 告诉webpack查找模块结构图的各个部分，这些部分可以安全地连接成一个模块。 取决于providedExports和usedExports。默认在生产模式下启用，否则禁用
+        concatenateModules: true,
+        // sideEffects主要用来用来做tree-shake
+        // sideEffects告诉webpack 识别引入模 package.json中的sideEffects标志或规则,以跳出 没有在(未使用) 导出时标记为不包含副作用的模块，
+        // 依赖于optimization.providedExports和optimization.usedExports
+        // 通过给 package.json 加入 sideEffects: false|true 声明该包模块是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。 默认在生产模式下启用，否则禁用
+        // 比如比如vue库的 package.json 设置为 sideEffects:false ，则optimization.sideEffects:true 之后 
+        // import { xxx } from 'vue' 将 打包成 import xxx from 'vue/xxx', 因为标记vue将自己标记为没有副作用的包(vue就sideEffects设置为false了)，所以符合跳过规则
+        // Webpack 中的 sideEffects 到底该怎么用？ https://segmentfault.com/a/1190000015689240
+        // 如果我们引入的 包/模块 被标记为 sideEffects: false 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块/包 都会被完整的移除
+        sideEffects: false,
+        // 无需单独设置 bool: false 告诉webpack生成具有相对路径的记录，以便能够移动上下文文件夹。
+        portableRecords: false,
     },
     module:{
-        // noParse: 排除编译项,有些库是自成一体不依赖其他库的没有使用模块化的，
-        // 比如jquey、momentjs、chart.js，要使用它们必须整体全部引入。 
-        // webpack是模块化打包工具完全没有必要去解析这些文件的依赖，因为它们都不依赖其它文件体积也很庞大，要忽略它们配置如下：
+        // 排除编译项   有些库是自成一体不依赖其他库的没有使用模块化的，比如jquey、momentjs、chart.js，要使用它们必须整体全部引入。 webpack是模块化打包工具完全没有必要去解析这些文件的依赖，因为它们都不依赖其它文件体积也很庞大，要忽略它们配置如下：
         noParse: /node_modules\/(moment\.js)/,
-
         rules:[
             {
                 // 需要检查打包的各种js资源文件
                 test: /(\.jsx|\.js|\.es6)$/,
                 use: {
                     // babel编译过程很耗时，好在babel-loader提供缓存编译结果选项，在重启webpack时不需要创新编译而是复用缓存结果减少编译流程。babel-loader缓存机制默认是关闭的，打开的配置如下babel-loader?cacheDirectory
-                    loader: 'babel-loader?cacheDirectory', // 'happypack/loader?id=js'
-                    // loader: 'happypack/loader?id=js'
+                    loader:  'happypack/loader?id=js' || 'babel-loader?cacheDirectory',
                 },
                 // 排除查找模块的目录,提升编译速度
                 exclude: path.resolve(__dirname, 'node_modules'),
@@ -369,15 +360,14 @@ module.exports = {
                 include: [path.resolve(__dirname, 'node_modules')],
                 use: [
                     // MiniCssExtractPlugin.loader,
-                    // 'happypack/loader?id=node_moudles_css'
+                    'happypack/loader?id=node_moudles_css'
                 ]
             },
 
             {
                 test: /\.scss/,
                 include: [path.resolve(__dirname, 'node_modules')],
-                use: ['style-loader', 'css-loader', 'sass-loader']
-                // use: 'happypack/loader?id=node_moudles_sass' || 
+                use: 'happypack/loader?id=node_moudles_sass' ||  ['style-loader', 'css-loader', 'sass-loader']
             },
 
             // 自定义样式-模块化
@@ -385,20 +375,19 @@ module.exports = {
                 test: /\.scss$/,
                 exclude: [path.resolve(__dirname, 'node_modules')],
                 use: [
-                    { 
-                        loader: MiniCssExtractPlugin.loader,
-                        // options: {
-                        //     publicPath: '../'
-                        // }
-                    },
-                    // 'happypack/loader?id=customizeSass'
+                    // { 
+                    //     loader: MiniCssExtractPlugin.loader,
+                    //     // options: {
+                    //     //     publicPath: '../'
+                    //     // }
+                    // },
+                    'happypack/loader?id=customizeSass'
                 ]
             },
             {
                 test: /\.less$/,
                 exclude: [path.resolve(__dirname, 'node_modules')],
-                // use: 'happypack/loader?id=less',
-                use: 'happypack/loader?id=less' 
+                use: 'happypack/loader?id=less' ||
                 [
                     { loader:'style-loader' },
                     { loader:'css-loader'   },
@@ -438,7 +427,7 @@ module.exports = {
             inject: 'body', // script标签位于html文件的 body 底部 注入,默认值:true， 
             author: 'tomy', // 加上编辑人
             hash: true, // hash选项的作用是 给生成的 js 文件一个独特的 hash 值 xxx.js?xxxxxx
-            // vendor: /*manifest.name*/'./vendors/vendor.dll.' + dllchunkname + '.js', // 动态引入dll， manifest就是dll生成的json
+            vendor: /*manifest.name*/'./vendors/vendor.dll.' + dllchunkname + '.js', // 动态引入dll， manifest就是dll生成的json
             // manifest: './vendors/vendor.manifest.json', // manifest只是运行时构建映射文件，不需要单独引入
             // inline: true, // ????
             // 标签格式化配置，生产环境建议开启
@@ -454,99 +443,94 @@ module.exports = {
                 removeStyleLinkTypeAttributes: true,
             }
         }),
-        // Html引入dll文件插件
-        new HtmlWebpackTagsPlugin({ 
-            tags: ['vendor.dll.' + dllchunkname + '.js'],
-            append: false
+
+        // js线程 id：js 对应上文的 module.rules.use: happypack/loader?id=js
+        new HappyPack({
+            id: 'js', // 自定义的线程id='js'
+            threads: 4,
+            // 指定使用哪个线程池
+            threadPool: HappyThreadPool,
+            loaders: ['babel-loader?cacheDirectory=true'],
+            verbose: false,
         }),
 
-        // // js线程 id：js 对应上文的 module.rules.use: happypack/loader?id=js
-        // new HappyPack({
-        //     id: 'js', // 自定义的线程id='js'
-        //     threads: 4,
-        //     // 指定使用哪个线程池
-        //     threadPool: HappyThreadPool,
-        //     loaders: ['babel-loader?cacheDirectory=true'],
-        //     verbose: false,
-        // }),
+        new HappyPack({
+            id: 'node_moudles_css', // 自定义的线程id='node_moudles_css'
+            threads: 4,
+            threadPool: HappyThreadPool,  // 指定使用哪个线程池
+            loaders: [
+                'style-loader', 
+                'css-loader',
+                'postcss-loader'
+            ],
+            verbose: false,
+        }),
 
-        // new HappyPack({
-        //     id: 'node_moudles_css', // 自定义的线程id='node_moudles_css'
-        //     threads: 4,
-        //     threadPool: HappyThreadPool,  // 指定使用哪个线程池
-        //     loaders: [
-        //         'style-loader', 
-        //         'css-loader',
-        //         'postcss-loader'
-        //     ],
-        //     verbose: false,
-        // }),
+        new HappyPack({
+            id: 'node_moudles_less',
+            threads: 4,
+            threadPool: HappyThreadPool,
+            loaders: [
+                'style-loader',
+                'css-loader',
+                'postcss-loader',
+                {
+                    loader:'less-loader',
+                    options: {
+                        // 将less打包到js行内
+                        javascriptEnabled: true
+                    }
+                }
+            ],
+            verbose: false,
+        }),
 
-        // new HappyPack({
-        //     id: 'node_moudles_less',
-        //     threads: 4,
-        //     threadPool: HappyThreadPool,
-        //     loaders: [
-        //         'style-loader',
-        //         'css-loader',
-        //         'postcss-loader',
-        //         {
-        //             loader:'less-loader',
-        //             options: {
-        //                 // 将less打包到js行内
-        //                 javascriptEnabled: true
-        //             }
-        //         }
-        //     ],
-        //     verbose: false,
-        // }),
+        new HappyPack({
+            id: 'less',
+            threads: 4,
+            threadPool: HappyThreadPool,
+            loaders: [
+                'style-loader',
+                'css-loader',
+                'postcss-loader',
+                {
+                    loader: 'less-loader',
+                    options: {
+                        // 将less打包到js行内
+                        javascriptEnabled: true
+                    }
+                }
+            ],
+            verbose: false,
+        }),
 
-        // new HappyPack({
-        //     id: 'less',
-        //     threads: 4,
-        //     threadPool: HappyThreadPool,
-        //     loaders: [
-        //         'style-loader',
-        //         'css-loader',
-        //         'postcss-loader',
-        //         {
-        //             loader: 'less-loader',
-        //             options: {
-        //                 // 将less打包到js行内
-        //                 javascriptEnabled: true
-        //             }
-        //         }
-        //     ],
-        //     verbose: false,
-        // }),
+        new HappyPack({
+            id: 'node_moudles_sass',
+            threads: 3,
+            threadPool: HappyThreadPool,
+            loaders: [
+                'style-loader',
+                'css-loader',
+                'postcss-loader',
+                'sass-loader'
+            ],
+            verbose: false,
+        }),
 
-        // new HappyPack({
-        //     id: 'node_moudles_sass',
-        //     threads: 3,
-        //     threadPool: HappyThreadPool,
-        //     loaders: [
-        //         'style-loader',
-        //         'css-loader',
-        //         'postcss-loader',
-        //         'sass-loader'
-        //     ],
-        //     verbose: false,
-        // }),
-
-        // new HappyPack({
-        //     id: 'customizeSass',
-        //     threads: 3,
-        //     // less文件和js文件都指定了使用HappyThreadPool线程池
-        //     threadPool: HappyThreadPool,
-        //     loaders: [
-        //         'style-loader',
-        //         'css-loader',
-        //         'postcss-loader',
-        //         'sass-loader'
-        //     ],
-        //     verbose: false,
-        //     debug: false
-        // }),
+        new HappyPack({
+            id: 'customizeSass',
+            threads: 3,
+            // less文件和js文件都指定了使用HappyThreadPool线程池
+            threadPool: HappyThreadPool,
+            loaders: [
+                'style-loader',
+                'css-loader',
+                'postcss-loader',
+                'sass-loader'
+            ],
+            verbose: false,
+            debug: false
+        }),
 
         new MiniCssExtractPlugin({
             // Options similar to the same options in webpackOptions.output
@@ -615,8 +599,7 @@ module.exports = {
     resolve: {
         // 默认后缀名，配置后可省略
         extensions: ['.js', '.jsx','.es6'],
-        // 指定模块查找目录，import 'redux'; 这样的不是相对也不是绝对路径的写法时会去node_modules目录下找。
-        // 但是默认的配置会采用向上递归搜索的方式去寻找node_modules
+        // 指定模块查找目录，import 'redux'这样不是相对也不是绝对路径的写法时会去node_modules目录下找。但是默认的配置会采用向上递归搜索的方式去寻找node_modules
         modules: [ path.resolve(__dirname, 'node_modules') ],
         // 文件夹别名配置
         alias: {
