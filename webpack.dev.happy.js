@@ -222,6 +222,11 @@ module.exports = {
         // // 所以只要我们不重命名一个模块文件，那么它的id就不会变，更不会影响到其它模块了
         // new webpack.NamedModulesPlugin(),
 
+        // 编译报warn: Critical dependency: the request of a dependency is an expression
+        new webpack.ContextReplacementPlugin(
+            /@0.1.12@encoding(\\|\/)lib/,
+            path.resolve(__dirname, './')
+        ),
         // 根据HappyPack线程id分配不同loader的线程资源：js 对应上文的 module.rules.use:happypack/loader?id=js
         new HappyPack({
             id: 'js'||'js_modules',

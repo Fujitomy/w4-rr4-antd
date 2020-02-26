@@ -13,10 +13,10 @@ import { getAccessToken,getAccessSign,getUserInfo,getToken,getSign,login,getInde
 import ajax from '@/components/Api/ajax.js';
 const fetch = require('node-fetch');
 
-const loadingImg = require('./giphy.gif');
-function preloader() {
-    return <img src={loadingImg} />;
-}
+// const loadingImg = require('./giphy.gif');
+// function preloader() {
+//     return <img src={loadingImg} />;
+// }
 
 
 
