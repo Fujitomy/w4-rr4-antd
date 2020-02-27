@@ -555,10 +555,10 @@ module.exports = {
             chunkFilename: "[id].css"
         }),
 
-        new OpenBrowserWebpackPlugin({
-            browser: 'Chrome',
-            url: 'http://localhost:9090',
-        }),
+        // new OpenBrowserWebpackPlugin({
+        //     browser: 'Chrome',
+        //     url: 'http://localhost:9090',
+        // }),
 
         new CleanWebpackPlugin(['dist/build/','dist/vendors/'],{
             // webpack文件夹的绝对路径,Default: root of your package
