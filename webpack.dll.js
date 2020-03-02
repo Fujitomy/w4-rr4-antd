@@ -14,6 +14,9 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin'); // 官方压缩默认
 const TerserPlugin = require('terser-webpack-plugin'); // js压缩混淆插件
 // const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 
+
+console.log('-------------------------dll generation mode-------------------------');
+
 const devConfig = { mode: 'development' }; // dll文件开发环境配置
 const proConfig = { // dll文件正式环境配置
     mode: 'production',

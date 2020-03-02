@@ -1,0 +1,60 @@
+{
+    // plugins 会在 Preset 之前运行，plugins 会从前到后顺序执行 顺序使用插件
+    "plugins": [
+        // 新版中 @babel/runtime 只包含了一些 helpers，如果需要 core-js polyfill 浏览器不支持的 API，可以用 transform 提供的选项 {"corejs": 2} 并安装依赖 @babel/runtime-corejs2。
+        // 由于本项目配置了"useBuiltIns": "usage"，并且本项目的superSlide又依赖core-js，所以这里需要做一些特定的配置，并需要下载@babel/runtime-corejs2插件。
+        ["@babel/plugin-transform-runtime",{
+            "corejs": 2
+        }],
+
+        "syntax-dynamic-import",
+        // 编译一些es7语法
+        "@babel/plugin-proposal-class-properties",
+        [
+            "import", {
+                "libraryName": "antd",
+                "libraryDirectory": "lib", // `lib` 默认
+                "style": "css" // `style: true` 会加载 less 文件
+            }
+        ]
+    ],
+    // targets, useBuiltIns 等选项用于编译出兼容目标环境的代码
+    // 其中 useBuiltIns 如果设为 "usage"
+    // Babel 会根据实际代码中使用的 ES6/ES7 代码，以及与你指定的 targets，按需引入对应的 polyfill
+    // 而无需在代码中直接引入 import '@babel/polyfill'，避免输出的包过大，同时又可以放心使用各种新语法特性。
+    // preset 倒序使用预设 主要是为了保证向后兼容
+    // 因为大多数用户的编写顺序是 ['es2015', 'stage-0'],这样必须先执行 stage-0 才能确保 babel 不报错
+    "presets": [
+        // "@babel/preset-env","@babel/preset-react"
+        [
+            "@babel/preset-env", 
+            {
+                "modules": false,
+                "targets": {
+                    "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
+                },
+                "useBuiltIns": "usage",
+                "corejs": 2// 最高2.6.5
+            }
+        ],
+        "@babel/preset-react"
+    ]
+}
+
+// 只要是这种找不到core-js/library，都说明你下载的是3.x版本的core-js，在3.x版本，已经没有library文件，
+// 原来的library文件夹下的文件，可以在core-js@3版本的es文件夹下找到，这里报错的原因是babel的插件和core-js的版本对应没有及时更新，所以，我们只能暂时做降级处理，删除3.x版本的core-js，并重新下载core-js@2.6.5版本，再次运行yarn start 就不会再出现这种问题了
+// 当我们在.babelrc文件中做了corejs相关配置后，我们上面所下载的那些babel相关插件中就会有关于core-js的代码会起作用了，目前这些插件的版本中所使用过的corejs版本还都是2.x版本，所以配置corejs时，下载插件如下：
+
+// yarn add core-js@2.6.5
+// yarn add @babel/runtime-corejs2 -D
+// 1
+// 2
+// 如果后期这些babel插件对依赖的core-js版本升级到3.x，那么上面两个插件就可以更新了：
+
+// yarn add core-js
+// yarn add @babel/runtime-corejs3 -D
+// 1
+// 2
+// @babel/runtime-corejs2 和 @babel/runtime-corejs3 是两个插件，不难看出，一个是corejs的2.x版本，一个是3.x版本，升级到3.x版本，就需要把.babelrc文件中对corejs配置的2改为3，这样corejs这一块的配置就不会再出问题了~
+
+// 原文链接：https://blog.csdn.net/kai_vin/article/details/88700181

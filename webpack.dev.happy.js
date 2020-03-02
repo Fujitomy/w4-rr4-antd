@@ -7,6 +7,7 @@
  */
 
 const os = require("os");
+const ip = require('ip').address();
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -24,9 +25,12 @@ const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 }); //
 process.traceDeprecation = false; // 跟踪弃用警告的调用栈,默认true
 process.noDeprecation = true; // 关闭弃用警告,默认true
 
+console.log('-------------------------dev happypack mode-------------------------');
+console.log(`-------------------------ip  ${ip}----------------------------------`);
+
 module.exports = {
-    mode: 'development', // 编译模式 compile mode
-    devtool: true ? 'cheap-module-eval-source-map' : 'hidden-source-map', // 错误跟踪工具
+    mode: 'development',
+    devtool: 'eval-source-map', // 错误跟踪工具
     stats: {  // 编译控制台打印配置
         colors: true, version: true 
     },
@@ -57,28 +61,37 @@ module.exports = {
     //     // 模块注释信息，默认为false,不应该使用到生产环境
     //     pathinfo: true
     // },
+    // devServer 模式所有代码运行在本地电脑内存中，不配置output也是可以的，开启服务后，打开的页面以及相关的一切文件，都是存储在缓存中的，用的不是生成的 dist 文件夹内的文件
     devServer:{
-        // open: true, // 启动后打开浏览器,默认为true
-        // contentBase: 告诉服务器从哪个目录中提供内容。只有在你想要提供静态文件时才需要,
-        // 若配置错误，是找不到资源文件的
+        // color（CLI only） console 中打印彩色日志
+        // progress（CLI only） 将编译进度输出到控制台。
+        // open: 启动后打开浏览器,默认为true
+        // open: true,
+        // inline: 实时刷新,当源文件改变时会自动刷新页面,默认为true
+        // inline: true,
+        // clientLogLevel: 当使用内联模式(inline mode)时，会在开发工具(DevTools)的控制台(console)显示消息，
+        // 例如：在重新加载之前，在一个错误之前，或者模块热替换(Hot Module Replacement)启用时。这可能显得很繁琐,So使用none
+        // clientLogLevel: 'none', 
+        // compress: 一切服务都启用gzip压缩(所有来自 './source/vendors' 目录的文件都做 gzip 压缩)
+        compress: true,
+        // port: 启动本地服务端口号, 配置要监听的端口, 默认端口8080
+        port: 8088,
+        // host: 指定一个host,默认是localhost。如果你希望服务器外部可以访问，指定如下：host: “0.0.0.0”。比如你用手机通过IP访问,也可设置为本机局域网IP
+        host: '0.0.0.0', // 配置host之后才可以使用本地ip打开localhost页面
+        // quiet: 是否关闭 console 编译控制台打印，默认为false, => true/世界一下子安静了
+        quiet: false,
+        // contentBase: 告诉服务器从哪个目录中提供内容。只有在你想要提供静态文件时才需要,若配置错误，则找不到资源文件
         // 默认情况下，将使用当前工作目录作为提供内容的目录，但是你可以修改为其他目录
         // 这个很重要，假如你的静态资源（图片多媒体）或者react公共包放在./source/vendors/目录下，
         // 如果你不配置到此，那么devServer启动可能会找不到这些依赖的静态资源文件或公共包，导致启动失败
         contentBase: path.resolve(__dirname,'./source/vendors/'),
-        // compress: 一切服务都启用gzip压缩(所有来自 './source/vendors' 目录的文件都做 gzip 压缩)
-        compress: true,
-        // port: 启动本地服务端口号
-        port: 8088,
-        // 配置host之后才可以使用本地ip打开localhost页面
-        host: '0.0.0.0',
+        // hot: 启用 Webpack 的模块热替换特性,和 react 的热替换搭配使用
         // 需要开启 plugins > new webpack.HotModuleReplacementPlugin()
-        quiet: false, // true关闭编译控制台打印，世界一下子安静了
-        // inline: true, // 实时刷新 设置为true，当源文件改变时会自动刷新页面,默认为true
-        // clientLogLevel: 当使用内联模式(inline mode)时，会在开发工具(DevTools)的控制台(console)显示消息，
-        // 例如：在重新加载之前，在一个错误之前，或者模块热替换(Hot Module Replacement)启用时。这可能显得很繁琐,So使用none
-        // clientLogLevel: 'none', 
-        historyApiFallback: true, // 不跳转
-        hot: true,
+        hot: true, 
+        // overlay: 在浏览页面输出报错信息
+        overlay: true,
+        // historyApiFallback任意的404响应都被替代为 index.html。启用该配置后，项目中任何找不到的链接都会被强制链接到 index.html 页面
+        historyApiFallback: true,
         // 接口代理
         proxy: {
             // 业务线接口升级到v4
@@ -125,7 +138,23 @@ module.exports = {
            
             {
                 test: /\.css$/,
-                // use: 'happypack/loader?id=css' || ['style-loader', 'css-loader'],
+                // use: 'happypack/loader?id=css' || ['style-loader', 'css-loader'] || 
+                // [
+                //     {
+                //         loader: 'style-loader'
+                //     },{
+                //     loader: 'css-loader'
+                //     },{
+                //     loader: 'postcss-loader',
+                //         options: {
+                //             sourceMap: true,
+                //             config: {
+                //                 path: 'postcss.config.js'
+                //             }
+                //         }
+                //     }
+                // ],
+
                 use: [
                     // MiniCssExtractPlugin.loader,
                     'happypack/loader?id=node_moudles_css'
@@ -174,7 +203,59 @@ module.exports = {
                 use:[
                     'file-loader'
                 ]
-            }
+            },
+            // 以下为新增的文件处理loader
+            {
+                // 文件依赖配置项——音频
+                test: /\.(wav|mp3|ogg)?$/,
+                use: [{
+                    loader: 'file-loader',
+                    // options: {
+                    //     limit: 8192, 
+                    //     name: 'audios/[name].[ext]?[hash:8]',
+                    //     publicPath:''
+                    // },
+                }],
+            },
+            {
+                // 文件依赖配置项——视频
+                test: /\.(ogg|mpeg4|webm)?$/,
+                use: [{
+                    loader: 'file-loader',
+                    // options: {
+                    //     limit: 8192, 
+                    //     name: 'videos/[name].[ext]?[hash:8]',
+                    //     publicPath:''
+                    // },
+                }],
+            },
+            {
+                test: /\.(png|jp?g|gif|svg)$/,
+                use: [
+                    {
+                        loader: 'url-loader',
+                        // options: {
+                        //     limit: 8192, // 小于8192字节的图片打包成base 64图片
+                        //     name:'images/[name].[hash:8].[ext]',
+                        //     publicPath:''
+                        // }
+                    }
+                ]
+            },
+            // 在html中引入文件
+            // webpack 本身是对 js 的处理工具，对其他文件处理能力很弱，所以要处理 html 文件中的图片，需要用到 html-loader
+            {
+                test:/\.(html|ejs)$/,
+                use:[
+                    {
+                        loader:"html-loader",
+                        options:{
+                            attrs:["img:src","img:data-src"] 
+                        }
+                    }
+                ]
+            },
+           
         ],
     },
     plugins: [
@@ -199,7 +280,7 @@ module.exports = {
         // 打开浏览器插件
         new OpenBrowserWebpackPlugin({
             browser: os.type()==='Darwin' ?'Google Chrome':'Chrome',
-            url: 'http://localhost:8088',
+            url: `http://${ip}:8088` || 'http://localhost:8088',
         }),
         // 热更新，不刷新页面异步更新,熱更新需要引入額外代碼在入口文件
         new webpack.HotModuleReplacementPlugin(),
@@ -215,15 +296,6 @@ module.exports = {
         //     path.resolve(__dirname, './')
         // ),
 
-        // 根据HappyPack线程id分配不同loader的线程资源：js 对应上文的 module.rules.use:happypack/loader?id=js
-        new HappyPack({
-            id: 'js'||'js_modules',
-            threads: 4,
-            // 指定使用哪个线程池
-            threadPool: HappyThreadPool,
-            loaders: ['babel-loader?cacheDirectory=true'],
-            verbose: false,
-        }),
 
         new HappyPack({
             id: 'node_moudles_css',
@@ -231,9 +303,31 @@ module.exports = {
             // 指定使用哪个线程池
             threadPool: HappyThreadPool,
             loaders: [
-                'style-loader', 
+                'style-loader',
                 'css-loader',
-                'postcss-loader'
+                // 'astroturf/css-loader',
+                // 'postcss-loader'
+                {
+                    loader: 'postcss-loader',
+                    options: {
+                        sourceMap: true,
+                        config: {
+                            path: 'postcss.config.js'
+                        }
+                    }
+                }
+            ],
+            verbose: false,
+        }),
+
+        // 根据HappyPack线程id分配不同loader的线程资源：js 对应上文的 module.rules.use:happypack/loader?id=js
+        new HappyPack({
+            id: 'js'||'js_modules',
+            threads: 4,
+            // 指定使用哪个线程池
+            threadPool: HappyThreadPool,
+            loaders: ['babel-loader?cacheDirectory=true',
+            // 'astroturf/loader' // 下载不了这个插件404
             ],
             verbose: false,
         }),
