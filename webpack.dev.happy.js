@@ -296,7 +296,6 @@ module.exports = {
         //     path.resolve(__dirname, './')
         // ),
 
-
         new HappyPack({
             id: 'node_moudles_css',
             threads: 4,
@@ -400,7 +399,20 @@ module.exports = {
             verbose: false,
             debug: false
         }),
+
+        // 配置jquery
+        // 但是这个也不是完美的方法，在网上确实看到一些文章说到，该方法对一些第三方库的插件的支持度不高，容易报错，
+        // 比如jquery-ui，而且如果配置了eslint，这种没有显性声明全局变量的方法，在eslint规则中是不严谨的，难以通过eslint 的语法校验
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery',
+            'window.jQuery': 'jquery',
+            'window.$': 'jquery',
+        }),
     ],
+    // externals: {
+    //     jquery: 'jQuery'// 不打包jQuery,jQuery对一些第三方库的打包效果并不理想，改为cdn引入后不需要再加入打包
+    // },
     // 文件解析配置
     resolve: {
         // 默认后缀名，配置后可省略

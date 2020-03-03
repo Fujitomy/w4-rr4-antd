@@ -1,5 +1,5 @@
 /**
- * @description Production dist config
+ * @description Production assets config
  * @author tomy
  * 
  * Antd 按需加载
@@ -68,145 +68,16 @@ module.exports = {
         // 通过 loader 创建的文件也不受影响。在这种情况下，你必须尝试 loader 特定的可用选项。
         filename: '[name].js',   // '[id].[hash:4].js'
         
-        // output 目录对应一个绝对路径，指定 bundle 文件输出路径
+        // output: 输出目录对应一个绝对路径，指定 bundle 文件输出路径
         path: path.resolve(__dirname,'./dist/build/'),
 
-        // 此选项决定了非入口(non-entry) chunk 文件的名称。配置方式和filename类似，在 optimization.splitChunks.cacheGroups.vender 中可以重命名
+        // chunkFilename: 非入口(non-entry) chunk 文件的名称。配置方式和filename类似，可以在 optimization.splitChunks.cacheGroups.vender 中重命名
         chunkFilename: "[name].[chunkhash:6]" || '[name].js' ||"[id].[chunkhash:6]", //"[name].[chunkhash:8].js"
 
         // 输出解析文件的目录，url 相对于 HTML 页面
         // publicPath 指定按需加载(on-demand-load)或加载外部资源(external resources)（如图片、文件等）路径，output.publicPath 是很重要的选项。如果指定了一个错误的值，则在加载这些资源时会收到 404 错误。
         publicPath: './build/', 
-
-        // publicPath: "https://cdn.example.com/assets/", // CDN（总是 HTTPS 协议）
-        // publicPath: "//cdn.example.com/assets/", // CDN (协议相同)
-        // publicPath: "/assets/", // 相对于服务(server-relative)
-        // publicPath: "assets/", // 相对于 HTML 页面
-        // publicPath: "../assets/", // 相对于 HTML 页面
-        // publicPath: "", // 相对于 HTML 页面（目录相同）
-
-        // 告诉 webpack 在 bundle 中引入「所包含模块信息」的相关注释。此选项默认值是 false，并且不应该用于生产环境(production)，但是对阅读开发环境(development)中的生成代码(generated code)极其有用。
-        pathinfo: true,
-
-        // 修改输出 bundle 中每行的前缀。 注意，默认情况下使用空字符串。使用一些缩进会看起来更美观，但是可能导致多行字符串中的问题。
-        // sourcePrefix:'\t',
-
-        // 暴露自定义js库的文件名 暴露 library 使其在各种用户环境(consumption)中可用
-        // library: 'xxxjs',
-        // 暴露 library 的方式 var(全局变量tomyjs),this(通过this访问this.tomyjs),window(window.tomyjs),UMD(require('tomyjs'))
-        // https://www.webpackjs.com/configuration/output/#通过在对象上赋值暴露
-        // libraryTarget: 'umd', 
-
-        // 此选项会向硬盘写入一个输出文件，只在 devtool 启用了 SourceMap 选项时才使用。 我们建议只使用 [file] 占位符，因为其他占位符在非 chunk 文件(non-chunk files)生成的 SourceMap 时不起作用。
-        // sourceMapFilename: "[file].map", 
     },
-    // 编译控制台打印配置
-    // stats: 'none',
-    // stats: {
-    //     // 未定义选项时，stats 选项的备用值（默认值）（优先级高于 webpack 本地默认值）
-    //     // all: undefined,
-
-    //     // 打印非入口文件的chunk编译信息
-    //     assets: true,
-
-    //     // 对资源按指定的字段进行排序
-    //     // 你可以使用 `!field` 来反转排序。
-    //     assetsSort: "field",
-
-    //     // 添加构建日期和构建时间信息
-    //     builtAt: true,
-
-    //     // 添加缓存（但未构建）模块的信息
-    //     cached: false,
-
-    //     // 显示缓存的资源（将其设置为 `false` 则仅显示输出的文件）
-    //     cachedAssets: false,
-
-    //     // 添加 children 信息
-    //     children: false,
-
-    //     // 添加 chunk 信息（设置为 `false` 能允许较少的冗长输出）
-    //     chunks: false,
-
-    //     // 将构建模块信息添加到 chunk 信息
-    //     chunkModules: false,
-
-    //     // 添加 chunk 和 chunk merge 来源的信息
-    //     chunkOrigins: false,
-
-    //     // 按指定的字段，对 chunk 进行排序
-    //     // 你可以使用 `!field` 来反转排序。默认是按照 `id` 排序。
-    //     chunksSort: "field",
-
-    //     // 用于缩短 request 的上下文目录
-    //     // context: "../src/",
-
-    //     // `webpack --colors` 等同于
-    //     colors: true,
-
-    //     // 显示每个模块到入口起点的距离(distance)
-    //     depth: false,
-
-    //     // 通过对应的 bundle 显示入口起点
-    //     entrypoints: true,
-
-    //     // 添加 --env information
-    //     env: false,
-
-    //     // 添加错误信息
-    //     errors: true,
-
-    //     // 添加错误的详细信息（就像解析日志一样）
-    //     errorDetails: true,
-
-    //     // 添加 compilation 的哈希值
-    //     hash: false,
-
-    //     // 设置要显示的模块的最大数量
-    //     maxModules: 15,
-
-    //     // 添加构建模块信息
-    //     modules: false,
-
-    //     // 你可以使用 `!field` 来反转排序。默认是按照 `id` 排序。
-    //     modulesSort: "field",
-
-    //     // 显示警告/错误的依赖和来源（从 webpack 2.5.0 开始）
-    //     moduleTrace: false,
-
-    //     // 当文件大小超过 `performance.maxAssetSize` 时显示性能提示
-    //     performance: false,
-
-    //     // 显示模块的导出
-    //     providedExports: true,
-
-    //     // 添加 public path 的信息
-    //     publicPath: false,
-
-    //     // 添加模块被引入的原因
-    //     reasons: false,
-
-    //     // 添加模块的源码
-    //     source: false,
-
-    //     // 添加时间信息
-    //     timings: true,
-
-    //     // 显示哪个模块导出被用到
-    //     usedExports: false,
-
-    //     // 添加 webpack 版本信息
-    //     version: false,
-
-    //     // 添加警告
-    //     warnings: true,
-
-    //     // 过滤警告显示（从 webpack 2.4.0 开始），
-    //     // 可以是 String, Regexp, 一个获取 warning 的函数
-    //     // 并返回一个布尔值或上述组合的数组。第一个匹配到的为胜(First match wins.)。
-    //     // warningsFilter: (warning) => { return false }
-    //     // "filter" // | /filter/ | ["filter", /filter/] | (warning) => ... return true|false
-    // },
     // --watch --info-verbosity verbose
     // 监听配置项
     // watchOptions:{
@@ -228,7 +99,7 @@ module.exports = {
     // 编译优化项，主要用于生产环境包请求，加载以及长效缓存优化
     optimization:{
         // minimize: true, // 告诉webpack使用其默认的压缩混淆插件 UglifyJs 混淆代码
-        // minimizer 允许用户使用其他最小化插件，覆盖webpack默认压缩混淆插件
+        // minimizer 允许用户自定义插件来优化配置，该配置会覆盖默认的配置，结合UglifyJsPlugin插件使用
         minimizer: [
             new UglifyJsPlugin({
                 cache: true,
@@ -294,8 +165,7 @@ module.exports = {
                 // }
             }
         },
-        // object string boolean 将optimization.runtimeChunk设置为true或“multiple”会为每个仅包含运行时的入口点添加一个额外的块。
-        // 默认值为false：为每个entry chunk嵌入运行时。
+        // 提取 webpack 运行时代码，默认值为false，设置为true或multiple会为每个仅包含运行时的入口点添加一个额外的块。
         runtimeChunk: false,
         // 取代 new webpack.NoEmitOnErrorsPlugin()，编译错误时不输出资源。 在编译时出现错误时，使用optimization.noEmitOnErrors跳过发射阶段。 这可确保不会发出错误资产。
         noEmitOnErrors: true,
@@ -339,6 +209,12 @@ module.exports = {
         // 无需单独设置 bool: false 告诉webpack生成具有相对路径的记录，以便能够移动上下文文件夹。
         portableRecords: false,
     },
+
+    // 加载器/loader
+    // Webpack的loader加载器机制用于处理非 JavaScript 文件，并将其转换为Webpack能够处理的有效模块。
+    // 即将JavaScript之外的其它类型文件，转换为 bundle 可以直接引用的模块
+    // 例如：将文件从TypeScript转换为JavaScript，或者把内联图片转换为data URL，甚至允许在JavaScript模块内引入CSS文件。
+    // Webpack配置文件中的 module 属性主要用于加载各种模块，可以通过其内嵌的 rules 属性指定加载某种类型文件时所需要使用到的 loader 加载器。
     module:{
         // 排除编译项   有些库是自成一体不依赖其他库的没有使用模块化的，比如jquey、momentjs、chart.js，要使用它们必须整体全部引入。 webpack是模块化打包工具完全没有必要去解析这些文件的依赖，因为它们都不依赖其它文件体积也很庞大，要忽略它们配置如下：
         noParse: /node_modules\/(moment\.js)/,
@@ -412,7 +288,9 @@ module.exports = {
             },
         ],
     },
-    // 编译插件
+    // plugin 如同上面(加载器loader)所描述的那样，loader用于转换某些类型的模块，而插件plugin得益于其丰富的接口，
+    // 可以用来处理加载器loader无法实现的更加丰富的任务，例如：打包优化与压缩、重新定义环境变量等等。
+    // Webpack的插件plugin本质是一个拥有 apply 属性的JavaScript对象，这个 apply 属性会被Webpack的 compiler 对象调用，而该对象可以在整个Webpack编译生命周期内进行访问。
     plugins: [
         // 引入dll（react，react-router之类的基础依赖库文件）
         new webpack.DllReferencePlugin({ 
@@ -594,38 +472,7 @@ module.exports = {
         // new StringReplacePlugin(),
         // 打包分析
         // new BundleAnalyzerPlugin(),
-    ],
-    // 文件解析配置
-    resolve: {
-        // 默认后缀名，配置后可省略
-        extensions: ['.js', '.jsx','.es6'],
-        // 指定模块查找目录，import 'redux'这样不是相对也不是绝对路径的写法时会去node_modules目录下找。但是默认的配置会采用向上递归搜索的方式去寻找node_modules
-        modules: [ path.resolve(__dirname, 'node_modules') ],
-        // 文件夹别名配置
-        alias: {
-            // 配置缩写路径 应用如下 @/components/App.jsx
-            '@': path.resolve('source'),
-            // 旧写法需要单独配置多个
-            // components: path.resolve(__dirname, './source/components'),
-            // $缩小查询范围，提升查询速度
-            // react$: path.resolve(__dirname, 'react'),
-            // 减少递归查询 发布到npm的库大多数都包含两个目录，一个是放着cmd模块化的lib目录，一个是把所有文件合成一个文件的dist目录，多数的入口文件是指向lib里面下的。 默认情况下webpack会去读lib目录下的入口文件再去递归加载其它依赖的文件这个过程很耗时，alias配置可以让webpack直接使用dist目录的整体文件减少文件递归解析。配置如下：
-            // 'react': 'react/dist/react.js',
-            // 防止antdicon全量打包临时方案 https://github.com/ant-design/ant-design/issues/12011
-            // '@antd/icons/lib/dist$': path.resolve(__dirname, './source/icons.js'),
-        },
-    },
-    // 排除打包配置，如果单独引入了lodash或者jquery这样的库，则没必要在业务代码中作为依赖打包，externals用于排除配置
-    // externals: {
-    //     lodash: {
-    //       commonjs: 'lodash', // commonjs中通过访问方式require('lodash')
-    //       commonjs2: 'lodash',
-    //       amd: 'lodash',
-    //       root: '_' // 在全局变量中通过 _ 比如 _.indexOf 访问 lodash
-    //     }
-    // },
-    // 引入意义？？？
-    // dependencies: ["vendor.dll.92e3e6cb242f782bd03e.js"],
+    ]
 };
 
 

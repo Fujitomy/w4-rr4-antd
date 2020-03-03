@@ -8,8 +8,9 @@
 {
  `
  `optimization.splitChunks `
- * 最初，chunks(以及其在內部通過import导入的模块)，它们通过webpack graph中的父子关系进行连接
- * 从webpack v4起，删除了CommonsChunkPlugin，转而使用optimization.splitChunks 
+ * 最初，块（及其内部导入的模块）是通过内部Webpack图形中的父子关系连接的。 
+ * CommonsChunkPlugin用于避免它们之间重复的依赖关系，但是无法进行进一步的优化。
+ * webpack v4+，删除了CommonsChunkPlugin，转而使用optimization.splitChunks 
  *
  * 默认情况下
  * 开箱即用的SplitChunksPlugin(默认配置)能够满足大多数用户的需求
