@@ -24,7 +24,8 @@ const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const OpenBrowserWebpackPlugin = require('open-browser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin'); 
+const TerserPlugin = require('terser-webpack-plugin'); // webpack v4.26.0+开始，官方弃用uglyjs转为使用terserjs作为最小化js库，terser-webpack-plugin，是一个使用terserjs的插件
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
@@ -67,11 +68,11 @@ module.exports = {
     output: {
         // filename: 决定了每个输出 bundle 的名称。这些 bundle 将写入到 output.path 选项指定的目录下。
         // 注意，此选项不会影响那些「按需加载 chunk」的输出文件，filename 基本上都是入口文件和基础依赖文件 // ??? 通过 loader 创建的文件也不受影响。在这种情况下，你必须尝试 loader 特定的可用选项。
-        filename: '[name].[chunkhash:6].js',   // '[id].[hash:4].js'
+        filename:'[name].[contenthash].js' ||'[name].[chunkhash:6].js',   // '[id].[hash:4].js'
 
         // chunkFilename: 非入口chunk文件的文件名。通过 loader 创建的文件也不受影响。在这种情况下，你必须尝试 loader 特定的可用选项。
         // 配置方式和filename类似，在 optimization.splitChunks.cacheGroups.vender 中可以重命名
-        chunkFilename: "[name].[chunkhash:6]" || '[name].js' ||"[id].[chunkhash:6]",  // "[name].[chunkhash:8].js"
+        // chunkFilename: "[name].[chunkhash:6]" || '[name].js' ||"[id].[chunkhash:6]",  // "[name].[chunkhash:8].js"
 
         // output 目录对应一个绝对路径，指定 bundle 文件输出路径
         path: path.resolve(__dirname,'./dist/build/'),
@@ -117,23 +118,39 @@ module.exports = {
     // 编译优化项，主要用于生产环境包请求，加载以及长效缓存优化
     optimization:{
         // minimize: 告知 webpack 使用 TerserPlugin(UglifyJs为默认混淆插件) 压缩 bundle。production 模式下，这里默认是 true。
+        // v4.26.0+webpack官方默认压缩混淆js已经切换为terser，不再使用uglify了，转而使用其继续维护的分支terser
         // minimize: true,
-        // minimizer 允许用户使用其他最小化插件，覆盖webpack默认压缩混淆插件
+        // minimizer: 允许用户使用一个或多个最小化插件，覆盖webpack默认的压缩混淆插件，v4.26.0+官方推荐terser-webpack-plugin
         minimizer: [
-            new UglifyJsPlugin({
-                cache: true,
-                parallel: true,
-                sourceMap: false // set to true if you want JS source maps
+            // v4.26.0起已被webpack官方弃用，原因是 uglifyjs-webpack-plugin 使用的 uglify-es 已经不再被维护，取而代之的是一个名为 terser 的分支。
+            // new UglifyJsPlugin({
+            //     cache: true,
+            //     parallel: true,
+            //     sourceMap: false // set to true if you want JS source maps
+            // }),
+            // 最小化插件
+            new TerserPlugin({
+                cache: true, // 开启缓存
+                parallel: true, // 开启多线程
+                sourceMap: false, // set to true if you want JS source maps
+                terserOptions: {
+                    output: {
+                        // 提取所有法律注释（比如/^\**!|@preserve|@license|@cc_on/i），/@license/i 用于保留法律注释
+                        // https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions
+                        comments: /@license/i,
+                    },
+                },
             }),
             new OptimizeCssAssetsPlugin({})
         ],
 
         // splitChunks: 对于动态导入模块，默认使用 webpack v4+ 提供的全新的通用分块策略(common chunk strategy)。
-        // 深入理解 Webpack 打包分块 https://juejin.im/post/5cdfb48fe51d4510ac6721b7
-        // https://www.cnblogs.com/wmhuang/p/8967639.html webpack4：连奏中的进化
+        // 深入理解 Webpack 打包分块 (上) https://juejin.im/post/5cdfb48fe51d4510ac6721b7
+        // 深入理解 Webpack 打包分块 (下) https://juejin.im/post/5cdfb5abf265da1b7c60e7b7
+        // webpack4：连奏中的进化 https://www.cnblogs.com/wmhuang/p/8967639.html 
         // webpack 4 Code Splitting 的 splitChunks 配置探索： https://imweb.io/topic/5b66dd601402769b60847149
         splitChunks: {
-            chunks: 'all', // 只对入口文件处理
+            chunks: 'all', // 默认只作用于异步模块，all 时对所有模块生效，initial 对同步模块有效
             minSize: 30000, // 模块大于30k会被抽离到公共模块
             maxSize: 500000, // 超过指定的大小就抽离成更小的模块
             minChunks: 1, // 模块出现1次就会被抽离到公共（共享）模块
@@ -149,6 +166,17 @@ module.exports = {
             //   return cacheGroupKey; 
             // },
             cacheGroups: {
+                // cacheGroups里默认自带vendors配置来分离node_modules里的类库模块，它的默认配置如下
+                // vendors: {
+                //     test: /[\\/]node_modules[\\/]/,
+                //     priority: -10
+                // },
+                // 如果你不配置缓存组，则webpack将帮你生成名为vendors的入口chunks
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    chunks: 'initial',
+                    name: 'rename-entry-vendors',
+                },
                 commons: {
                     name: 'vendor-page', // 要缓存的 分隔出来的 chunk 名称 ???
                     test: /[\\/]node_modules[\\/]/,
@@ -186,9 +214,23 @@ module.exports = {
                 // }
             }
         },
+        // runtimeChunk: 设置为 true 或 "multiple"，会为每个仅含有 runtime 的入口起点添加一个额外 chunk
+        // 假设入口模块为app.js，app内动态引入了 const C = () =>import('./c.js')
+        // 打包后生成了  c.01e47fe5.js(按需加载chunk)  app.xxx.js  runtime.xxx.js
+        // runtime.xxx.js内包含的是c.01e47fe5.js的内容hash:01e47fe5
+        // 当更改app的时候runtime与（被分出的动态加载的代码）c.01e47fe5.js的名称(hash)不会改变，app的名称(hash)会改变。
+        // 当更改c.js，app的名称(hash)不会改变，runtime与 (动态加载的代码) 0.01e47fe5.js的名称(hash)会改变
+        // 简而言之，runtimeChunk是一个用于优化持久化缓存分包策略的配置，使得每次编译变更变得更小
+        // runtimeChunk: false,// 关闭按需加载分包优化策略
         runtimeChunk: {
-            name: 'manifest'
+            name: 'runtime-chunks'//'manifest'
+            // name: entrypoint => `runtimechunk~${entrypoint.name}.js`
         },
+        
+        // // runtimeChunk: "single" 等价于下面的语法
+        // runtimeChunk: {
+        //     name: "manifest"
+        // }
 
         // // object string boolean 将optimization.runtimeChunk设置为true或“multiple”会为每个仅包含运行时的入口点添加一个额外的块。
         // // 默认值为false：为每个entry chunk嵌入运行时。
