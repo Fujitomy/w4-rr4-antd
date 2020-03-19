@@ -13,6 +13,9 @@
  * 抽离css
  * http://wangwl.net/static/pages/npm_minicssextractplugin.html
  * 
+ * 关于import()动态引入打包的配置https://babeljs.io/docs/en/babel-plugin-syntax-dynamic-import/
+ * 
+ * code split cache https://webpack.js.org/guides/caching/
  */
 
 const os = require("os");
