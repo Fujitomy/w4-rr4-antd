@@ -10,7 +10,6 @@ import { BrowserRouter, HashRouter, Link,Route } from 'react-router-dom';
 import Loading from '@/components/Loading';
 import ErrBoundary from './ErrBoundary.jsx';
 import './App.less';
-import AwesomeSwiper from 'react-awesome-swiper';
 import { DatePicker,Select,Button,From,message,Cascader } from 'antd';
 // import 'braft-editor/dist/index.css';
 // import BraftEditor from 'braft-editor';
@@ -180,44 +179,12 @@ function generateCitys(data){
     return { provinces, cities }
 }
 
-const config = {
-  direction:'vertical',
-  loop : true,
-  autoplay: {
-    delay: 3000,
-    stopOnLastSlide: false,
-    disableOnInteraction: true,
-  },
-  // Disable preloading of all images
-  preloadImages: false,
-  // Enable lazy loading
-  lazy: true,
-  speed: 500,
-  navigation: {
-    nextEl: '.swiper-button-next',
-    prevEl: '.swiper-button-prev',
-  },
-  pagination: {
-    el: '.swiper-pagination',
-    bulletElement : 'li',
-    hideOnClick :true,
-    clickable :true,
-  },
-  on: {
-    slideChange: function () {
-      console.log(this.activeIndex);
-    },
-  },
-};
 class App extends React.Component {
     constructor(props){
         super(props)
         this.state =  {}
     }
     componentDidMount(){
-
-    }
-    componentDidMounts(){
         // 创建地图
         const map = new AMap.Map('container', {
             zoom: 4,
@@ -538,29 +505,11 @@ class App extends React.Component {
         const { } = this.state;
         return (
             <HashRouter basename='manage' >
-                {/* <main className='main' ref={this.main}>
+                <main className='main' ref={this.main}>
                     <aside style={{overflowY:'scroll'}}>
                       <div id="container" style={{height:'100vh',width:'100%'}}></div>
                     </aside>
-                </main> */}
-                <main className='flex-pagesa'>
-                  <aside className='item'>top bar</aside>
-                  <aside className='item'>
-                    
-                  <AwesomeSwiper ref={ref => (this.swiperRef = ref)} config={config} className="your-classname">
-                  <div className="swiper-wrapper">
-                    <div className="swiper-slide">slider1</div>
-                    <div className="swiper-slide">slider2</div>
-                    <div className="swiper-slide">slider3</div>
-                  </div>
-                  <div className="swiper-button-prev"></div>
-                  <div className="swiper-button-next"></div>
-                  <div className="swiper-pagination"></div>
-                </AwesomeSwiper>
-                  </aside>
-                  <aside className='item'>bottom bar</aside>
                 </main>
-               
             </HashRouter>
         )
     }

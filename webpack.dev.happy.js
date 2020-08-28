@@ -154,7 +154,6 @@ module.exports = {
                 //         }
                 //     }
                 // ],
-
                 use: [
                     // MiniCssExtractPlugin.loader,
                     'happypack/loader?id=node_moudles_css'

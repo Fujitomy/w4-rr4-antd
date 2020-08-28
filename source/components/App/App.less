@@ -8,6 +8,36 @@
     html{ font-size:16px; }
 }
 
+
+.flex-page {
+  height: 100vh;
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+  .item {
+    width: 100%;
+    word-wrap: break-word;
+    &:first-child,&:last-child {
+      position: fixed;
+      height: 80px;
+      background: rgba(0,0,0,.3);
+      color: #fff;
+    }
+    &:first-child {
+      top: 0;
+    }
+    &:last-child {
+      bottom: 0;
+    }
+    &:nth-child(2){
+      color:#000;
+      margin: 80px auto;
+      background: darkorange;
+      // max-height: calc(100% - 160px);
+    }
+  }
+}
+
 .pager {
     background: #333;
     header {

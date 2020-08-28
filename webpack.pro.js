@@ -594,7 +594,7 @@ module.exports = {
         // Antd icon 本地化
         // new StringReplacePlugin(),
         // 打包分析
-        // new BundleAnalyzerPlugin(),
+         new BundleAnalyzerPlugin(),
     ],
     // 文件解析配置
     resolve: {
