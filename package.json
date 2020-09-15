@@ -4,6 +4,7 @@
   "description": "wepack4-react-router4-antd",
   "main": "index.js",
   "scripts": {
+    "dlls": "webpack --config webpack.dll.js --env.NODE_ENV=pro",
     "dll": "webpack --config webpack.dll.js --env.NODE_ENV=pro",
     "dll:dev": "webpack --progress --config webpack.dll.js --env.NODE_ENV=dev",
     "dev": "webpack-dev-server --hotOnly --color --watch --config webpack.dev.happy.js",
@@ -91,6 +92,7 @@
     "os": "^0.1.1",
     "postcss-loader": "^3.0.0",
     "postcss-preset-env": "^6.6.0",
+    "react-dev-utils": "^10.2.1",
     "readable-stream": "^3.6.0",
     "resolve-from": "^4.0.0",
     "sass-loader": "^7.1.0",

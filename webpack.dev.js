@@ -18,6 +18,8 @@ process.noDeprecation = false;
 
 module.exports = {
     mode: 'development',
+    // 编译遇到错误是否停止编译 // https://segmentfault.com/a/1190000007915447 返回编译状态码1是错误，如果设置为true
+    bail: false,
     // 调试工具，错误打印等级，eval-source-map
     devtool: "source-map",
     // w4之后独立出来，在配置文件中，配置才能生效，以前直接在packjson中配置也行
@@ -45,7 +47,11 @@ module.exports = {
         // 告诉服务器从哪个目录中提供内容。只有在你想要提供静态文件时才需要,
         // 若配置错误，是找不到资源文件的
         // 默认情况下，将使用当前工作目录作为提供内容的目录，但是你可以修改为其他目录
-        contentBase: path.resolve(__dirname,'./source/vendors'),
+        // 简单的说，在 Node.js 中使用 fs 读取文件的时候，
+        // 经常碰到要拼一个文件的绝对路径的问题 (fs 处理相对路径均以进程执行目录为准)
+        // 比如使用path.resolve(__dirname,'./source/vendors')拼一个绝对路径
+        // 使用 require.resolve 可以简化这一过程
+        contentBase: require.resolve('./source/vendors') || path.resolve(__dirname,'./source/vendors'),
         // 一切服务都启用gzip压缩(所有来自 './source/vendors' 目录的文件都做 gzip 压缩)
         compress: true,
         // 启动本地服务端口号
@@ -69,7 +75,7 @@ module.exports = {
         // 文件夹别名配置
         alias: {
             components: path.resolve(__dirname, './source/components'),
-            pages: path.resolve(__dirname, './source/pages'),
+            pages:  path.resolve(process.cwd(), 'src') || path.resolve(__dirname, './source/pages'),
             // commonjsx: path.resolve(__dirname, '../src/commonjsx'),
             // common: path.resolve(__dirname, '../src/assets/common'),
             // actions: path.resolve(__dirname, '../src/redux/actions')
@@ -101,7 +107,7 @@ module.exports = {
             './source/vendors/index.*.map',
         ],
         {
-            // webpack文件夹的绝对路径,Default: root of your package
+            // webpack文件夹的绝对路径,Default: root of your package // 当前工作目录
             root: __dirname, 
             verbose: true,
             // 删除排除选项，无法排除指定正则文件格式,so,要排除从第一个参数吧

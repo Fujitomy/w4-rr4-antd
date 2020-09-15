@@ -108,7 +108,7 @@ const datamap = [
         name:'广州',
         count: 76,
         cityType: 0,
-        cityId: '',
+        cityId: '1',
     },
     {
         lnglat: ["110.154393", "22.63136"],

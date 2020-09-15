@@ -19,14 +19,52 @@ const dllchunkname = manifest.name.split('_')[3];
 const devMode = process.argv.indexOf('--mode=development') > -1;
 const HappyPack = require('happypack');
 const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 }); // 开启多线程，线程数量等于最大线程减4，几乎全开
-
+const clearConsole = require('react-dev-utils/clearConsole');
 // console.log(dllchunkname,'dllchunkname');
-
+const isInteractive = process.stdout.isTTY; // 是否交互式终端 // 监听终端的输入输出流，并执行相应的逻辑
 process.traceDeprecation = false; // 跟踪弃用警告的调用栈,默认true
 process.noDeprecation = true; // 关闭弃用警告,默认true
 
 console.log('-------------------------dev happypack mode-------------------------');
 console.log(`-------------------------ip  ${ip}----------------------------------`);
+console.log(process.stdout.isTTY,'----------------process.stdout.isTTY');
+
+// 命令行界面 (CLI) = 使用文本命令进行交互的用户界面
+// console系统控制台，包含内置api,一种特殊的终端
+// 终端 (Terminal) = TTY = 文本输入/输出环境，可读写的交互式输入出入（早期原型是Unix报文机设备）环境
+// Shell = 命令行解释器，执行用户输入的命令并返回结果，可以看做shell执行终端的输入来调用系统内核与软硬件交互，然后执行输出给终端
+
+// ['SIGINT', 'SIGTERM'].forEach(function(sig) {
+//   process.on(sig, function(e) {
+//     console.log(e,'get current sigint')
+//     // devServer.close();
+//     process.exitCode = 324;
+//     process.exit(3);
+//   });
+// });
+
+// process.stdin.on('end', function() {
+//   process.stdout.write('end');
+// });
+
+// function gets(cb){
+//   process.stdin.setEncoding('utf8');
+//   //输入进入流模式（flowing-mode，默认关闭，需用resume开启），注意开启后将无法read到数据
+//   //见 https://github.com/nodejs/node-v0.x-archive/issues/5813
+//   process.stdin.resume();
+//   process.stdin.on('data', function(chunk) {
+//       console.log('start!');
+//       //去掉下一行可一直监听输入，即保持标准输入流为开启模式
+//       // process.stdin.pause();
+//       cb(chunk);
+//   });
+//   console.log('试着在键盘敲几个字然后按回车吧');
+// }
+
+// gets(function(reuslt){
+//   console.log("["+reuslt+"]");
+//   //process.stdin.emit('end'); //触发end事件
+// });
 
 module.exports = {
     mode: 'development',
@@ -438,5 +476,15 @@ module.exports = {
  * 
  * core-js warning solve method
  * https://blog.csdn.net/kai_vin/article/details/88700181
+ * 
+ * 命令行界面 (CLI)、终端 (Terminal)、Shell、TTY的区别 - 通俗易懂
+ * https://www.cnblogs.com/sddai/p/9769086.html
+ * 
+ * tty演变史，从证券报文机硬件到虚拟终端的演变
+ * https://www.cnblogs.com/liqiuhao/p/9031803.html
+ * https://www.cnblogs.com/sparkdev/p/11460821.html
+ * https://segmentfault.com/a/1190000009082089 比较晦涩
+ * https://stackoverflow.com/questions/15466383/how-to-detect-if-a-node-js-script-is-running-through-a-shell-pipe
+ * https://unix.stackexchange.com/questions/4126/what-is-the-exact-difference-between-a-terminal-a-shell-a-tty-and-a-con
  * 
  */

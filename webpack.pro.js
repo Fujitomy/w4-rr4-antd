@@ -16,6 +16,9 @@
  * 关于import()动态引入打包的配置https://babeljs.io/docs/en/babel-plugin-syntax-dynamic-import/
  * 
  * code split cache https://webpack.js.org/guides/caching/
+ * 
+ * webpack 核心编译流程钩子
+ * https://www.jianshu.com/p/273e1c9904d2
  */
 
 const os = require("os");
@@ -45,12 +48,14 @@ process.traceDeprecation = true; // 是否打印调用栈
 process.noDeprecation = true; // 是否关闭弃用警告
 
 console.log('-------------------------production mode-------------------------');
-
+// https://github.com/jawil/blog/issues/18
 // webpack的三种chunk类型 entry chunk, children chunk , common chunk
 
 module.exports = {
     // production生产模式，默认加入 tree shaking
     mode: 'production',
+    // 编译错误是否退出编译，并返回错误码
+    bail: true,
     // devtool: 调试工具，浏览器console控制台错误打印配置
     devtool: 'cheap-module-source-map',
     // watch: true 启用 Watch 模式。这意味着在初始构建之后，webpack 将继续监听任何已解析文件的更改。默认false/关闭。
