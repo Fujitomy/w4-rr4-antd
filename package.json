@@ -30,7 +30,7 @@
     "@babel/runtime": "^7.3.1",
     "@babel/runtime-corejs2": "^7.4.2",
     "antd": "^3.13.0",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "babel-polyfill": "^6.26.0",
     "braft-editor": "^2.3.8",
     "core-js": "^2.6.11",
